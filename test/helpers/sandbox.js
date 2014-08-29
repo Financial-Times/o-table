@@ -1,7 +1,8 @@
-/*global exports*/
+/*global export*/
 "use strict";
 var sandboxEl;
 
+function init() {
     if (document.querySelector('.sandbox')) {
         sandboxEl = document.querySelector('.sandbox');
     } else {
