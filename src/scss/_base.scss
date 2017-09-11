@@ -23,6 +23,30 @@
 		@include oColorsFor(o-table-header, color);
 	}
 
+	&[data-o-table--js] thead th {
+		cursor: pointer;
+		user-select: none; // add vendor prefixes
+		&:after {
+			content: '';
+			visibility: hidden;
+			@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+			vertical-align: middle;
+		}
+		&[aria-sort='descending'] {
+			&:after {
+				@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+			}
+		}
+		&:hover,
+		&[aria-sort='ascending'],
+		&[aria-sort='descending'] {
+			&:after {
+				vertical-align: middle;
+				visibility: visible;
+			}
+		}
+	}
+
 	td {
 		@include oTypographySans(1);
 		@include oColorsFor(o-table-data, color);
