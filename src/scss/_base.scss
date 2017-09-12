@@ -26,25 +26,25 @@
 	&[data-o-table--js] thead th {
 		cursor: pointer;
 		user-select: none; // add vendor prefixes
-		padding-right: 30px;
+		padding-right: 20px;
 		&:after {
 			content: '';
-			visibility: hidden;
-			@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+			@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+			margin-right: -20px;
 			vertical-align: middle;
-			margin-right: -30px;
 		}
 		&[aria-sort='descending'] {
 			&:after {
 				@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+				vertical-align: middle;
 			}
 		}
-		&:hover,
-		&[aria-sort='ascending'],
-		&[aria-sort='descending'] {
+		&[aria-sort='none']:hover,
+		&:not([aria-sort]):hover,
+		&[aria-sort='ascending'] {
 			&:after {
+				@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 				vertical-align: middle;
-				visibility: visible;
 			}
 		}
 	}
@@ -59,10 +59,6 @@
 		padding: 8px;
 		text-align: left;
 		vertical-align: top;
-	}
-
-	&[data-o-table--js] td {
-		padding-right: 30px;
 	}
 
 	th:not([scope=row]) {
