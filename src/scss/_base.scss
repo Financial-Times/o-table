@@ -26,11 +26,13 @@
 	&[data-o-table--js] thead th {
 		cursor: pointer;
 		user-select: none; // add vendor prefixes
+		padding-right: 30px;
 		&:after {
 			content: '';
 			visibility: hidden;
 			@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 			vertical-align: middle;
+			margin-right: -30px;
 		}
 		&[aria-sort='descending'] {
 			&:after {
@@ -57,6 +59,10 @@
 		padding: 8px;
 		text-align: left;
 		vertical-align: top;
+	}
+
+	&[data-o-table--js] td {
+		padding-right: 30px;
 	}
 
 	th:not([scope=row]) {

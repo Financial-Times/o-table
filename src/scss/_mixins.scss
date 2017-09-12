@@ -30,21 +30,6 @@
 			@include oTableCellNumeric;
 		}
 
-		&[data-o-table--js] thead th.#{$classname}__cell--numeric {
-			padding-left: 20px;
-			&:after {
-				display: none;
-			}
-			&:hover,
-			&[aria-sort='ascending'],
-			&[aria-sort='descending'] {
-				padding-left: 0;
-				&:after {
-					display: inline-block;
-				}
-			}
-		}
-
 		.#{$classname}__cell--content-secondary {
 			@include oTableCellContentSecondary;
 		}
