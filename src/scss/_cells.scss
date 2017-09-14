@@ -11,4 +11,5 @@
 /// Makes content block and a smaller font size for secondary text in a table cell.
 @mixin oTableCellContentSecondary {
 	@include oTypographySans(0);
+	font-weight: normal;
 }
