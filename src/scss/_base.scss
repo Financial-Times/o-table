@@ -25,20 +25,22 @@
 
 	&[data-o-table--js] thead th {
 		cursor: pointer;
-		user-select: none; // add vendor prefixes
+		user-select: none;
 		padding-right: 20px;
 		&:after {
 			content: '';
-			@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 			margin-right: -20px;
+			@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 			vertical-align: middle;
 		}
+		// Show descending icon with DSC sort applied.
 		&[aria-sort='descending'] {
 			&:after {
 				@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 				vertical-align: middle;
 			}
 		}
+		// Show ascending icon with ASC sort applied or on hover with no sort.
 		&[aria-sort='none']:hover,
 		&:not([aria-sort]):hover,
 		&[aria-sort='ascending'] {
