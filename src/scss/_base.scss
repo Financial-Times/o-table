@@ -31,13 +31,13 @@
 			content: '';
 			margin-right: -20px;
 			@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
-			vertical-align: middle;
+			vertical-align: top;
 		}
 		// Show descending icon with DSC sort applied.
 		&[aria-sort='descending'] {
 			&:after {
 				@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
-				vertical-align: middle;
+				vertical-align: top;
 			}
 		}
 		// Show ascending icon with ASC sort applied or on hover with no sort.
@@ -46,7 +46,7 @@
 		&[aria-sort='ascending'] {
 			&:after {
 				@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
-				vertical-align: middle;
+				vertical-align: top;
 			}
 		}
 	}
