@@ -19,15 +19,18 @@ function OTable(rootEl) {
 	if (this.rootEl !== undefined) {
 		this.listeners = [];
 		this.isResponsive = false;
-		this.rootEl.setAttribute('data-o-table--js', '');
+		this.rootEl.setAttribute('data-o-table-js', '');
 
-		this.tableHeaders = Array.from(this.rootEl.querySelectorAll('thead th'));
 		const tableRows = Array.from(this.rootEl.getElementsByTagName('tr'));
 
+		// Get tables headers from the last header row (not headers of headers).
+		this.tableHeaders = Array.from(this.rootEl.querySelectorAll('thead tr:last-of-type th'));
+		// Sort is only supported where each header maps to a single column.
 		this.tableHeaders.forEach((th, columnIndex) => {
 			const listener = this._sortByColumn(columnIndex);
 			this.listeners.push(listener);
 			th.addEventListener('click', listener);
+			th.classList.add('o-table__sortable-header');
 		});
 
 		// "o-table--responsive-flat" configuration only works when there is a
@@ -191,7 +194,7 @@ OTable.prototype.destroy = function() {
 		clearTimeout(this._timeoutID);
 		this._timeoutID = undefined;
 	}
-	this.rootEl.removeAttribute('data-o-table--js');
+	this.rootEl.removeAttribute('data-o-table-js');
 	this.removeEventListeners();
 	delete this.rootEl;
 };
