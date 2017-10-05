@@ -25,13 +25,16 @@ function OTable(rootEl) {
 
 		// Get tables headers from the last header row (not headers of headers).
 		this.tableHeaders = Array.from(this.rootEl.querySelectorAll('thead tr:last-of-type th'));
+		const firstDataRow = this.rootEl.querySelectorAll('tbody tr:first-of-type td');
 		// Sort is only supported where each header maps to a single column.
-		this.tableHeaders.forEach((th, columnIndex) => {
-			const listener = this._sortByColumn(columnIndex);
-			this.listeners.push(listener);
-			th.addEventListener('click', listener);
-			th.classList.add('o-table__sortable-header');
-		});
+		if (firstDataRow.length == this.tableHeaders.length) {
+			this.tableHeaders.forEach((th, columnIndex) => {
+				const listener = this._sortByColumn(columnIndex);
+				this.listeners.push(listener);
+				th.addEventListener('click', listener);
+				th.classList.add('o-table__sortable-header');
+			});
+		}
 
 		// "o-table--responsive-flat" configuration only works when there is a
 		// `<thead>` block containing the table headers. If there are no headers

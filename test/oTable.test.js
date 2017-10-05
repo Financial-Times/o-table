@@ -158,7 +158,7 @@ describe('An oTable instance', () => {
 
 	it('sets a data attribute on the root element of the component to indicate the JS has executed', () => {
 		testOTable = new OTable(oTableEl);
-		proclaim.isTrue(oTableEl.hasAttribute('data-o-table--js'));
+		proclaim.isTrue(oTableEl.hasAttribute('data-o-table-js'));
 	});
 
 	it('has an `isResponsive` property set to `false`', () => {
@@ -266,7 +266,7 @@ describe('Init', () => {
 		const oTables = OTable.init();
 		const tables = oTables.map(oTable => oTable.rootEl);
 		tables.forEach(table => {
-			proclaim.isTrue(table.hasAttribute('data-o-table--js'));
+			proclaim.isTrue(table.hasAttribute('data-o-table-js'));
 		});
 	});
 });
@@ -341,6 +341,6 @@ describe('Destroying an oTable instance', () => {
 	it('when destroyed, removes the data attribute which was added during JS initialisation', () => {
 		testOTable = new OTable(oTableEl);
 		testOTable.destroy();
-		proclaim.isFalse(oTableEl.hasAttribute('data-o-table--js'));
+		proclaim.isFalse(oTableEl.hasAttribute('data-o-table-js'));
 	});
 });
