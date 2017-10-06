@@ -24,18 +24,22 @@ Add an `o-table` class to any table you wish to apply the styles to:
 </table>
 ```
 
-Where a `td` contains numeric data, or a `th` is for cells containing numeric data, also add the class `.o-table__cell--numeric` and a `data-o-table-data-type="numeric"` attribute (the latter allows the column to be sorted correctly):
+Where a `td` contains numeric data, or a `th` is for cells containing numeric data, you may also add the class `.o-table__cell--numeric`. Additionally add the `data-o-table-data-type="numeric"` attribute to the `th` to allow the column to be sorted numerically:
 
 ```html
 <table class="o-table">
-	<tr>
-		<th>Index</th>
-		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
-	</tr>
-	<tr>
-		<td>FTSE 100</td>
-		<td data-o-table-data-type="numeric" class="o-table__cell--numeric">6685.52</td>
-	</tr>
+	<thead>
+		<tr>
+			<th>Index</th>
+			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>FTSE 100</td>
+			<td data-o-table-data-type="numeric" class="o-table__cell--numeric">6685.52</td>
+		</tr>
+	</tbody>
 	...
 </table>
 ```
@@ -52,7 +56,7 @@ Where table headings (`th`) are used as row headings, `scope="row"` attributes m
 </table>
 ```
 
-When they're are not present, browsers will implicitly wrap table contents in `tbody` tags, including the header row. It is therefore advisable (and when row-stripes are required, essential) to use `thead`, `tbody` (and if appropriate, `tfoot`) tags in your markup:
+`thead` and `tbody` tags should be used in your markup and where appropriate `tfoot` should also be used. Each of these elements must contain `tr` children to wrap any `td` or `th` element:
 
 ```html
 <table class="o-table">
@@ -62,6 +66,11 @@ When they're are not present, browsers will implicitly wrap table contents in `t
 			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
 		</tr>
 	</thead>
+	<tfoot>
+		<tr>
+			<td colspan="2">footer content</td>
+		</tr>
+	</tfoot>
 	<tbody>
 		<tr>
 			<td>FTSE 100</td>
@@ -195,7 +204,7 @@ const OTable = require('o-table');
 oTable = new OTable(document.body);
 ```
 
-Sorting numbers works if the column has been declared as a numeric column via `data-o-table-data-type="numeric" class="o-table__cell--numeric"`.
+Sorting numbers works if the column has been declared as a numeric column via `data-o-table-data-type="numeric"`.
 
 ##### Sorting declaratively
 If you are wanting to sort by a custom pattern, you can apply the sorting values to each row as a data attribute:
@@ -204,7 +213,9 @@ If you are wanting to sort by a custom pattern, you can apply the sorting values
 ``` html
 <table class="o-table" data-o-component="o-table">
 	<thead>
-		<th>Things</th>
+		<tr>
+			<th>Things</th>
+		</tr>
 	</thead>
 	<tbody>
 		<tr>
