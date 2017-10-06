@@ -27,7 +27,7 @@ function OTable(rootEl) {
 		this.tableHeaders = Array.from(this.rootEl.querySelectorAll('thead tr:last-of-type th'));
 		const firstDataRow = this.rootEl.querySelectorAll('tbody tr:first-of-type td');
 		// Sort is only supported where each header maps to a single column.
-		if (firstDataRow.length == this.tableHeaders.length) {
+		if (firstDataRow.length === this.tableHeaders.length) {
 			this.tableHeaders.forEach((th, columnIndex) => {
 				const listener = this._sortByColumn(columnIndex);
 				this.listeners.push(listener);

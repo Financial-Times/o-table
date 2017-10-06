@@ -260,7 +260,7 @@ describe('oTable sorting', () => {
 		const testOTableHeader = document.querySelector('th:first-of-type');
 		testOTable = new OTable(oTableEl);
 		oTableEl.addEventListener('oTable.sorted', (done) => {
-			proclaim.fail(true, false, 'The table was sorted when sort should be disabled.', '===');			
+			proclaim.fail(true, false, 'The table was sorted when sort should be disabled.', '===');
 			done();
 		});
 		testOTableHeader.click();
