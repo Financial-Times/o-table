@@ -24,18 +24,22 @@ Add an `o-table` class to any table you wish to apply the styles to:
 </table>
 ```
 
-Where a `td` contains numeric data, or a `th` is for cells containing numeric data, also add the class `.o-table__cell--numeric` and a `data-o-table-data-type="numeric"` attribute (the latter allows the column to be sorted correctly):
+Where a `td` contains numeric data, or a `th` is for cells containing numeric data, you may also add the class `.o-table__cell--numeric`. Additionally add the `data-o-table-data-type="numeric"` attribute to the `th` to allow the column to be sorted numerically:
 
 ```html
 <table class="o-table">
-	<tr>
-		<th>Index</th>
-		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
-	</tr>
-	<tr>
-		<td>FTSE 100</td>
-		<td data-o-table-data-type="numeric" class="o-table__cell--numeric">6685.52</td>
-	</tr>
+	<thead>
+		<tr>
+			<th>Index</th>
+			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>FTSE 100</td>
+			<td data-o-table-data-type="numeric" class="o-table__cell--numeric">6685.52</td>
+		</tr>
+	</tbody>
 	...
 </table>
 ```
@@ -52,7 +56,7 @@ Where table headings (`th`) are used as row headings, `scope="row"` attributes m
 </table>
 ```
 
-When they're are not present, browsers will implicitly wrap table contents in `tbody` tags, including the header row. It is therefore advisable (and when row-stripes are required, essential) to use `thead`, `tbody` (and if appropriate, `tfoot`) tags in your markup:
+`thead` and `tbody` tags should be used in your markup and where appropriate `tfoot` should also be used. Each of these elements must contain `tr` children to wrap any `td` or `th` element:
 
 ```html
 <table class="o-table">
@@ -62,6 +66,11 @@ When they're are not present, browsers will implicitly wrap table contents in `t
 			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
 		</tr>
 	</thead>
+	<tfoot>
+		<tr>
+			<td colspan="2">footer content</td>
+		</tr>
+	</tfoot>
 	<tbody>
 		<tr>
 			<td>FTSE 100</td>
@@ -122,6 +131,12 @@ If using __o-table__ in silent mode, use the mixin `oTableBase' in your table st
 Additional classes may be added to the table root element to also apply the following styling options. They can be combined as required.
 
 #### Content styles
+
+Class: `.o-table__multi-level-header`
+
+Adds styles to a multi-level table header, i.e. a header of a header. A multi-level header should span columns and be within the first row of a table header (`thead > tr:first-child > th[colspan][scope="colgroup"].o-table__multi-level-header`).
+
+The responsive scroll and flat table variants do not support multi level headers on mobile.
 
 Class: `o-table__cell--content-secondary`, Mixin: `oTableCellContentSecondary`
 
@@ -189,7 +204,7 @@ const OTable = require('o-table');
 oTable = new OTable(document.body);
 ```
 
-Sorting numbers works if the column has been declared as a numeric column via `data-o-table-data-type="numeric" class="o-table__cell--numeric"`.
+Sorting numbers works if the column has been declared as a numeric column via `data-o-table-data-type="numeric"`.
 
 ##### Sorting declaratively
 If you are wanting to sort by a custom pattern, you can apply the sorting values to each row as a data attribute:
@@ -198,7 +213,9 @@ If you are wanting to sort by a custom pattern, you can apply the sorting values
 ``` html
 <table class="o-table" data-o-component="o-table">
 	<thead>
-		<th>Things</th>
+		<tr>
+			<th>Things</th>
+		</tr>
 	</thead>
 	<tbody>
 		<tr>
@@ -224,12 +241,23 @@ Known issues:
 
 ## Migration guide
 
-### How to upgrade from v4.x.x to v5.x.x?
+### How to upgrade from v6.x.x to v7.x.x?
+
+- `thead` elements must have `tr` children i.e. `thead > tr > th`.
+- The data attribute `data-o-table--js`, which is automatically set with JavaScript when the table is instantiated, is now `data-o-table-js`.
+- The default vertical lines have been removed from the flat responsive variant (`.o-table--responsive-flat` `oTableResponsiveFlat()`) but these can be reinstated if required using the vertical lines class `.o-table--vertical-lines` or mixin `oTableVerticalLines()`.
+
+### How to upgrade from v5.x.x to v6.x.x?
 
 This major takes the new o-colors and o-typography. Some of the colors and typography have changed slightly from v4 to v5. The font size and line heights of the table data has increased to sit in line with the new typography scale. Some of the colors have changed as there isn't an exact mapping from one color to the other in o-colors.
 
 The `oTableCellContentPrimary` mixin (deprecated in v5) has been removed.
 The concrete classes `.primary-data` and `.secondary-data` (deprecated in v5) have been removed.
+
+
+### How to upgrade from v4.x.x to v5.x.x?
+
+To support new responsive tables this major introduces a dependency on `o-grid`. Confirm this version of `o-grid` is compatible with other dependencies in your project.
 
 ### How to upgrade from v3.x.x to v4.x.x?
 

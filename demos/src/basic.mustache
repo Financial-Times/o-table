@@ -1,9 +1,11 @@
 <table class="o-table {{modifierClass}}" data-o-component="o-table">
 	<thead>
-		<th>Cheese <span class="o-table__cell--content-secondary">Type of cheese</span></th>
-		<th>Bread <span class="o-table__cell--content-secondary">Type of bread</span></th>
-		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost <span class="o-table__cell--content-secondary">(GBP)</span></th>
-		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost <span class="o-table__cell--content-secondary">(EUR)</span></th>
+		<tr>
+			<th>Cheese <span class="o-table__cell--content-secondary">Type of cheese</span></th>
+			<th>Bread <span class="o-table__cell--content-secondary">Type of bread</span></th>
+			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost <span class="o-table__cell--content-secondary">(GBP)</span></th>
+			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost <span class="o-table__cell--content-secondary">(EUR)</span></th>
+		</tr>
 	</thead>
 	<tbody>
 		<tr>
@@ -29,10 +31,18 @@
 
 <table class="o-table {{modifierClass}}" data-o-component="o-table">
 	<thead>
-		<th>Cheese</th>
-		<th>Bread</th>
-		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost (GBP)</th>
-		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost (EUR)</th>
+		<tr>
+			<th></th>
+			<th></th>
+			<th class="o-table__multi-level-header" colspan="2" scope="colgroup">Cost Per Combination</th>
+			<th></th>
+		</tr>
+		<tr>
+			<th>Cheese <span class="o-table__cell--content-secondary">Type of cheese</span></th>
+			<th>Bread <span class="o-table__cell--content-secondary">Type of bread</span></th>
+			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost <span class="o-table__cell--content-secondary">(GBP)</span></th>
+			<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Cost <span class="o-table__cell--content-secondary">(EUR)</span></th>
+		</tr>
 	</thead>
 	<tbody>
 		<tr>
@@ -45,7 +55,7 @@
 			<td>stilton</td>
 			<td>wholemeal</td>
 			<td class="o-table__cell--numeric">2</td>
-			<td  class="o-table__cell--numeric">1.85</td>
+			<td class="o-table__cell--numeric">1.85</td>
 		</tr>
 		<tr>
 			<td>red leicester</td>
