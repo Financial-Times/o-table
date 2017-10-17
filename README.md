@@ -137,7 +137,7 @@ Using themes is not required and mixins can continue to be used without setting 
 
 ##### Origami Build Service Users
 
-To set the theme modify your Origami Build Service request to include your desired theme e.g. `o-table@^6.2.1:masterbrand`. If the theme is not set or found only base styles will be returned.
+To set the theme modify your Origami Build Service request to include your desired theme e.g. `o-table@^7.0.0&theme=masterbrand`. If the theme is not set or found only base styles will be returned.
 
 ##### Bower Users
 
