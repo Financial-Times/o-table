@@ -130,18 +130,18 @@ If using __o-table__ in silent mode, use the mixin `oTableBase' in your table st
 
 Themes allow Bower and Build Service users to request `o-table` with a different look and feel. Default themes include:
 
-1. primary - The primary FT brand, which includes uses of the FT paper colour.
+1. masterbrand - The masterbrand FT brand, which includes uses of the FT paper colour.
 2. internal - A more neutral theme useful for internal products, tooling, or tech documentation.
 
 Using themes is not required and mixins can continue to be used without setting a theme, however doing so is a quick way to customise the look and feel of `o-table`. For base styles, which outputs minimal css, leave the theme unset.
 
 ##### Origami Build Service Users
 
-To set the theme modify your Origami Build Service request to include your desired theme e.g. `o-table@^6.2.1:primary`. If the theme is not set or found only base styles will be returned.
+To set the theme modify your Origami Build Service request to include your desired theme e.g. `o-table@^6.2.1:masterbrand`. If the theme is not set or found only base styles will be returned.
 
 ##### Bower Users
 
-To use a default theme set `$o-table-theme` to the theme you would like to use, e.g. `$o-table-theme: 'primary';`. 
+To use a default theme set `$o-table-theme` to the theme you would like to use, e.g. `$o-table-theme: 'masterbrand';`. 
 
 If you are a Bower user you may also configure your own theme.
 
@@ -149,8 +149,8 @@ If you are a Bower user you may also configure your own theme.
 $o-table-theme: 'my-theme';
 @include oTableThemeSetTheme('my-theme', (
 	stripes: (
-		background: oColorsGetColorFor(o-table-row-primary o-table-row page, background),
-		alt-background: oColorsGetColorFor(o-table-row-alt-primary o-table-row-alt page, background)
+		background: oColorsGetColorFor(o-table-row-masterbrand o-table-row page, background),
+		alt-background: oColorsGetColorFor(o-table-row-alt-masterbrand o-table-row-alt page, background)
 	)
 ));
 ```
@@ -182,7 +182,7 @@ Reduce the size of some text in a cell and display block to start a new line. Th
 
 #### Row stripes
 
-Class: `o-table--row-stripes` _(themes: primary, internal)_
+Class: `o-table--row-stripes` _(themes: masterbrand, internal)_
 
 Mixin: `oTableRowStripes`
 
@@ -285,8 +285,8 @@ Known issues:
 
 - Themes have been introduced and should be set as needed to retain the correct look and feel, see [theme documentation](#themes).
 - The following colour usecases are renamed:
-	- `o-table-striped` is now `o-table-row-primary`.
-	- `o-table-row-alt` is now `o-table-row-alt-primary`.
+	- `o-table-striped` is now `o-table-row-masterbrand`.
+	- `o-table-row-alt` is now `o-table-row-alt-masterbrand`.
 - `thead` elements must have `tr` children i.e. `thead > tr > th`.
 - The data attribute `data-o-table--js`, which is automatically set with JavaScript when the table is instantiated, is now `data-o-table-js`.
 - The default vertical lines have been removed from the flat responsive variant (`.o-table--responsive-flat` `oTableResponsiveFlat()`) but these can be reinstated if required using the vertical lines class `.o-table--vertical-lines` or mixin `oTableVerticalLines()`.

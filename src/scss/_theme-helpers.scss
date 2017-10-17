@@ -15,7 +15,7 @@ $_o-table-themes-avalible: () !default;
 // 	)
 // ));
 //
-// @param {String} $theme - The name of the theme being configured, e.g. "primary".
+// @param {String} $theme - The name of the theme being configured, e.g. "masterbrand".
 // @param {Map} $theme-states - A map of theme states, a theme state is a key value map of configuration.
 @mixin oTableThemeSetTheme($theme, $theme-states) {
 	$component-name: "o-table";
@@ -41,7 +41,7 @@ $_o-table-themes-avalible: () !default;
 //
 // @include oTableThemeGetFor('minimal', 'stripes');
 //
-// @param {String} $theme - The name of the theme to retrieve a state for, e.g. "primary".
+// @param {String} $theme - The name of the theme to retrieve a state for, e.g. "masterbrand".
 // @param {String} $state - The state (i.e. specific portion of theme configuration) to return.
 // @return {Map|null}
 @function oTableThemeGetFor($theme, $state) {
@@ -70,7 +70,7 @@ $_o-table-themes-avalible: () !default;
 //
 // @include oTableThemeStateConfigured('minimal', 'stripes');
 //
-// @param {String} $theme - The name of the theme to retrieve a state for, e.g. "primary".
+// @param {String} $theme - The name of the theme to retrieve a state for, e.g. "masterbrand".
 // @param {String} $state - The state (i.e. specific portion of theme configuration) to check exists.
 // @return {Boolean}
 @function oTableThemeStateConfigured($theme, $state) {

@@ -1,7 +1,7 @@
-@include oTableThemeSetTheme('primary', (
+@include oTableThemeSetTheme('masterbrand', (
 	stripes: (
-		background: oColorsGetColorFor(o-table-row-primary, background),
-		alt-background: oColorsGetColorFor(o-table-row-alt-primary, background)
+		background: oColorsGetColorFor(o-table-row-masterbrand, background),
+		alt-background: oColorsGetColorFor(o-table-row-alt-masterbrand, background)
 	)
 ));
 

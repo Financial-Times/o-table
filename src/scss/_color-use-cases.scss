@@ -1,9 +1,9 @@
 @include oColorsSetUseCase(o-table, background, 'transparent');
 // Row
 @include oColorsSetUseCase(o-table-row, border, 'black-20');
-@include oColorsSetUseCase(o-table-row-primary, background, 'paper')
+@include oColorsSetUseCase(o-table-row-masterbrand, background, 'paper')
 // Row alt (i.e. striped)
-@include oColorsSetUseCase(o-table-row-alt-primary, background, 'wheat');
+@include oColorsSetUseCase(o-table-row-alt-masterbrand, background, 'wheat');
 // Header
 @include oColorsSetUseCase(o-table-header-row, border, 'black-30');
 @include oColorsSetUseCase(o-table-header, color, 'black-90');
