@@ -284,9 +284,10 @@ Known issues:
 ### How to upgrade from v6.x.x to v7.x.x?
 
 - Themes have been introduced and should be set as needed to retain the correct look and feel, see [theme documentation](#themes).
-- The following colour usecases are renamed:
+- The following colour usecases must be updated:
 	- `o-table-striped` is now `o-table-row-primary`.
 	- `o-table-row-alt` is now `o-table-row-alt-primary`.
+	- `o-table-row-right` has been removed, `o-table-row` is a suitable alternative.
 - `thead` elements must have `tr` children i.e. `thead > tr > th`.
 - The data attribute `data-o-table--js`, which is automatically set with JavaScript when the table is instantiated, is now `data-o-table-js`.
 - The default vertical lines have been removed from the flat responsive variant (`.o-table--responsive-flat` `oTableResponsiveFlat()`) but these can be reinstated if required using the vertical lines class `.o-table--vertical-lines` or mixin `oTableVerticalLines()`.

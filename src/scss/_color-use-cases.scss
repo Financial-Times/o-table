@@ -9,5 +9,3 @@
 @include oColorsSetUseCase(o-table-header, color, 'black-90');
 // Data
 @include oColorsSetUseCase(o-table-data, color, 'black-70');
-// Border
-@include oColorsSetUseCase(o-table-row-right, border-right, 'black-20');

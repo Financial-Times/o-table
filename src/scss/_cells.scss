@@ -13,3 +13,9 @@
 	@include oTypographySans(0);
 	font-weight: normal;
 }
+
+/// Visually differentiate a header of table headers.
+@mixin oTableMultiLevelHeader {
+	border-bottom: 3px solid oColorsGetColorFor(o-table-data, color);
+	text-align: center;
+}
