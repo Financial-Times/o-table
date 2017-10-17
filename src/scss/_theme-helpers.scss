@@ -1,0 +1,96 @@
+// These mixins are build in a component agnostic way, this is why they set 
+// a component name. To break these mixins out into a reusable theming component 
+// rename to remove table references and introduce a `$component-name` argument.
+$_o-table-themes-avalible: () !default;
+
+
+// Set a new table theme.
+//
+// @include oTableThemeSetTheme('minimal', (
+// 	stripes: (
+// 		color: black,
+// 		alt-color: white,
+// 		background: white,
+// 		alt-background: black
+// 	)
+// ));
+//
+// @param {String} $theme - The name of the theme being configured, e.g. "masterbrand".
+// @param {Map} $theme-states - A map of theme states, a theme state is a key value map of configuration.
+@mixin oTableThemeSetTheme($theme, $theme-states) {
+	$component-name: "o-table";
+	// Get all themes for the provided component name.
+	$themes-for-component: map-get($_o-table-themes-avalible, $component-name);
+	// If no themes are yet set for this component create an empty map to contain them.
+	@if type-of($themes-for-component) != map {
+		$themes-for-component: ();
+	}
+	// Set the new states for this theme.
+	$themes-for-component: map-merge(
+		$themes-for-component,
+		($theme: (states: $theme-states))
+	);
+	// Merge the updated component themes.
+	$_o-table-themes-avalible: map-merge(
+		$_o-table-themes-avalible,
+		($component-name: $themes-for-component)
+	) !global;
+}
+
+// Get table theme configuration for a given state.
+//
+// @include oTableThemeGetFor('minimal', 'stripes');
+//
+// @param {String} $theme - The name of the theme to retrieve a state for, e.g. "masterbrand".
+// @param {String} $state - The state (i.e. specific portion of theme configuration) to return.
+// @return {Map|null}
+@function oTableThemeGetFor($theme, $state) {
+	$component-name: "o-table";
+	// If no theme is requested return no state config.
+	@if $theme == null {
+		@return null;
+	}
+	// Get all themes for the provided component name.
+	$themes-for-component: map-get($_o-table-themes-avalible, $component-name);
+	// Error if the theme is not set for this component.
+	@if type-of($themes-for-component) != map or not map-has-key($themes-for-component, $theme) {
+		@error "No theme '#{$theme}' is set for the component #{$component-name}.";
+	}
+	// Get the theme states.
+	$theme-states: map-get($themes-for-component, $theme);
+	$theme-states: map-get($theme-states, 'states');
+	@if type-of($theme-states) != map or not map-has-key($theme-states, $state) {
+		@error "Could not get '#{$state}' configuration for the #{$component-name} #{$theme} theme.";
+	}
+
+	@return map-get($theme-states, $state);
+}
+
+// Check for the existence of theme configuration for a given state.
+//
+// @include oTableThemeStateConfigured('minimal', 'stripes');
+//
+// @param {String} $theme - The name of the theme to retrieve a state for, e.g. "masterbrand".
+// @param {String} $state - The state (i.e. specific portion of theme configuration) to check exists.
+// @return {Boolean}
+@function oTableThemeStateConfigured($theme, $state) {
+	$component-name: "o-table";
+	// If no theme is requested the state cannot be set.
+	@if $theme == null {
+		@return false;
+	}
+	// Get all themes for the provided component name.
+	$themes-for-component: map-get($_o-table-themes-avalible, $component-name);
+	// If the theme is not set for this component no state can be configured.
+	@if type-of($themes-for-component) != map or not map-has-key($themes-for-component, $theme) {
+		@return false;
+	}
+	// Attempt to find the theme state.
+	$theme-states: map-get($themes-for-component, $theme);
+	$theme-states: map-get($theme-states, 'states');
+	@if type-of($theme-states) != map or not map-has-key($theme-states, $state) {
+		@return false;
+	}
+
+	@return true;
+}

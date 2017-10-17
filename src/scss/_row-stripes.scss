@@ -3,20 +3,31 @@
 /// @link http://registry.origami.ft.com/components/o-table
 ////
 
-/// Add this to the table element to get row stripes
-@mixin oTableRowStripes {
-
-	caption {
-		background-color: oColorsGetColorFor(o-table-striped o-table page, background);
-	}
-
+/// Table row stripes.
+///
+/// @example
+/// .my-stripy-table {
+/// 	@include oTableRowStripes($background: #fff, $alt-background: #000);
+/// }
+/// 
+/// @param {String} $color The color property for the tables main rows.
+/// @param {String} $background The background color property for the tables main rows.
+/// @param {String} $alt-color The color property for the tables alternative (even) rows.
+/// @param {String} $alt-background The background color property for the tables alternative (even) rows.
+@mixin oTableRowStripes($background, $alt-background, $color: null, $alt-color: null) {
+	caption,
 	tbody tr, 
 	thead tr:last-of-type {
-		background-color: oColorsGetColorFor(o-table-striped o-table page, background);
+		background-color: $background;
+		@if	$color {
+			color: $color;
+		}
 	}
 
 	tbody tr:nth-child(even) {
-		background-color: oColorsGetColorFor(o-table-row-alt o-table, background);
+		background-color: $alt-background;
+		@if $alt-color {
+			color: $alt-color;
+		}
 	}
-
 }

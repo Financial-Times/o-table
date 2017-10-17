@@ -1,4 +1,5 @@
 $o-table-is-silent: true !default;
+$o-table-theme: null !default;
 
 @import "o-colors/main";
 @import "o-grid/main";
@@ -6,6 +7,9 @@ $o-table-is-silent: true !default;
 @import "o-typography/main";
 
 @import "src/scss/color-use-cases";
+@import "src/scss/theme-helpers";
+@import "src/scss/themes";
+
 @import "src/scss/mixins";
 @import "src/scss/captions";
 @import "src/scss/base";
