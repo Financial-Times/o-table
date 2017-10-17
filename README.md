@@ -126,6 +126,44 @@ If using __o-table__ in silent mode, use the mixin `oTableBase' in your table st
 }
 ```
 
+#### Themes
+
+Themes allow Bower and Build Service users to request `o-table` with a different look and feel. Default themes include:
+
+1. primary - The primary FT brand, which includes uses of the FT paper colour.
+2. internal - A more neutral theme useful for internal products, tooling, or tech documentation.
+
+Using themes is not required and mixins can continue to be used without setting a theme, however doing so is a quick way to customise the look and feel of `o-table`. For base styles, which outputs minimal css, leave the theme unset.
+
+##### Origami Build Service Users
+
+To set the theme modify your Origami Build Service request to include your desired theme e.g. `o-table@^6.2.1:primary`. If the theme is not set or found only base styles will be returned.
+
+##### Bower Users
+
+To use a default theme set `$o-table-theme` to the theme you would like to use, e.g. `$o-table-theme: 'primary';`. 
+
+If you are a Bower user you may also configure your own theme.
+
+```sass
+$o-table-theme: 'my-theme';
+@include oTableThemeSetTheme('my-theme', (
+	stripes: (
+		background: oColorsGetColorFor(o-table-row-primary o-table-row page, background),
+		alt-background: oColorsGetColorFor(o-table-row-alt-primary o-table-row-alt page, background)
+	)
+));
+```
+
+Now calling `@include oTableAll` will output using your theme configuration. Alternatively in [silent mode](#silent-mode) you may use your chosen theme per mixin.
+
+```sass
+.my-table {
+	$strip-config: oTableThemeGetFor($theme:$o-table-theme, $state:'stripes');
+	@include oTableRowStripes($strip-config...);
+}
+```
+
 #### Variant classes and placeholders
 
 Additional classes may be added to the table root element to also apply the following styling options. They can be combined as required.
@@ -144,9 +182,11 @@ Reduce the size of some text in a cell and display block to start a new line. Th
 
 #### Row stripes
 
-Class: `o-table--row-stripes`, Mixin: `oTableRowStripes`
+Class: `o-table--row-stripes` _(themes: primary, internal)_
 
-A background colour will be set on the whole table, and alternate rows within the `tbody` will have their background colour set to a pink tint.
+Mixin: `oTableRowStripes`
+
+A background colour will be set on the whole table, and alternate rows within the `tbody` will have their background colour set.
 
 #### Horizontal lines
 
@@ -243,6 +283,10 @@ Known issues:
 
 ### How to upgrade from v6.x.x to v7.x.x?
 
+- Themes have been introduced and should be set as needed to retain the correct look and feel, see [theme documentation](#themes).
+- The following colour usecases are renamed:
+	- `o-table-striped` is now `o-table-row-primary`.
+	- `o-table-row-alt` is now `o-table-row-alt-primary`.
 - `thead` elements must have `tr` children i.e. `thead > tr > th`.
 - The data attribute `data-o-table--js`, which is automatically set with JavaScript when the table is instantiated, is now `data-o-table-js`.
 - The default vertical lines have been removed from the flat responsive variant (`.o-table--responsive-flat` `oTableResponsiveFlat()`) but these can be reinstated if required using the vertical lines class `.o-table--vertical-lines` or mixin `oTableVerticalLines()`.

@@ -1,0 +1,14 @@
+@include oTableThemeSetTheme('primary', (
+	stripes: (
+		background: oColorsGetColorFor(o-table-row-primary, background),
+		alt-background: oColorsGetColorFor(o-table-row-alt-primary, background)
+	)
+));
+
+@include oTableThemeSetTheme('internal', (
+	stripes: (
+		background: transparent,
+		alt-background: oColorsMix(black, white, 5)
+	)
+));
+
