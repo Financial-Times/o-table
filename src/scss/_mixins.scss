@@ -52,13 +52,23 @@
 	.#{$classname}--compact {
 		@include oTableCompact;
 	}
-	.#{$classname}--responsive-flat {
-		@include oTableResponsiveFlat;
-	}
 	.#{$classname}--responsive-overflow {
 		@include oTableResponsiveOverflow;
 	}
+	.#{$classname}--responsive-flat {
+		@include oTableResponsiveFlat;
+	}
 	.#{$classname}--responsive-scroll {
 		@include oTableResponsiveScroll;
+	}
+	// For small viewports (mobile) and certain resposnive tables,
+	// remove center text alignment from numeric cells.
+	.#{$classname}--responsive-flat,
+	.#{$classname}--responsive-scroll {
+		@include oGridRespondTo($until: S) {
+			.#{$classname}__cell--numeric {
+				text-align: left;
+			}
+		}
 	}
 }
