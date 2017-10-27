@@ -231,4 +231,39 @@ describe('oTable sorting', () => {
 			done();
 		});
 	});
+
+	it('is not enabled if the number of headers do not map directly to a column of data.', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table id="tableHeaderMismatch" class="o-table" data-o-component="o-table">
+				<thead>
+					<th colspan="2" scope="colgroup">Things</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>extra data column</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>extra data column</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>extra data column</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		const oTableEl = document.getElementById('tableHeaderMismatch');
+		const testOTableHeader = document.querySelector('th:first-of-type');
+		testOTable = new OTable(oTableEl);
+		oTableEl.addEventListener('oTable.sorted', (done) => {
+			proclaim.fail(true, false, 'The table was sorted when sort should be disabled.', '===');
+			done();
+		});
+		testOTableHeader.click();
+		done();
+	});
 });

@@ -58,4 +58,11 @@
 		}
 	}
 
+
+	thead tr:not(:last-of-type) {
+		@include oGridRespondTo($until: S) {
+			display: none;
+		}
+	}
+
 } // mixin

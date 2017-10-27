@@ -12,7 +12,7 @@
 
 /// Add verticle lines to a table
 @mixin oTableVerticalLines {
-	th:not(:last-child):not(:first-child),
+	thead tr:last-of-type th:not(:last-child):not(:first-child),
 	td:not(:last-child):not(:first-child) {
 		border-left: 1px solid oColorsGetColorFor(o-table-row, border);
 		border-right: 1px solid oColorsGetColorFor(o-table-row, border);

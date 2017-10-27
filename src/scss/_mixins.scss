@@ -7,7 +7,7 @@
 /// Generates all styles available, with a set of modifiers for alternative styles
 ///
 /// @param {string} $classname
-@mixin oTableAll($classname: o-table) {
+@mixin oTableAll($classname: o-table, $theme: $o-table-theme) {
 	.#{$classname}-wrapper {
 		@include oTableWrapper;
 	}
@@ -33,10 +33,7 @@
 		.#{$classname}__cell--content-secondary {
 			@include oTableCellContentSecondary;
 		}
-	}
-	.#{$classname}--row-stripes {
-		@include oTableRowStripes;
-	}
+	}	
 	.#{$classname}--horizontal-lines {
 		@include oTableHorizontalLines;
 	}
@@ -60,5 +57,13 @@
 	}
 	.#{$classname}--responsive-scroll {
 		@include oTableResponsiveScroll;
+	}
+	// Only include `.o-table--row-stripes` if the theme configures it.
+	// Stripes do not make sense for a unstyled base table.
+	@if oTableThemeStateConfigured($theme, 'stripes') {
+		.#{$classname}--row-stripes {
+			$strip-config: oTableThemeGetFor($theme: $theme, $state: 'stripes');
+			@include oTableRowStripes($strip-config...);
+		}	
 	}
 }
