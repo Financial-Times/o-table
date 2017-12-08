@@ -6,13 +6,9 @@
 /// Make a table 'compact'
 @mixin oTableCompact {
 
-	th {
+	th, td {
 		@include oTypographySize(0);
 		padding: 4px 8px;
 	}
 
-	td {
-		@include oTypographySize(0);
-		padding: 4px 8px;
-	}
 }

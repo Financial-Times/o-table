@@ -1,0 +1,134 @@
+$o-table-brand: 'masterbrand' !default;
+$_o-table-brands: () !default;
+$_o-table-current-variant: '';
+
+/**	
+* Get a variable for the current brand.
+**/
+@function _oTableBrandVariable($variable, $variant: $_o-table-current-variant) {
+	// 1. Return the current brand value if possible.
+	$brand-value: _oTableBrandGetValue($variable, $variant, $o-table-brand);
+	@if $brand-value != false {
+		@return $brand-value;
+	}
+	// 2. The current brand failed, return the whitelabel value instead.
+	@if $o-table-brand != 'whitelabel' {
+		$whitelabel-value: _oTableBrandGetValue($variable, $variant, 'whitelabel');
+		@if $whitelabel-value != false {
+			@return $whitelabel-value;
+		}
+	}
+	// 3. There is no value for the requested variant, get a none-variant value instead.
+	@if $variant != '' {
+		@return _oTableBrandVariable($variable, '');
+	}
+	// 4. Variable not set.
+	@return null;
+}
+
+/**
+* Outputs a variant modifier class if enabled by the current brand setting config. 
+* A variant modifier overrides the appearence of a component.
+* E.g. .o-table--inverse
+**/
+@mixin _oTableBrandVariant($variant, $classname) {
+	$_o-table-current-variant: $variant !global;
+	@include _oTableBrandFeature($variant, $classname) {
+		@content;
+	}
+	$_o-table-current-variant: '' !global;
+}
+
+/**
+* Outputs a feature modifier class if enabled by the current brand setting config. 
+* A feature modifier can change the appearence of a component, a feature might
+* rely on new markup. A variant modifier can visually override a feature's appearence.
+*
+* E.g. .o-table--stripes
+**/
+@mixin _oTableBrandFeature($modifier, $classname) {
+	@if _oTableSetting($modifier) {
+		&.#{$classname}--#{$modifier} {
+			@content;
+		}
+	}
+}
+
+/**	
+* A boolean flag for turning features and variants on/off for the current brand.
+**/
+@function _oTableSetting($setting, $brand: $o-table-brand) {
+	$brand-config: _oTableBrandConfig($brand);
+	$brand-features: map-get($brand-config, 'settings');
+	$setting-configured: type-of($brand-features) == 'map' and map-has-key($brand-features, $setting);
+	@return $setting-configured and map-get($brand-features, $setting);
+}
+
+/**	
+* Set brand configuration.
+**/
+@mixin _oTableBrandSet($brand, $config) {
+	@if type-of($config) != 'map' {
+		@error 'Could not set brand "#{$brand}", it\'s config must be a map.';
+	}
+	$variables: map-get($config, 'variables');
+	$settings: map-get($config, 'variables');
+	$errorMessage: 'Could not set brand "#{$brand}".';
+	@if $variables and (type-of($variables) != 'map' and type-of($variables) != 'list' ) {
+		@error $errorMessage + ' Config key "variables" should be a map but is of type #{type-of($variables)}.';	
+	}
+	@if $settings and (type-of($settings) != 'map' and type-of($settings) != 'list' ) {
+		@error $errorMessage + ' Config key "settings" should be a map but is of type #{type-of($settings)}.';	
+	}
+	$_o-table-brands: map-merge($_o-table-brands, ($brand: $config)) !global;
+}
+
+/**	
+* Get a value from brand configuration. Returns `false` if 
+* the variable for the variant and brand is not set.
+**/
+@function _oTableBrandGetValue($variable, $variant, $brand) {
+	// Get config for the brand.
+	$brand-config: _oTableBrandConfig($brand);
+	$brand-variables: map-get($brand-config, 'variables');
+	@if type-of($brand-variables) == 'map' {
+
+		@if $variant == '' {
+			$value: _oTableBrandExtractVar($brand-variables, $variable);
+			@return if(map-has-key($brand-variables, $variable), $value, false);
+		}
+
+		$variant-variables: map-get($brand-variables, $variant);
+		@if type-of($variant-variables) == 'map' {
+			$value: _oTableBrandExtractVar($variant-variables, $variable);
+			@return if(map-has-key($variant-variables, $variable), $value, false);
+		}
+	}
+
+	@return false;
+}
+
+/**	
+* Get a variable from a map of variables.
+**/
+@function _oTableBrandExtractVar($variables, $variable) {
+	@if type-of($variables) == 'map' {
+		$value: map-get($variables, $variable);
+		@if $value {
+			@return $value;
+		}
+	}
+	@return null;
+}
+
+/**	
+* Get all brand config.
+**/
+@function _oTableBrandConfig($brand) {
+	// Get config for the brand.
+	$brand-config: map-get($_o-table-brands, $brand);
+	@if $brand-config == null {
+		@error 'Could not get brand variable "#{$variable}". The brand #{$brand} has not been set.';
+	}
+	@return $brand-config;
+}

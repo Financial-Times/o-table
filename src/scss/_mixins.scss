@@ -34,9 +34,6 @@
 			@include oTableCellContentSecondary;
 		}
 	}
-	.#{$classname}--row-stripes {
-		@include oTableRowStripes;
-	}
 	.#{$classname}--horizontal-lines {
 		@include oTableHorizontalLines;
 	}
@@ -49,9 +46,6 @@
 	.#{$classname}--vertical-borders {
 		@include oTableVerticalBorders;
 	}
-	.#{$classname}--compact {
-		@include oTableCompact;
-	}
 	.#{$classname}--responsive-flat {
 		@include oTableResponsiveFlat;
 	}
@@ -60,5 +54,25 @@
 	}
 	.#{$classname}--responsive-scroll {
 		@include oTableResponsiveScroll;
+	}
+
+	// .o-table--compact
+	@include _oTableBrandFeature('compact', $classname) {
+		@include oTableCompact;
+	}
+
+	// .o-table--row-stripes
+	@include _oTableBrandFeature('row-stripes', $classname) {
+		@include oTableRowStripes;
+	}
+
+	// .o-table--inverse
+	@include _oTableBrandVariant('inverse', $classname) {
+		background-color: _oTableBrandVariable('background');
+		color: _oTableBrandVariable('color');
+		// .o-table--inverse.o-table--row-stripes
+		@include _oTableBrandFeature('row-stripes', $classname) {
+			@include oTableRowStripes;
+		}
 	}
 }

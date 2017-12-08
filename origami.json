@@ -42,6 +42,11 @@
 			"description": ""
 		},
 		{
+			"name": "row-stripes",
+			"template": "demos/src/row-stripes.mustache",
+			"description": ""
+		},
+		{
 			"name": "responsive-flat",
 			"template": "demos/src/responsive-flat.mustache",
 			"description": "This is a flat responsive version"

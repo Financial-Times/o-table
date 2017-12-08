@@ -1,0 +1,37 @@
+$o-table-brand: 'internal';
+
+@include _oTableBrandSet('masterbrand', (
+	'variables': (
+		color: oColorsGetColorFor(o-table page, text),
+		background: oColorsGetColorFor(o-table page, background),
+		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
+		stripe-background: oColorsGetColorFor(o-table-stripe, background)
+	),
+	'settings': (
+		'row-stripes': true
+	)
+));
+
+@include _oTableBrandSet('internal', (
+	'variables': (
+		background: oColorsMix(black, white, 5),
+		stripe-background: oColorsMix(black, white, 20),
+		'inverse': (
+			color: oColorsMix(black, white, 20),
+			background: oColorsMix(black, white, 80),
+			stripe-background: oColorsMix(black, white, 20),
+			stripe-color: oColorsMix(black, white, 80),
+		)
+	),
+	'settings': (
+		'row-stripes': true,
+		'inverse': true,
+		'compact': true
+	)
+));
+
+@include _oTableBrandSet('whitelabel', (
+	'settings': (
+		'compact': true
+	)
+));

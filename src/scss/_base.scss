@@ -4,9 +4,10 @@
 ////
 
 /// Base tables styles - add to <table>
-@mixin oTableBase {
+@mixin oTableBase() {
 	@include oTypographyBody;
-	background-color: oColorsGetColorFor(o-table page, background);
+	background-color: _oTableBrandVariable('background');
+	color: _oTableBrandVariable('color');
 	border-collapse: collapse;
 	border-spacing: 0;
 	margin: 0 0 20px;
