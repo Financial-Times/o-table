@@ -3,7 +3,11 @@ $_o-table-brands: () !default;
 $_o-table-current-variant: '';
 
 /**	
-* Get a variable for the current brand.
+* Gets a variable for the globally set brand.
+* 
+* @param {string} $variable
+* @param {string} $variant
+* @return {string | number | color | null}
 **/
 @function _oTableBrandVariable($variable, $variant: $_o-table-current-variant) {
 	// 1. Return the current brand value if possible.
@@ -30,6 +34,8 @@ $_o-table-current-variant: '';
 * Outputs a variant modifier class if enabled by the current brand setting config. 
 * A variant modifier overrides the appearence of a component.
 * E.g. .o-table--inverse
+*
+* @param {string} $variant
 **/
 @mixin _oTableBrandVariant($variant) {
 	$_o-table-current-variant: $variant !global;
@@ -45,6 +51,8 @@ $_o-table-current-variant: '';
 * rely on new markup. A variant modifier can visually override a feature's appearence.
 *
 * E.g. .o-table--stripes
+*
+* @param {string} $feature
 **/
 @mixin _oTableBrandFeature($feature) {
 	@if _oTableSetting($feature) {
@@ -54,6 +62,10 @@ $_o-table-current-variant: '';
 
 /**	
 * A boolean flag for turning features and variants on/off for the current brand.
+* 
+* @param {string} $setting
+* @param {string} $brand
+* @return {boolean}
 **/
 @function _oTableSetting($setting, $brand: $o-table-brand) {
 	$brand-config: _oTableBrandConfig($brand);
@@ -64,6 +76,9 @@ $_o-table-current-variant: '';
 
 /**	
 * Set brand configuration.
+*
+* @param {string} $brand
+* @param {map} $config
 **/
 @mixin _oTableBrandSet($brand, $config) {
 	@if type-of($config) != 'map' {
@@ -84,6 +99,11 @@ $_o-table-current-variant: '';
 /**	
 * Get a value from brand configuration. Returns `false` if 
 * the variable for the variant and brand is not set.
+*
+* @param {string} $variable
+* @param {string} $variant
+* @param {string} $brand
+* @return {string | number | color | null | false}
 **/
 @function _oTableBrandGetValue($variable, $variant, $brand) {
 	// Get config for the brand.
@@ -92,13 +112,13 @@ $_o-table-current-variant: '';
 	@if type-of($brand-variables) == 'map' {
 
 		@if $variant == '' {
-			$value: _oTableBrandExtractVar($brand-variables, $variable);
+			$value: _oTableBrandExtractVariable($brand-variables, $variable);
 			@return if(map-has-key($brand-variables, $variable), $value, false);
 		}
 
 		$variant-variables: map-get($brand-variables, $variant);
 		@if type-of($variant-variables) == 'map' {
-			$value: _oTableBrandExtractVar($variant-variables, $variable);
+			$value: _oTableBrandExtractVariable($variant-variables, $variable);
 			@return if(map-has-key($variant-variables, $variable), $value, false);
 		}
 	}
@@ -108,19 +128,29 @@ $_o-table-current-variant: '';
 
 /**	
 * Get a variable from a map of variables.
+*
+* @param {map} $variables
+* @param {string} $variable
+* @return {string | number | color | null}
+* @throw Error unexpected brand variable type.
 **/
-@function _oTableBrandExtractVar($variables, $variable) {
+@function _oTableBrandExtractVariable($variables, $variable) {
 	@if type-of($variables) == 'map' {
 		$value: map-get($variables, $variable);
-		@if $value {
-			@return $value;
+		$supported-variable-types: ('string', 'number', 'color', "null");
+		@if not index($supported-variable-types, type-of($value)) {
+			@error 'Brand variable "#{$variable}" is type of "#{type-of($value)}" but only be one of: #{$supported-variable-types}.';
 		}
+		@return $value;
 	}
 	@return null;
 }
 
 /**	
-* Get all brand config.
+* Get all config for a given brand.
+*
+* @param {string} $brand
+* @return {map}
 **/
 @function _oTableBrandConfig($brand) {
 	// Get config for the brand.
