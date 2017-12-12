@@ -31,9 +31,9 @@ $_o-table-current-variant: '';
 * A variant modifier overrides the appearence of a component.
 * E.g. .o-table--inverse
 **/
-@mixin _oTableBrandVariant($variant, $classname) {
+@mixin _oTableBrandVariant($variant) {
 	$_o-table-current-variant: $variant !global;
-	@include _oTableBrandFeature($variant, $classname) {
+	@if _oTableSetting($variant) {
 		@content;
 	}
 	$_o-table-current-variant: '' !global;
@@ -46,11 +46,9 @@ $_o-table-current-variant: '';
 *
 * E.g. .o-table--stripes
 **/
-@mixin _oTableBrandFeature($modifier, $classname) {
-	@if _oTableSetting($modifier) {
-		&.#{$classname}--#{$modifier} {
-			@content;
-		}
+@mixin _oTableBrandFeature($feature) {
+	@if _oTableSetting($feature) {
+		@content;
 	}
 }
 
