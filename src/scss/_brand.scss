@@ -1,4 +1,4 @@
-$o-table-brand: 'masterbrand';
+$o-table-brand: 'masterbrand' !default;
 
 @include _oTableBrandSet('masterbrand', (
 	'variables': (
