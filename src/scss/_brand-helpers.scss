@@ -1,7 +1,8 @@
 $_o-table-brands: () !default;
 $_o-table-current-variant: '';
-$_o-table-current-selector: '';
+$_o-table-last-selector: '';
 $_o-table-current-depth: 0;
+$sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z") !default;
 
 /**	
 * Gets a variable for the globally set brand.
@@ -39,19 +40,35 @@ $_o-table-current-depth: 0;
 * @param {string} $variant
 **/
 @mixin _oTableBrandModifier($variant) {
-	@if ($_o-table-current-selector != '' and #{&} != '' and is_superselector(#{&}, $_o-table-current-selector)) {
+	$_o-table-current-depth: $_o-table-current-depth + 1 !global;
+	@include updateBrandVariants(#{&}, $variant);
+	@if _oTableSetting($variant) {
+		@content;
+	}
+	$_o-table-current-depth: $_o-table-current-depth - 1 !global; 
+}
+
+@mixin updateBrandVariants($current-selector, $new-variant) {
+	@if $_o-table-current-depth == 1 {
+		$_o-table-current-variant: '' !global;
+	}
+	
+	@if ($_o-table-last-selector != '' and $current-selector != '' and is_superselector($current-selector, $_o-table-last-selector)) {
 		$new-variants: ();
 		$n: 1;
-		@while $n <= $_o-table-current-depth {
+		@while $n < $_o-table-current-depth {
 			$new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
 			$n: $n + 1;	
 		}
 		$_o-table-current-variant: $new-variants !global;
 	}
 
-	$_o-table-current-selector: #{&} !global;
-	$_o-table-current-depth: $_o-table-current-depth + 1 !global;
+	@include setBrandVariant($new-variant);
 
+	$_o-table-last-selector: $current-selector !global;
+}
+
+@mixin setBrandVariant($variant) {
 	@if $_o-table-current-variant == '' {
 		$_o-table-current-variant: $variant !global;
 	} @else {
@@ -60,14 +77,6 @@ $_o-table-current-depth: 0;
 		}
 		$_o-table-current-variant: join($_o-table-current-variant, ($variant)) !global;
 	}
-	@if _oTableSetting($variant) {
-		@content;
-	}
-	$_o-table-current-depth: $_o-table-current-depth - 1 !global; 
-	@if $_o-table-current-depth == 0 {
-		$_o-table-current-variant: '' !global;
-	}
-	// $_o-table-current-variant: '' !global;
 }
 
 /**
@@ -110,7 +119,7 @@ $_o-table-current-depth: 0;
 		@error 'Could not set brand "#{$brand}", it\'s config must be a map.';
 	}
 	$variables: map-get($config, 'variables');
-	$settings: map-get($config, 'variables');
+	$settings: map-get($config, 'settings');
 	$errorMessage: 'Could not set brand "#{$brand}".';
 	@if $variables and (type-of($variables) != 'map' and type-of($variables) != 'list' ) {
 		@error $errorMessage + ' Config key "variables" should be a map but is of type #{type-of($variables)}.';	
@@ -118,7 +127,18 @@ $_o-table-current-depth: 0;
 	@if $settings and (type-of($settings) != 'map' and type-of($settings) != 'list' ) {
 		@error $errorMessage + ' Config key "settings" should be a map but is of type #{type-of($settings)}.';	
 	}
-	$_o-table-brands: map-merge($_o-table-brands, ($brand: $config)) !global;
+	// sort brand
+	$sorted-variables: ();
+	@each $key, $value in $variables {
+		@if type-of($value) == 'map' {
+			$key: quick-sort($key);
+		}
+		$sorted-variables: map-merge($sorted-variables, ($key: $value));
+	}
+	$_o-table-brands: map-merge($_o-table-brands, ($brand: (
+		'variables': $sorted-variables,
+		'settings': $settings
+	))) !global;
 }
 
 /**	
@@ -141,7 +161,7 @@ $_o-table-current-depth: 0;
 			@return if(map-has-key($brand-variables, $variable), $value, false);
 		}
 
-		$variant-variables: map-get($brand-variables, $variant);
+		$variant-variables: map-get($brand-variables, quick-sort($variant));
 		@if type-of($variant-variables) == 'map' {
 			$value: _oTableBrandExtractVariable($variant-variables, $variable);
 			@return if(map-has-key($variant-variables, $variable), $value, false);
@@ -184,4 +204,61 @@ $_o-table-current-depth: 0;
 		@error 'Could not get brand variable "#{$variable}". The brand #{$brand} has not been set.';
 	}
 	@return $brand-config;
+}
+
+/// Compares two string to determine which comes first
+/// @access private
+/// @param {String} $a - first string
+/// @parem {String} $b - second string
+/// @param {List} $order - order to deal with
+/// @return {Bool}
+@function _str-compare($a, $b, $order) {
+  @if type-of($a) == "number" and type-of($b) == "number" {
+    @return $a < $b;
+  }
+
+  $a: to-lower-case($a + unquote(""));
+  $b: to-lower-case($b + unquote(""));
+
+  @for $i from 1 through min(str-length($a), str-length($b)) {
+    $char-a: str-slice($a, $i, $i);
+    $char-b: str-slice($b, $i, $i);
+
+    @if $char-a and $char-b and index($order, $char-a) != index($order, $char-b) {
+      @return index($order, $char-a) < index($order, $char-b);
+    }
+  }
+
+  @return str-length($a) < str-length($b);
+}
+
+/// Quick sort
+/// @author Hugo Giraudel
+/// @param {List} $list - list to sort
+/// @param {List} $order [$default-order] - order to use for sorting
+/// @return {List}
+/// @require {function} _str-compare
+/// @require $default-order
+@function quick-sort($list, $order: $sort-order) {
+  $less:  ();
+  $equal: ();
+  $large: ();
+
+  @if length($list) > 1 {
+    $seed: nth($list, ceil(length($list) / 2));
+
+    @each $item in $list {
+      @if $item == $seed {
+        $equal: append($equal, $item);
+      } @else if _str-compare($item, $seed, $order) {
+        $less: append($less, $item);
+      } @else if not _str-compare($item, $seed, $order) {
+        $large: append($large, $item);
+      }
+    }
+
+    @return join(join(quick-sort($less, $order), $equal), quick-sort($large, $order), list-separator($list));
+  }
+
+  @return $list;
 }
