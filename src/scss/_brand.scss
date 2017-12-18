@@ -1,32 +1,42 @@
-$o-table-brand: 'masterbrand' !default;
+$o-table-brand: 'internal' !default;
 
-@include _oTableBrandSet('masterbrand', (
-	'variables': (
-		color: oColorsGetColorFor(o-table page, text),
-		background: oColorsGetColorFor(o-table page, background),
-		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
-		stripe-background: oColorsGetColorFor(o-table-stripe, background)
-	),
-	'settings': (
-		'row-stripes': true
-	)
-));
+// @include _oTableBrandSet('masterbrand', (
+// 	'variables': (
+// 		color: oColorsGetColorFor(o-table page, text),
+// 		background: oColorsGetColorFor(o-table page, background),
+// 		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
+// 		stripe-background: oColorsGetColorFor(o-table-stripe, background)
+// 	),
+// 	'settings': (
+// 		'row-stripes': true
+// 	)
+// ));
 
 @include _oTableBrandSet('internal', (
 	'variables': (
 		background: oColorsMix(black, white, 5),
-		stripe-background: oColorsMix(black, white, 20),
 		'inverse': (
 			color: oColorsMix(black, white, 20),
 			background: oColorsMix(black, white, 80),
+		),
+		'stripe': (
+			stripe-background: red,
+			stripe-color: blue
+		),
+		('inverse','stripe'): (
 			stripe-background: oColorsMix(black, white, 20),
-			stripe-color: oColorsMix(black, white, 80),
+			stripe-color: oColorsMix(black, white, 80)
+		),
+		('inverse','b2b','stripe'): (
+			stripe-background: green,
+			stripe-color: yellow,
 		)
 	),
 	'settings': (
-		'row-stripes': true,
+		'stripe': true,
 		'inverse': true,
-		'compact': true
+		'compact': true,
+		'b2b': true,
 	)
 ));
 

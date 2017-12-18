@@ -56,25 +56,39 @@
 		@include oTableResponsiveScroll;
 	}
 
-	@include _oTableBrandFeature('compact') {
+	@include _oTableBrandModifier('compact') {
 		.#{$classname}--compact {
 			@include oTableCompact;
 		}
 	}
 
-	@include _oTableBrandFeature('row-stripes') {
+	@include _oTableBrandModifier('stripe') {
 		.#{$classname}--row-stripes {
 			@include oTableRowStripes;
 		}
 	}
 
-	@include _oTableBrandVariant('inverse') {
+	@include _oTableBrandModifier('inverse') {
 		.#{$classname}--inverse {
 			background-color: _oTableBrandVariable('background');
 			color: _oTableBrandVariable('color');
 			&.#{$classname}--row-stripes {
-				@include _oTableBrandFeature('row-stripes') {
+				@include _oTableBrandModifier('stripe') {
 					@include oTableRowStripes;
+				}
+			}
+		}
+	}
+
+	@include _oTableBrandModifier('inverse') {
+		.#{$classname}--inverse {
+			@include _oTableBrandModifier('b2b') {
+				&.#{$classname}--b2b {
+					&.#{$classname}--row-stripes {
+						@include _oTableBrandModifier('stripe') {
+							@include oTableRowStripes;
+						}
+					}
 				}
 			}
 		}

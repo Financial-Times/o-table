@@ -36,8 +36,15 @@ $_o-table-current-variant: '';
 *
 * @param {string} $variant
 **/
-@mixin _oTableBrandVariant($variant) {
-	$_o-table-current-variant: $variant !global;
+@mixin _oTableBrandModifier($variant) {
+	@if $_o-table-current-variant == '' {
+		$_o-table-current-variant: $variant !global;
+	} @else {
+		@if type-of($_o-table-current-variant) != 'list' {
+			$_o-table-current-variant: ($_o-table-current-variant,) !global;
+		}
+		$_o-table-current-variant: join($_o-table-current-variant, ($variant)) !global;
+	}
 	@if _oTableSetting($variant) {
 		@content;
 	}
