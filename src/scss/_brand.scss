@@ -15,21 +15,24 @@ $o-table-brand: 'internal' !default;
 @include _oTableBrandSet('internal', (
 	'variables': (
 		background: oColorsMix(black, white, 5),
-		'inverse': (
-			color: oColorsMix(black, white, 20),
-			background: oColorsMix(black, white, 80),
-		),
 		'stripe': (
 			stripe-background: red,
 			stripe-color: blue
 		),
-		('inverse','stripe'): (
+		'inverse': (
+			color: oColorsMix(black, white, 20),
+			background: oColorsMix(black, white, 80)
+		),
+		('inverse', 'stripe'): (
 			stripe-background: oColorsMix(black, white, 20),
 			stripe-color: oColorsMix(black, white, 80)
 		),
-		('inverse','b2b','stripe'): (
+		('inverse','stripe','b2b'): (
 			stripe-background: green,
 			stripe-color: yellow,
+		),
+		('inverse', 'b2b'): (
+			background: pink
 		)
 	),
 	'settings': (

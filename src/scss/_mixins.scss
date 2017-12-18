@@ -75,20 +75,16 @@
 			&.#{$classname}--row-stripes {
 				@include _oTableBrandModifier('stripe') {
 					@include oTableRowStripes;
-				}
-			}
-		}
-	}
-
-	@include _oTableBrandModifier('inverse') {
-		.#{$classname}--inverse {
-			@include _oTableBrandModifier('b2b') {
-				&.#{$classname}--b2b {
-					&.#{$classname}--row-stripes {
-						@include _oTableBrandModifier('stripe') {
+					&.#{$classname}--b2b {
+						@include _oTableBrandModifier('b2b') {
 							@include oTableRowStripes;
 						}
 					}
+				}
+			}
+			&.#{$classname}--b2b {
+				@include _oTableBrandModifier(('b2b')) {
+					background-color: _oTableBrandVariable('background');
 				}
 			}
 		}

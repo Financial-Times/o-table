@@ -1,5 +1,7 @@
 $_o-table-brands: () !default;
 $_o-table-current-variant: '';
+$_o-table-current-selector: '';
+$_o-table-current-depth: 0;
 
 /**	
 * Gets a variable for the globally set brand.
@@ -37,6 +39,19 @@ $_o-table-current-variant: '';
 * @param {string} $variant
 **/
 @mixin _oTableBrandModifier($variant) {
+	@if ($_o-table-current-selector != '' and #{&} != '' and is_superselector(#{&}, $_o-table-current-selector)) {
+		$new-variants: ();
+		$n: 1;
+		@while $n <= $_o-table-current-depth {
+			$new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
+			$n: $n + 1;	
+		}
+		$_o-table-current-variant: $new-variants !global;
+	}
+
+	$_o-table-current-selector: #{&} !global;
+	$_o-table-current-depth: $_o-table-current-depth + 1 !global;
+
 	@if $_o-table-current-variant == '' {
 		$_o-table-current-variant: $variant !global;
 	} @else {
@@ -48,7 +63,11 @@ $_o-table-current-variant: '';
 	@if _oTableSetting($variant) {
 		@content;
 	}
-	$_o-table-current-variant: '' !global;
+	$_o-table-current-depth: $_o-table-current-depth - 1 !global; 
+	@if $_o-table-current-depth == 0 {
+		$_o-table-current-variant: '' !global;
+	}
+	// $_o-table-current-variant: '' !global;
 }
 
 /**
