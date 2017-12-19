@@ -27,7 +27,7 @@ $o-table-brand: 'internal' !default;
 			stripe-background: oColorsMix(black, white, 20),
 			stripe-color: oColorsMix(black, white, 80)
 		),
-		('inverse','stripe','b2b'): (
+		('b2b', 'inverse','stripe'): (
 			stripe-background: green,
 			stripe-color: yellow,
 		),

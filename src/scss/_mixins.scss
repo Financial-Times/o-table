@@ -72,16 +72,16 @@
 		.#{$classname}--inverse {
 			background-color: _oTableBrandVariable('background');
 			color: _oTableBrandVariable('color');
-			&.#{$classname}--row-stripes {
-				@include _oTableBrandModifier('stripe') {
+			@include _oTableBrandModifier('stripe') {
+				&.#{$classname}--row-stripes {
 					@include oTableRowStripes;
 				}
 			}
-			&.#{$classname}--b2b {
-				@include _oTableBrandModifier('b2b') {
+			@include _oTableBrandModifier('b2b') {
+				&.#{$classname}--b2b {
 					background-color: _oTableBrandVariable('background');
-					&.#{$classname}--row-stripes {
-						@include _oTableBrandModifier('stripe') {
+					@include _oTableBrandModifier('stripe') {
+						&.#{$classname}--row-stripes {
 							@include oTableRowStripes;
 						}
 					}
@@ -90,8 +90,8 @@
 		}
 	}
 
-	.#{$classname}--b2b {
-		@include _oTableBrandModifier('b2b') {
+	@include _oTableBrandModifier('b2b') {
+		.#{$classname}--b2b {
 			background-color: _oTableBrandVariable('background');
 		}
 	}

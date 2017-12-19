@@ -54,14 +54,13 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 		$_o-table-current-variant: '' !global;
 	}
 	
-
-		$new-variants: ();
-		$n: 1;
-		@while $n < $_o-table-current-depth {
-			$new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
-			$n: $n + 1;	
-		}
-		$_o-table-current-variant: if(length($new-variants) == 0, '', $new-variants) !global;
+	$new-variants: ();
+	$n: 1;
+	@while $n < $_o-table-current-depth {
+		$new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
+		$n: $n + 1;	
+	}
+	$_o-table-current-variant: if(length($new-variants) == 0, '', $new-variants) !global;
 
 	$_o-table-last-selector: $current-selector !global;
 }
@@ -86,7 +85,7 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 *
 * @param {string} $feature
 **/
-@mixin _oTableBrandFeature($feature) {
+@mixin _oTableBrandFeatureModifier($feature) {
 	@if _oTableSetting($feature) {
 		@content;
 	}
