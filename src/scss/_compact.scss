@@ -7,7 +7,8 @@
 @mixin oTableCompact {
 
 	th, td {
-		@include oTypographySize(0);
+		$typography-size: _oTableBrandVariable('compact-typography-size');
+		@include oTypographySize(if($typography-size, $typography-size, 0));
 		padding: 4px 8px;
 	}
 

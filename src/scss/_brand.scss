@@ -8,34 +8,45 @@ $o-table-brand: 'internal' !default;
 		stripe-background: oColorsGetColorFor(o-table-stripe, background)
 	),
 	'settings': (
-		'row-stripes': true
+		'stripe': true
 	)
 ));
 
 @include _oTableBrandSet('internal', (
 	'variables': (
 		background: oColorsMix(black, white, 5),
-		'stripe': (
-			stripe-background: red,
-			stripe-color: blue
+		stripe-background: oColorsMix(black, white, 15),
+		compact-typography-size: 0,
+		'b2c': (
+			background: oColorsGetPaletteColor('org-b2c'),
+			stripe-background: oColorsGetPaletteColor('org-b2c-light'),
+			color: white,
+			stripe-color: oColorsMix(black, white, 80),
+			compact-typography-size: -2
+		),
+		'b2b': (
+			background: oColorsGetPaletteColor('claret-90'),
+			stripe-background: oColorsGetPaletteColor('claret-70'),
+			color: white,
+			compact-typography-size: -2
 		),
 		'inverse': (
 			color: oColorsMix(black, white, 20),
-			background: oColorsMix(black, white, 80)
-		),
-		('inverse', 'stripe'): (
+			background: oColorsMix(black, white, 80),
 			stripe-background: oColorsMix(black, white, 20),
 			stripe-color: oColorsMix(black, white, 80)
 		),
-		('b2b', 'inverse','stripe'): (
-			stripe-background: green,
-			stripe-color: yellow,
-		),
 		('b2b','inverse'): (
-			background: pink
+			background: oColorsGetPaletteColor('claret-40'),
+			stripe-background: oColorsGetPaletteColor('claret-30'),
+			color: white,
+			stripe-color: white,
 		),
-		'b2b': (
-			background: orange
+		('b2c','inverse'): (
+			background: oColorsGetPaletteColor('org-b2c-dark'),
+			stripe-background: oColorsGetPaletteColor('org-b2c'),
+			color: white,
+			stripe-color: white,
 		)
 	),
 	'settings': (
@@ -43,6 +54,7 @@ $o-table-brand: 'internal' !default;
 		'inverse': true,
 		'compact': true,
 		'b2b': true,
+		'b2c': true
 	)
 ));
 

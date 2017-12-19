@@ -56,43 +56,43 @@
 		@include oTableResponsiveScroll;
 	}
 
-	@include _oTableBrandModifier('compact') {
+	@include _oTableBrandVariant('compact', $parent-variables: true) {
 		.#{$classname}--compact {
 			@include oTableCompact;
 		}
 	}
 
-	@include _oTableBrandModifier('stripe') {
+	@include _oTableBrandVariant('stripe', $parent-variables: true) {
 		.#{$classname}--row-stripes {
 			@include oTableRowStripes;
 		}
 	}
 
-	@include _oTableBrandModifier('inverse') {
-		.#{$classname}--inverse {
-			background-color: _oTableBrandVariable('background');
-			color: _oTableBrandVariable('color');
-			@include _oTableBrandModifier('stripe') {
-				&.#{$classname}--row-stripes {
-					@include oTableRowStripes;
-				}
-			}
-			@include _oTableBrandModifier('b2b') {
-				&.#{$classname}--b2b {
-					background-color: _oTableBrandVariable('background');
-					@include _oTableBrandModifier('stripe') {
-						&.#{$classname}--row-stripes {
-							@include oTableRowStripes;
-						}
-					}
-				}
-			}
+	@include _oTableBrandVariant('b2b') {
+		.#{$classname}--b2b {
+			@include _oTableVariantOverrides($classname);
 		}
 	}
 
-	@include _oTableBrandModifier('b2b') {
-		.#{$classname}--b2b {
-			background-color: _oTableBrandVariable('background');
+	@include _oTableBrandVariant('b2c') {
+		.#{$classname}--b2c {
+			@include _oTableVariantOverrides($classname);
+		}
+	}
+
+	@include _oTableBrandVariant('inverse') {
+		.#{$classname}--inverse {
+			@include _oTableVariantOverrides($classname);
+			@include _oTableBrandVariant('b2b') {
+				&.#{$classname}--b2b {
+					@include _oTableVariantOverrides($classname);
+				}
+			}
+			@include _oTableBrandVariant('b2c') {
+				&.#{$classname}--b2c {
+					@include _oTableVariantOverrides($classname);
+				}
+			}
 		}
 	}
 }

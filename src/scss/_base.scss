@@ -80,3 +80,19 @@
 	overflow: auto;
 	width: 100%;
 }
+
+/// Base modifications to the tables styles
+@mixin _oTableVariantOverrides($classname) {
+	background-color: _oTableBrandVariable('background');
+	color: _oTableBrandVariable('color');
+	@include _oTableBrandVariant('stripe', $parent-variables: true) {
+		&.#{$classname}--row-stripes {
+			@include oTableRowStripes;
+		}
+	}
+	@include _oTableBrandVariant('compact', $parent-variables: true) {
+		&.#{$classname}--compact {
+			@include oTableCompact;
+		}
+	}
+}
