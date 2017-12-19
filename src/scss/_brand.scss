@@ -1,16 +1,16 @@
 $o-table-brand: 'internal' !default;
 
-// @include _oTableBrandSet('masterbrand', (
-// 	'variables': (
-// 		color: oColorsGetColorFor(o-table page, text),
-// 		background: oColorsGetColorFor(o-table page, background),
-// 		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
-// 		stripe-background: oColorsGetColorFor(o-table-stripe, background)
-// 	),
-// 	'settings': (
-// 		'row-stripes': true
-// 	)
-// ));
+@include _oTableBrandSet('masterbrand', (
+	'variables': (
+		color: oColorsGetColorFor(o-table page, text),
+		background: oColorsGetColorFor(o-table page, background),
+		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
+		stripe-background: oColorsGetColorFor(o-table-stripe, background)
+	),
+	'settings': (
+		'row-stripes': true
+	)
+));
 
 @include _oTableBrandSet('internal', (
 	'variables': (
@@ -33,6 +33,9 @@ $o-table-brand: 'internal' !default;
 		),
 		('b2b','inverse'): (
 			background: pink
+		),
+		'b2b': (
+			background: orange
 		)
 	),
 	'settings': (
