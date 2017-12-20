@@ -1,34 +1,26 @@
 $_o-table-brands: () !default;
-$_o-table-current-variant: '';
+$_o-table-current-variant: ();
 $_o-table-current-depth: 0;
-$sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z") !default;
 
 /**	
 * Gets a variable for the globally set brand.
 * 
 * @param {string} $variable
-* @param {string} $variant
 * @return {string | number | color | null}
 **/
-@function _oTableBrandVariable($variable, $variant: $_o-table-current-variant) {
-	// 1. Return the current brand value if possible.
-	$brand-value: _oTableBrandGetValue($variable, $variant, $o-table-brand);
-	@if $brand-value != false {
-		@return $brand-value;
-	}
-	// 2. The current brand failed, return the whitelabel value instead.
-	// @if $o-table-brand != 'whitelabel' {
-	// 	$whitelabel-value: _oTableBrandGetValue($variable, $variant, 'whitelabel');
-	// 	@if $whitelabel-value != false {
-	// 		@return $whitelabel-value;
-	// 	}
-	// }
-	// 3. There is no value for the requested variant, get a none-variant value instead.
-	// @if $variant != '' {
-	// 	@return _oTableBrandVariable($variable, '');
-	// }
-	// 4. Variable not set.
-	@return null;
+@function _oTableBrandVariable($variable) {
+    $brand-config: _oTableBrandConfig($o-table-brand);
+    $brand-variables: map-get($brand-config, 'variables');
+    @if type-of($brand-variables) == 'map' {
+        @if length($_o-table-current-variant) == 0 {
+            @return _oTableBrandExtractVariable($brand-variables, $variable);
+        }
+        $variant-variables: map-get($brand-variables, _oTableQuickSort($_o-table-current-variant));
+        @if type-of($variant-variables) == 'map' {
+            @return _oTableBrandExtractVariable($variant-variables, $variable);
+        }
+    }
+    @return null;
 }
 
 /**
@@ -39,59 +31,68 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 * @param {string} $variant
 **/
 @mixin _oTableBrandConfigureFor($variant) {
-	@include setBrandVariant($variant);
-	@if _oTableBrandSupports($variant) {
-		@content;
-	}
-	@include removeBrandVariant($variant);
+    @include _oTableSetBrandVariant($variant);
+    @if _oTableBrandSupports($variant) {
+        @content;
+    }
+    @include _oTableRemoveBrandVariant($variant);
 }
 
-@mixin removeBrandVariant($variant) {
-	$_o-table-current-depth: $_o-table-current-depth - length($variant) !global; 
-	@if $_o-table-current-depth == 0 {
-		$_o-table-current-variant: '' !global;
-	}
-	$new-variants: ();
-	$n: 1;
-	@while $n <= $_o-table-current-depth {
-		$new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
-		$n: $n + 1;	
-	}
-	$_o-table-current-variant: if(length($new-variants) == 0, '', $new-variants) !global;
+/**
+* Remove the lastest added brand variant.
+*
+* @param {string} $latest-variant
+**/
+@mixin _oTableRemoveBrandVariant($latest-variant) {
+    $_o-table-current-depth: $_o-table-current-depth - length($latest-variant) !global; 
+    @if $_o-table-current-depth == 0 {
+        $_o-table-current-variant: () !global;
+    }
+    $new-variants: ();
+    $n: 1;
+    @while $n <= $_o-table-current-depth {
+        $new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
+        $n: $n + 1;	
+    }
+    $_o-table-current-variant: if(length($new-variants) == 0, (), $new-variants) !global;
 }
 
-@mixin setBrandVariant($variant) {
-	$_o-table-current-depth: $_o-table-current-depth + length($variant) !global;
-	@if $_o-table-current-variant == '' {
-		$_o-table-current-variant: $variant !global;
-	} @else {
-		@if type-of($_o-table-current-variant) != 'list' {
-			$_o-table-current-variant: ($_o-table-current-variant,) !global;
-		}
-		$_o-table-current-variant: join($_o-table-current-variant, ($variant)) !global;
-	}
+/**
+* Set a new brand variant.
+*
+* @param {string} $latest-variant
+**/
+@mixin _oTableSetBrandVariant($latest-variant) {
+    $_o-table-current-depth: $_o-table-current-depth + length($latest-variant) !global;
+    @if length($_o-table-current-variant) == 0 {
+        $_o-table-current-variant: $latest-variant !global;
+    } @else {
+        @if type-of($latest-variant) != 'list' {
+            $latest-variant: ($latest-variant);
+        }
+        $_o-table-current-variant: join($_o-table-current-variant, ($latest-variant)) !global;
+    }
 }
 
 /**	
 * A boolean flag for turning features and variants on/off for the current brand.
 * 
 * @param {string|map} $variant
-* @param {string} $brand
 * @return {boolean}
 **/
-@function _oTableBrandSupports($variant, $brand: $o-table-brand) {
-	$brand-config: _oTableBrandConfig($brand);
-	$brand-features: map-get($brand-config, 'settings');
-	@if type-of($variant) == 'string' {
-		$variant: ($variant);
-	}
-	@each $setting in $variant {
-		$setting-configured: type-of($brand-features) == 'map' and map-has-key($brand-features, $setting);
-		@if $setting-configured == false or map-get($brand-features, $setting) == false {
-			@return false;
-		}
-	}
-	@return true;
+@function _oTableBrandSupports($variant) {
+    $brand-config: _oTableBrandConfig($o-table-brand);
+    $brand-features: map-get($brand-config, 'settings');
+    @if type-of($variant) == 'string' {
+        $variant: ($variant);
+    }
+    @each $setting in $variant {
+        $setting-configured: type-of($brand-features) == 'map' and map-has-key($brand-features, $setting);
+        @if $setting-configured == false or map-get($brand-features, $setting) == false {
+            @return false;
+        }
+    }
+    @return true;
 }
 
 /**	
@@ -101,60 +102,30 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 * @param {map} $config
 **/
 @mixin _oTableBrandSet($brand, $config) {
-	@if type-of($config) != 'map' {
-		@error 'Could not set brand "#{$brand}", it\'s config must be a map.';
-	}
-	$variables: map-get($config, 'variables');
-	$settings: map-get($config, 'settings');
-	$errorMessage: 'Could not set brand "#{$brand}".';
-	@if $variables and (type-of($variables) != 'map' and type-of($variables) != 'list' ) {
-		@error $errorMessage + ' Config key "variables" should be a map but is of type #{type-of($variables)}.';	
-	}
-	@if $settings and (type-of($settings) != 'map' and type-of($settings) != 'list' ) {
-		@error $errorMessage + ' Config key "settings" should be a map but is of type #{type-of($settings)}.';	
-	}
-	// sort brand
-	$sorted-variables: ();
-	@each $key, $value in $variables {
-		@if type-of($value) == 'map' {
-			$key: quick-sort($key);
-		}
-		$sorted-variables: map-merge($sorted-variables, ($key: $value));
-	}
-	$_o-table-brands: map-merge($_o-table-brands, ($brand: (
-		'variables': $sorted-variables,
-		'settings': $settings
-	))) !global;
-}
-
-/**	
-* Get a value from brand configuration. Returns `false` if 
-* the variable for the variant and brand is not set.
-*
-* @param {string} $variable
-* @param {string} $variant
-* @param {string} $brand
-* @return {string | number | color | null | false}
-**/
-@function _oTableBrandGetValue($variable, $variant, $brand) {
-	// Get config for the brand.
-	$brand-config: _oTableBrandConfig($brand);
-	$brand-variables: map-get($brand-config, 'variables');
-	@if type-of($brand-variables) == 'map' {
-
-		@if $variant == '' {
-			$value: _oTableBrandExtractVariable($brand-variables, $variable);
-			@return if(map-has-key($brand-variables, $variable), $value, false);
-		}
-
-		$variant-variables: map-get($brand-variables, quick-sort($variant));
-		@if type-of($variant-variables) == 'map' {
-			$value: _oTableBrandExtractVariable($variant-variables, $variable);
-			@return if(map-has-key($variant-variables, $variable), $value, false);
-		}
-	}
-
-	@return false;
+    @if type-of($config) != 'map' {
+        @error 'Could not set brand "#{$brand}", it\'s config must be a map.';
+    }
+    $variables: map-get($config, 'variables');
+    $settings: map-get($config, 'settings');
+    $errorMessage: 'Could not set brand "#{$brand}".';
+    @if $variables and (type-of($variables) != 'map' and type-of($variables) != 'list' ) {
+        @error $errorMessage + ' Config key "variables" should be a map but is of type #{type-of($variables)}.';	
+    }
+    @if $settings and (type-of($settings) != 'map' and type-of($settings) != 'list' ) {
+        @error $errorMessage + ' Config key "settings" should be a map but is of type #{type-of($settings)}.';	
+    }
+    // sort brand
+    $sorted-variables: ();
+    @each $key, $value in $variables {
+        @if type-of($value) == 'map' {
+            $key: _oTableQuickSort($key);
+        }
+        $sorted-variables: map-merge($sorted-variables, ($key: $value));
+    }
+    $_o-table-brands: map-merge($_o-table-brands, ($brand: (
+        'variables': $sorted-variables,
+        'settings': $settings
+    ))) !global;
 }
 
 /**	
@@ -166,15 +137,15 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 * @throw Error unexpected brand variable type.
 **/
 @function _oTableBrandExtractVariable($variables, $variable) {
-	@if type-of($variables) == 'map' {
-		$value: map-get($variables, $variable);
-		$supported-variable-types: ('string', 'number', 'color', "null");
-		@if not index($supported-variable-types, type-of($value)) {
-			@error 'Brand variable "#{$variable}" is type of "#{type-of($value)}" but only be one of: #{$supported-variable-types}.';
-		}
-		@return $value;
-	}
-	@return null;
+    @if type-of($variables) == 'map' {
+        $value: map-get($variables, $variable);
+        $supported-variable-types: ('string', 'number', 'color', "null");
+        @if not index($supported-variable-types, type-of($value)) {
+            @error 'Brand variable "#{$variable}" is type of "#{type-of($value)}" but only be one of: #{$supported-variable-types}.';
+        }
+        @return $value;
+    }
+    @return null;
 }
 
 /**	
@@ -184,67 +155,65 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 * @return {map}
 **/
 @function _oTableBrandConfig($brand) {
-	// Get config for the brand.
-	$brand-config: map-get($_o-table-brands, $brand);
-	@if $brand-config == null {
-		@error 'Could not get brand variable "#{$variable}". The brand #{$brand} has not been set.';
-	}
-	@return $brand-config;
+    // Get config for the brand.
+    $brand-config: map-get($_o-table-brands, $brand);
+    @if $brand-config == null {
+        @error 'Could not get brand variable "#{$variable}". The brand #{$brand} has not been set.';
+    }
+    @return $brand-config;
 }
 
-/// Compares two string to determine which comes first
-/// @access private
-/// @param {String} $a - first string
-/// @parem {String} $b - second string
-/// @param {List} $order - order to deal with
-/// @return {Bool}
-@function _str-compare($a, $b, $order) {
-  @if type-of($a) == "number" and type-of($b) == "number" {
-    @return $a < $b;
-  }
-
-  $a: to-lower-case($a + unquote(""));
-  $b: to-lower-case($b + unquote(""));
-
-  @for $i from 1 through min(str-length($a), str-length($b)) {
-    $char-a: str-slice($a, $i, $i);
-    $char-b: str-slice($b, $i, $i);
-
-    @if $char-a and $char-b and index($order, $char-a) != index($order, $char-b) {
-      @return index($order, $char-a) < index($order, $char-b);
+/**	
+* Quick sort, alphanumeric.
+*
+* @param {List} $list The list to sort.
+* @return {List}
+**/
+@function _oTableQuickSort($list) {
+    $less:  ();
+    $equal: ();
+    $large: ();
+    @if length($list) > 1 {
+        $seed: nth($list, ceil(length($list) / 2));
+        @each $item in $list {
+            @if $item == $seed {
+                $equal: append($equal, $item);
+            } @else if _oTableStringCompare($item, $seed) {
+                $less: append($less, $item);
+            } @else if not _oTableStringCompare($item, $seed) {
+                $large: append($large, $item);
+            }
+        }
+        @return join(join(_oTableQuickSort($less), $equal), _oTableQuickSort($large), list-separator($list));
     }
-  }
-
-  @return str-length($a) < str-length($b);
+    @return $list;
 }
 
-/// Quick sort
-/// @author Hugo Giraudel
-/// @param {List} $list - list to sort
-/// @param {List} $order [$default-order] - order to use for sorting
-/// @return {List}
-/// @require {function} _str-compare
-/// @require $default-order
-@function quick-sort($list, $order: $sort-order) {
-  $less:  ();
-  $equal: ();
-  $large: ();
-
-  @if length($list) > 1 {
-    $seed: nth($list, ceil(length($list) / 2));
-
-    @each $item in $list {
-      @if $item == $seed {
-        $equal: append($equal, $item);
-      } @else if _str-compare($item, $seed, $order) {
-        $less: append($less, $item);
-      } @else if not _str-compare($item, $seed, $order) {
-        $large: append($large, $item);
-      }
+/**	
+* Compares two strings to determine which comes first
+* according to the order of a given character list.
+*
+* @param {String} $a
+* @param {String} $b
+* @return {List}
+**/
+@function _oTableStringCompare($a, $b) {
+    $character-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z") !default;
+    @if type-of($a) == "number" and type-of($b) == "number" {
+        @return $a < $b;
     }
 
-    @return join(join(quick-sort($less, $order), $equal), quick-sort($large, $order), list-separator($list));
-  }
+    $a: to-lower-case($a + unquote(""));
+    $b: to-lower-case($b + unquote(""));
 
-  @return $list;
+    @for $i from 1 through min(str-length($a), str-length($b)) {
+        $char-a: str-slice($a, $i, $i);
+        $char-b: str-slice($b, $i, $i);
+
+        @if $char-a and $char-b and index($character-order, $char-a) != index($character-order, $char-b) {
+            @return index($character-order, $char-a) < index($character-order, $char-b);
+        }
+    }
+
+    @return str-length($a) < str-length($b);
 }

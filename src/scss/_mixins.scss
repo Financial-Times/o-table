@@ -80,19 +80,18 @@
 		}
 	}
 
-	@include _oTableBrandConfigureFor(('inverse','b2b')) {
-		.#{$classname}--inverse.#{$classname}--b2b {
-			@include _oTableOverrides($classname);
+	@include _oTableBrandConfigureFor('inverse') {
+		@include _oTableBrandConfigureFor('b2b') {
+			.#{$classname}--inverse.#{$classname}--b2b {
+				@include _oTableOverrides($classname);
+			}
 		}
-	}
-
-	@include _oTableBrandConfigureFor('b2c') {
-		@include _oTableBrandConfigureFor('inverse') {
+		@include _oTableBrandConfigureFor('b2c') {
 			.#{$classname}--inverse.#{$classname}--b2c {
 				@include _oTableOverrides($classname);
 			}
 		}
-		@include _oTableBrandConfigureFor(('inverse', 'primary')) {
+		@include _oTableBrandConfigureFor(('b2c', 'primary')) {
 			.#{$classname}--inverse.#{$classname}--b2c.#{$classname}--primary {
 				@include _oTableOverrides($classname);
 			}

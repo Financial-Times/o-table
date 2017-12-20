@@ -81,7 +81,12 @@
 	width: 100%;
 }
 
-/// Variant modifications to the tables styles
+/**	
+* Styles to override the look of the standard table.
+* 
+* @param {string} $classname
+* @param {bool} $compact To output the compact override or not.
+**/
 @mixin _oTableOverrides($classname, $compact: false) {
 	background-color: _oTableBrandVariable('background');
 	color: _oTableBrandVariable('color');
