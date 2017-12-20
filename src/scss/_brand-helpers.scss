@@ -139,7 +139,7 @@ $_o-table-current-depth: 0;
 @function _oTableBrandExtractVariable($variables, $variable) {
     @if type-of($variables) == 'map' {
         $value: map-get($variables, $variable);
-        $supported-variable-types: ('string', 'number', 'color', "null");
+        $supported-variable-types: ('string', 'number', 'color', 'null');
         @if not index($supported-variable-types, type-of($value)) {
             @error 'Brand variable "#{$variable}" is type of "#{type-of($value)}" but only be one of: #{$supported-variable-types}.';
         }
@@ -198,13 +198,13 @@ $_o-table-current-depth: 0;
 * @return {List}
 **/
 @function _oTableStringCompare($a, $b) {
-    $character-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z") !default;
-    @if type-of($a) == "number" and type-of($b) == "number" {
+    $character-order: ('0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
+    @if type-of($a) == 'number' and type-of($b) == 'number' {
         @return $a < $b;
     }
 
-    $a: to-lower-case($a + unquote(""));
-    $b: to-lower-case($b + unquote(""));
+    $a: to-lower-case($a + unquote(''));
+    $b: to-lower-case($b + unquote(''));
 
     @for $i from 1 through min(str-length($a), str-length($b)) {
         $char-a: str-slice($a, $i, $i);
