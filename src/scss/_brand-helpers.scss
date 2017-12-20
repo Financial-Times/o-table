@@ -1,6 +1,5 @@
 $_o-table-brands: () !default;
 $_o-table-current-variant: '';
-$_o-table-last-selector: '';
 $_o-table-current-depth: 0;
 $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z") !default;
 
@@ -18,12 +17,12 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 		@return $brand-value;
 	}
 	// 2. The current brand failed, return the whitelabel value instead.
-	@if $o-table-brand != 'whitelabel' {
-		$whitelabel-value: _oTableBrandGetValue($variable, $variant, 'whitelabel');
-		@if $whitelabel-value != false {
-			@return $whitelabel-value;
-		}
-	}
+	// @if $o-table-brand != 'whitelabel' {
+	// 	$whitelabel-value: _oTableBrandGetValue($variable, $variant, 'whitelabel');
+	// 	@if $whitelabel-value != false {
+	// 		@return $whitelabel-value;
+	// 	}
+	// }
 	// 3. There is no value for the requested variant, get a none-variant value instead.
 	// @if $variant != '' {
 	// 	@return _oTableBrandVariable($variable, '');
@@ -39,36 +38,30 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 *
 * @param {string} $variant
 **/
-@mixin _oTableBrandVariant($variant, $parent-variables: false) {
-	@if not $parent-variables {
-		$_o-table-current-depth: $_o-table-current-depth + 1 !global;
-		@include setBrandVariant($variant);
-	}
-	@if _oTableSetting($variant) {
+@mixin _oTableBrandConfigureFor($variant) {
+	@include setBrandVariant($variant);
+	@if _oTableBrandSupports($variant) {
 		@content;
 	}
-	@if not $parent-variables {
-		@include removeBrandVariant(#{&});
-		$_o-table-current-depth: $_o-table-current-depth - 1 !global; 
-	}
+	@include removeBrandVariant($variant);
 }
 
-@mixin removeBrandVariant($current-selector) {
-	@if $_o-table-current-depth == 1 {
+@mixin removeBrandVariant($variant) {
+	$_o-table-current-depth: $_o-table-current-depth - length($variant) !global; 
+	@if $_o-table-current-depth == 0 {
 		$_o-table-current-variant: '' !global;
 	}
 	$new-variants: ();
 	$n: 1;
-	@while $n < $_o-table-current-depth {
+	@while $n <= $_o-table-current-depth {
 		$new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
 		$n: $n + 1;	
 	}
 	$_o-table-current-variant: if(length($new-variants) == 0, '', $new-variants) !global;
-
-	$_o-table-last-selector: $current-selector !global;
 }
 
 @mixin setBrandVariant($variant) {
+	$_o-table-current-depth: $_o-table-current-depth + length($variant) !global;
 	@if $_o-table-current-variant == '' {
 		$_o-table-current-variant: $variant !global;
 	} @else {
@@ -82,15 +75,23 @@ $sort-order: ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f" "g
 /**	
 * A boolean flag for turning features and variants on/off for the current brand.
 * 
-* @param {string} $setting
+* @param {string|map} $variant
 * @param {string} $brand
 * @return {boolean}
 **/
-@function _oTableSetting($setting, $brand: $o-table-brand) {
+@function _oTableBrandSupports($variant, $brand: $o-table-brand) {
 	$brand-config: _oTableBrandConfig($brand);
 	$brand-features: map-get($brand-config, 'settings');
-	$setting-configured: type-of($brand-features) == 'map' and map-has-key($brand-features, $setting);
-	@return $setting-configured and map-get($brand-features, $setting);
+	@if type-of($variant) == 'string' {
+		$variant: ($variant);
+	}
+	@each $setting in $variant {
+		$setting-configured: type-of($brand-features) == 'map' and map-has-key($brand-features, $setting);
+		@if $setting-configured == false or map-get($brand-features, $setting) == false {
+			@return false;
+		}
+	}
+	@return true;
 }
 
 /**	

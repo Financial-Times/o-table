@@ -81,16 +81,18 @@
 	width: 100%;
 }
 
-/// Base modifications to the tables styles
-@mixin _oTableVariantOverrides($classname) {
+/// Variant modifications to the tables styles
+@mixin _oTableOverrides($classname, $compact: false) {
 	background-color: _oTableBrandVariable('background');
 	color: _oTableBrandVariable('color');
-	@include _oTableBrandVariant('stripe', $parent-variables: true) {
+
+	@if _oTableBrandSupports('stripe') {
 		&.#{$classname}--row-stripes {
 			@include oTableRowStripes;
 		}
 	}
-	@include _oTableBrandVariant('compact', $parent-variables: true) {
+
+	@if _oTableBrandSupports('compact') and $compact {
 		&.#{$classname}--compact {
 			@include oTableCompact;
 		}

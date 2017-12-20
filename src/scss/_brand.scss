@@ -47,6 +47,10 @@ $o-table-brand: 'internal' !default;
 			stripe-background: oColorsGetPaletteColor('org-b2c'),
 			color: white,
 			stripe-color: white,
+		),
+		('b2c', 'inverse', 'primary'): (
+			background: purple,
+			stripe-background: rgb(192, 85, 192),
 		)
 	),
 	'settings': (
@@ -54,7 +58,8 @@ $o-table-brand: 'internal' !default;
 		'inverse': true,
 		'compact': true,
 		'b2b': true,
-		'b2c': true
+		'b2c': true,
+		'primary': true
 	)
 ));
 
