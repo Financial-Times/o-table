@@ -2,8 +2,8 @@ $o-table-brand: 'internal' !default;
 
 @include _oTableBrandSet('masterbrand', (
 	'variables': (
-		color: oColorsGetColorFor(o-table page, text),
-		background: oColorsGetColorFor(o-table page, background),
+		table-color: oColorsGetColorFor(o-table page, text),
+		table-background: oColorsGetColorFor(o-table page, background),
 		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
 		stripe-background: oColorsGetColorFor(o-table-stripe, background)
 	),
@@ -14,42 +14,42 @@ $o-table-brand: 'internal' !default;
 
 @include _oTableBrandSet('internal', (
 	'variables': (
-		background: oColorsMix(black, white, 5),
+		table-background: oColorsMix(black, white, 5),
 		stripe-background: oColorsMix(black, white, 15),
 		compact-typography-size: 0,
 		'b2c': (
-			background: oColorsGetPaletteColor('org-b2c'),
+			table-background: oColorsGetPaletteColor('org-b2c'),
 			stripe-background: oColorsGetPaletteColor('org-b2c-light'),
-			color: white,
+			table-color: white,
 			stripe-color: oColorsMix(black, white, 80),
 			compact-typography-size: -2
 		),
 		'b2b': (
-			background: oColorsGetPaletteColor('claret-90'),
+			table-background: oColorsGetPaletteColor('claret-90'),
 			stripe-background: oColorsGetPaletteColor('claret-70'),
-			color: white,
+			table-color: white,
 			compact-typography-size: -2
 		),
 		'inverse': (
-			color: oColorsMix(black, white, 20),
-			background: oColorsMix(black, white, 80),
+			table-color: oColorsMix(black, white, 20),
+			table-background: oColorsMix(black, white, 80),
 			stripe-background: oColorsMix(black, white, 20),
 			stripe-color: oColorsMix(black, white, 80)
 		),
 		('b2b','inverse'): (
-			background: oColorsGetPaletteColor('claret-40'),
+			table-background: oColorsGetPaletteColor('claret-40'),
 			stripe-background: oColorsGetPaletteColor('claret-30'),
-			color: white,
+			table-color: white,
 			stripe-color: white,
 		),
 		('b2c','inverse'): (
-			background: oColorsGetPaletteColor('org-b2c-dark'),
+			table-background: oColorsGetPaletteColor('org-b2c-dark'),
 			stripe-background: oColorsGetPaletteColor('org-b2c'),
-			color: white,
+			table-color: white,
 			stripe-color: white,
 		),
 		('b2c', 'inverse', 'primary'): (
-			background: purple,
+			table-background: purple,
 			stripe-background: rgb(192, 85, 192)
 		)
 	),
