@@ -6,8 +6,8 @@
 /// Base tables styles - add to <table>
 @mixin oTableBase() {
 	@include oTypographyBody;
-	background-color: _oTableBrandVariable('table-background');
-	color: _oTableBrandVariable('table-color');
+	background-color: _oTableBrandProperty('table-background');
+	border: _oTableBrandProperty('table-border-width', 'table-border-style', 'table-border-color');
 	border-collapse: collapse;
 	border-spacing: 0;
 	margin: 0 0 20px;
@@ -22,6 +22,7 @@
 	th {
 		@include oTypographySansBold(1);
 		@include oColorsFor(o-table-header, color);
+		background-color: _oTableBrandProperty('header-background');
 	}
 
 	&[data-o-table--js] thead th {
@@ -67,6 +68,7 @@
 		padding: 8px;
 		text-align: left;
 		vertical-align: top;
+		border-bottom: _oTableBrandProperty('table-border-width', 'table-border-style', 'table-border-color');
 	}
 
 	th:not([scope=row]) {
@@ -79,27 +81,4 @@
 @mixin oTableWrapper {
 	overflow: auto;
 	width: 100%;
-}
-
-/**	
-* Styles to override the look of the standard table.
-* 
-* @param {string} $classname
-* @param {bool} $compact To output the compact override or not.
-**/
-@mixin _oTableOverrides($classname, $compact: false) {
-	background-color: _oTableBrandVariable('table-background');
-	color: _oTableBrandVariable('table-color');
-
-	@if _oTableBrandSupports('stripe') {
-		&.#{$classname}--row-stripes {
-			@include oTableRowStripes;
-		}
-	}
-
-	@if _oTableBrandSupports('compact') and $compact {
-		&.#{$classname}--compact {
-			@include oTableCompact;
-		}
-	}
 }

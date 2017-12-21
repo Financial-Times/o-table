@@ -1,65 +1,25 @@
-$o-table-brand: 'internal' !default;
+$o-table-brand: 'masterbrand' !default;
 
 @include _oTableBrandSet('masterbrand', (
 	'variables': (
-		table-color: oColorsGetColorFor(o-table page, text),
-		table-background: oColorsGetColorFor(o-table page, background),
-		stripe-color: oColorsGetColorFor(o-table-stripe o-table page, text),
-		stripe-background: oColorsGetColorFor(o-table-stripe, background)
+		table-background: oColorsGetColorFor(o-table page, background)
 	),
 	'settings': (
-		'stripe': true
+		'stripe': true,
+		'compact': true
 	)
 ));
 
 @include _oTableBrandSet('internal', (
 	'variables': (
-		table-background: oColorsMix(black, white, 5),
-		stripe-background: oColorsMix(black, white, 15),
-		compact-typography-size: 0,
-		'b2c': (
-			table-background: oColorsGetPaletteColor('org-b2c'),
-			stripe-background: oColorsGetPaletteColor('org-b2c-light'),
-			table-color: white,
-			stripe-color: oColorsMix(black, white, 80),
-			compact-typography-size: -2
-		),
-		'b2b': (
-			table-background: oColorsGetPaletteColor('claret-90'),
-			stripe-background: oColorsGetPaletteColor('claret-70'),
-			table-color: white,
-			compact-typography-size: -2
-		),
-		'inverse': (
-			table-color: oColorsMix(black, white, 20),
-			table-background: oColorsMix(black, white, 80),
-			stripe-background: oColorsMix(black, white, 20),
-			stripe-color: oColorsMix(black, white, 80)
-		),
-		('b2b','inverse'): (
-			table-background: oColorsGetPaletteColor('claret-40'),
-			stripe-background: oColorsGetPaletteColor('claret-30'),
-			table-color: white,
-			stripe-color: white,
-		),
-		('b2c','inverse'): (
-			table-background: oColorsGetPaletteColor('org-b2c-dark'),
-			stripe-background: oColorsGetPaletteColor('org-b2c'),
-			table-color: white,
-			stripe-color: white,
-		),
-		('b2c', 'inverse', 'primary'): (
-			table-background: purple,
-			stripe-background: rgb(192, 85, 192)
-		)
+		table-background: oColorsGetPaletteColor(white),
+		header-background: oColorsMix(black, white, 5),
+		table-border-width: 1px,
+		table-border-style: solid,
+		table-border-color: oColorsMix(black, white, 5)
 	),
 	'settings': (
-		'stripe': true,
-		'inverse': true,
-		'compact': true,
-		'b2b': true,
-		'b2c': true,
-		'primary': true
+		'compact': true
 	)
 ));
 

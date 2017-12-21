@@ -7,6 +7,12 @@
 @mixin oTableResponsiveScroll {
 	display: flex;
 	overflow: hidden;
+	
+	// Ensure collapsed table border is not hidden.
+	@if _oTableBrandProperty('table-border-width') == 1px {
+		border-right-width: 2px;
+		border-bottom-width: 2px;
+	}
 
 	@include oGridRespondTo(S) {
 		display: table;

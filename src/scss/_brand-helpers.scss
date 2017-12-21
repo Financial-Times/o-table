@@ -3,12 +3,32 @@ $_o-table-current-variant: ();
 $_o-table-current-depth: 0;
 
 /**	
-* Gets a variable for the globally set brand.
+* Gets a variable value from for the globally set brand for use as a property.
+* If multiple variables are requested they are composed to one property.
+* 
+* @param {arglist} $variable
+* @return {string | number | color | null}
+**/
+@function _oTableBrandProperty($variables...) {
+    @if length($variables) == 1 {
+        @return _oTableBrandGetVariableValue(nth($variables, 1));
+    }
+    $values: ();
+    @each $variable in $variables {
+        @if  $variable {
+            $values: join($values,  _oTableBrandGetVariableValue($variable));
+        }
+    }
+    @return $values;
+}
+
+/**	
+* Gets a variable value from the globally set brand.
 * 
 * @param {string} $variable
 * @return {string | number | color | null}
 **/
-@function _oTableBrandVariable($variable) {
+@function _oTableBrandGetVariableValue($variable) {
     $brand-config: _oTableBrandConfig($o-table-brand);
     $variables: map-get($brand-config, 'variables');
     // Use brand variant variables if a variant is configured.
@@ -22,7 +42,7 @@ $_o-table-current-depth: 0;
         }
         $value: map-get($variables, $variable);
          // Confirm the set value is what we expect of a brand variable.
-        $supported-variable-types: ('string', 'number', 'color', 'null');
+        $supported-variable-types: ('string', 'number', 'color', 'list', 'null');
         @if not index($supported-variable-types, type-of($value)) {
             @error 'Brand variable "#{$variable}" is type of "#{type-of($value)}" but can only be one of: #{$supported-variable-types}.';
         }

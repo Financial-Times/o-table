@@ -67,40 +67,4 @@
 			@include oTableRowStripes;
 		}
 	}
-
-	@include _oTableBrandConfigureFor('b2b') {
-		.#{$classname}--b2b {
-			@include _oTableOverrides($classname, $compact: true);
-		}
-	}
-
-	@include _oTableBrandConfigureFor('b2c') {
-		.#{$classname}--b2c {
-			@include _oTableOverrides($classname, $compact: true);
-		}
-	}
-
-	@include _oTableBrandConfigureFor('inverse') {
-		.#{$classname}--inverse {
-			@include _oTableOverrides($classname);
-		}
-	}
-
-	@include _oTableBrandConfigureFor('inverse') {
-		@include _oTableBrandConfigureFor('b2b') {
-			.#{$classname}--inverse.#{$classname}--b2b {
-				@include _oTableOverrides($classname);
-			}
-		}
-		@include _oTableBrandConfigureFor('b2c') {
-			.#{$classname}--inverse.#{$classname}--b2c {
-				@include _oTableOverrides($classname);
-			}
-		}
-		@include _oTableBrandConfigureFor(('b2c', 'primary')) {
-			.#{$classname}--inverse.#{$classname}--b2c.#{$classname}--primary {
-				@include _oTableOverrides($classname);
-			}
-		}
-	}
 }
