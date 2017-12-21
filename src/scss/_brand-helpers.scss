@@ -69,8 +69,8 @@ $_o-table-current-depth: 0;
 **/
 @mixin _oTableBrandConfigureFor($variant) {
     @if type-of($variant) != 'list' and type-of($variant) != 'string' {
-        @error 'Cound not configure for variant #{type-of($variant)} "#{$variant}", expecting a list or string.'
-    };
+        @error 'Cound not configure for variant #{type-of($variant)} "#{$variant}", expecting a list or string.';
+    }
     @include _oTableSetBrandVariant($variant);
     @if _oTableBrandSupports($variant) {
         @content;
@@ -103,10 +103,10 @@ $_o-table-current-depth: 0;
         $_o-table-current-variant: () !global;
     }
     $new-variants: ();
-    $n: 1;
-    @while $n <= $_o-table-current-depth {
-        $new-variants: join($new-variants, (nth($_o-table-current-variant, $n)), 'comma');
-        $n: $n + 1;	
+    $num: 1;
+    @while $num <= $_o-table-current-depth {
+        $new-variants: join($new-variants, (nth($_o-table-current-variant, $num)), 'comma');
+        $num: $num + 1;
     }
     $_o-table-current-variant: if(length($new-variants) == 0, (), $new-variants) !global;
 }
@@ -119,8 +119,8 @@ $_o-table-current-depth: 0;
 **/
 @function _oTableBrandSupports($variant) {
     @if type-of($variant) != 'list' and type-of($variant) != 'string' {
-        @error 'Cound not check support for variant #{type-of($variant)} "#{$variant}", expecting a list or string.'
-    };
+        @error 'Cound not check support for variant #{type-of($variant)} "#{$variant}", expecting a list or string.';
+    }
     $brand-config: _oTableBrandConfig($o-table-brand);
     $brand-features: map-get($brand-config, 'settings');
     // No settings are enabled.
@@ -193,6 +193,7 @@ $_o-table-current-depth: 0;
 * @return {list}
 **/
 @function _oTableQuickSort($list) {
+    // sass-lint:disable variable-name-format
     $less:  ();
     $equal: ();
     $large: ();
@@ -210,33 +211,36 @@ $_o-table-current-depth: 0;
         @return join(join(_oTableQuickSort($less), $equal), _oTableQuickSort($large), list-separator($list));
     }
     @return $list;
+    // sass-lint:enable variable-name-format
 }
 
 /**	
 * Compares two strings to determine which comes first
 * according to the order of a given character list.
 *
-* @param {string} $a
-* @param {string} $b
+* @param {string} $string-a
+* @param {string} $string-b
 * @return {list}
 **/
-@function _oTableStringCompare($a, $b) {
-    $character-order: ('0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
-    @if type-of($a) == 'number' and type-of($b) == 'number' {
-        @return $a < $b;
+@function _oTableStringCompare($string-a, $string-b) {
+    // sass-lint:disable variable-name-format
+    $character-order: ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+    @if $string-a {
+        @return $string-a < $string-b;
     }
 
-    $a: to-lower-case($a + unquote(''));
-    $b: to-lower-case($b + unquote(''));
+    $string-a: to-lower-case($string-a + unquote(''));
+    $string-b: to-lower-case($string-b + unquote(''));
 
-    @for $i from 1 through min(str-length($a), str-length($b)) {
-        $char-a: str-slice($a, $i, $i);
-        $char-b: str-slice($b, $i, $i);
+    @for $i from 1 through min(str-length($string-a), str-length($string-b)) {
+        $character-a: str-slice($string-a, $i, $i);
+        $character-b: str-slice($string-b, $i, $i);
 
-        @if $char-a and $char-b and index($character-order, $char-a) != index($character-order, $char-b) {
-            @return index($character-order, $char-a) < index($character-order, $char-b);
+        @if $character-a and $character-b and index($character-order, $character-a) != index($character-order, $character-b) {
+            @return index($character-order, $char-a) < index($character-order, $character-b);
         }
     }
 
-    @return str-length($a) < str-length($b);
+    @return str-length($string-a) < str-length($string-b);
+    // sass-lint:enable variable-name-format
 }
