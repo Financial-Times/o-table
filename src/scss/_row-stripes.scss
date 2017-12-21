@@ -6,11 +6,11 @@
 /// Add this to the table element to get row stripes
 @mixin oTableRowStripes() {
 	background-color: oColorsGetColorFor(o-table-striped o-table page, background);
-	
+
 	caption {
 		background-color: oColorsGetColorFor(o-table-striped o-table page, background);
 	}
-	
+
 	tbody tr:nth-child(even) {
 		background-color: oColorsGetColorFor(o-table-row-alt o-table, background);
 	}
