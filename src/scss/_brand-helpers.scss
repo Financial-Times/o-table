@@ -1,11 +1,14 @@
 $_o-table-brands: () !default;
 $_o-table-current-variant: ();
 $_o-table-current-depth: 0;
+$o-table-brand: null !default;
+$_o-table-default-brand: 'masterbrand';
+$_o-table-default-brand-is-configured: false !default;
 
-/**	
+/**
 * Gets a variable value from for the globally set brand for use as a property.
 * If multiple variables are requested they are composed to one property.
-* 
+*
 * @param {arglist} $variable
 * @return {string | number | color | null}
 **/
@@ -15,16 +18,16 @@ $_o-table-current-depth: 0;
     }
     $values: ();
     @each $variable in $variables {
-        @if  $variable {
+        @if $variable {
             $values: join($values,  _oTableBrandGetVariableValue($variable));
         }
     }
     @return $values;
 }
 
-/**	
+/**
 * Gets a variable value from the globally set brand.
-* 
+*
 * @param {string} $variable
 * @return {string | number | color | null}
 **/
@@ -57,7 +60,7 @@ $_o-table-current-depth: 0;
 * This mixin can be nested within itself to build on a variant to target a new variant.
 * If the current, globally set brand does not support the variant no CSS will be output.
 *
-* E.g. 
+* E.g.
 * _oTableBrandConfigureFor('inverse') {
 *    // Will use the 'inverse' variant when fetching variable values.
 *   _oTableBrandConfigureFor('b2b') {
@@ -98,7 +101,7 @@ $_o-table-current-depth: 0;
 * @param {string | list} $variant
 **/
 @mixin _oTableUnsetBrandVariant($variant) {
-    $_o-table-current-depth: $_o-table-current-depth - length($variant) !global; 
+    $_o-table-current-depth: $_o-table-current-depth - length($variant) !global;
     @if $_o-table-current-depth == 0 {
         $_o-table-current-variant: () !global;
     }
@@ -111,9 +114,9 @@ $_o-table-current-depth: 0;
     $_o-table-current-variant: if(length($new-variants) == 0, (), $new-variants) !global;
 }
 
-/**	
+/**
 * Check the brand's settings to see if it supports a variant.
-* 
+*
 * @param {string | list} $variant
 * @return {boolean}
 **/
@@ -137,7 +140,7 @@ $_o-table-current-depth: 0;
     @return true;
 }
 
-/**	
+/**
 * Set brand configuration.
 *
 * @param {string} $brand
@@ -147,14 +150,17 @@ $_o-table-current-depth: 0;
     @if type-of($config) != 'map' {
         @error 'Could not set brand "#{$brand}", it\'s configuration must be a map.';
     }
+    @if $_o-table-default-brand == $brand {
+        $_o-table-default-brand-is-configured: true !global;
+    }
     $variables: map-get($config, 'variables');
     $settings: map-get($config, 'settings');
     $errorMessage: 'Could not set brand "#{$brand}".';
     @if $variables and (type-of($variables) != 'map' and type-of($variables) != 'list' ) {
-        @error $errorMessage + ' Config key "variables" should be a map but is of type #{type-of($variables)}.';	
+        @error $errorMessage + ' Config key "variables" should be a map but is of type #{type-of($variables)}.';
     }
     @if $settings and (type-of($settings) != 'map' and type-of($settings) != 'list' ) {
-        @error $errorMessage + ' Config key "settings" should be a map but is of type #{type-of($settings)}.';	
+        @error $errorMessage + ' Config key "settings" should be a map but is of type #{type-of($settings)}.';
     }
     // Sort brand variant keys.
     // E.g. Input ('c', 'a', 'b'): (background: red) becomes ('a', 'b', 'c'): (background: red)
@@ -171,7 +177,7 @@ $_o-table-current-depth: 0;
     ))) !global;
 }
 
-/**	
+/**
 * Get all config for a given brand.
 *
 * @param {string} $brand
@@ -180,13 +186,17 @@ $_o-table-current-depth: 0;
 @function _oTableBrandConfig($brand) {
     // Get config for the brand.
     $brand-config: map-get($_o-table-brands, $brand);
+    @if $_o-table-default-brand-is-configured == false {
+        @error 'The default brand "#{$_o-table-default-brand}" must be set.';
+    }
     @if $brand-config == null {
-        @error 'The brand #{$brand} has not been set.';
+        @warn 'The requested brand "#{$brand}" has not been set. Using "#{$_o-table-default-brand}" brand instead.';
+        @return _oTableBrandConfig($_o-table-default-brand);
     }
     @return $brand-config;
 }
 
-/**	
+/**
 * Quick sort, alphanumeric.
 *
 * @param {list} $list The list to sort.
@@ -194,7 +204,7 @@ $_o-table-current-depth: 0;
 **/
 @function _oTableQuickSort($list) {
     // sass-lint:disable variable-name-format
-    $less:  ();
+    $less: ();
     $equal: ();
     $large: ();
     @if length($list) > 1 {
@@ -214,7 +224,7 @@ $_o-table-current-depth: 0;
     // sass-lint:enable variable-name-format
 }
 
-/**	
+/**
 * Compares two strings to determine which comes first
 * according to the order of a given character list.
 *
