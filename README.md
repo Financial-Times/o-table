@@ -73,7 +73,7 @@ When they're are not present, browsers will implicitly wrap table contents in `t
 
 #### Disable sort on one or more columns
 
-Adding `data-o-table-heading-disable-sort` to a table column heading with disable and hide the sort interface on that column heading. This is useful for columns of a table which do not provide sortable data, such as an edit button related to the data in its row.
+Adding `data-o-table-heading-disable-sort` to a table column heading will disable and hide the sort interface on that column heading. This is useful for columns of a table which do not provide sortable data, such as an edit button related to the data in its row.
 
 ```html
 <table class="o-table" data-o-component="o-table">
