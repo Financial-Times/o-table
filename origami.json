@@ -27,50 +27,6 @@
 			"name": "basic",
 			"template": "demos/src/basic.mustache",
 			"description": ""
-		},
-		{
-			"name": "compact",
-			"template": "demos/src/basic.mustache",
-			"data": {
-				"modifierClass": "o-table--compact"
-			},
-			"description": ""
-		},
-		{
-			"name": "captions",
-			"template": "demos/src/captions.mustache",
-			"description": ""
-		},
-		{
-			"name": "row-stripes",
-			"template": "demos/src/row-stripes.mustache",
-			"description": ""
-		},
-		{
-			"name": "responsive-flat",
-			"template": "demos/src/responsive-flat.mustache",
-			"description": "This is a flat responsive version"
-		},
-		{
-			"name": "responsive-overflow",
-			"template": "demos/src/responsive-overflow.mustache",
-			"data": {
-				"modifierClass": "o-table--responsive-overflow"
-			},
-			"description": "This is an overflow responsive version"
-		},
-		{
-			"name": "responsive-scroll",
-			"template": "demos/src/responsive-scroll.mustache",
-			"data": {
-				"modifierClass": "o-table--responsive-scroll"
-			},
-			"description": "This is a scrolling responsive version"
-		},
-		{
-			"name": "pa11y",
-			"template": "demos/src/pa11y.mustache",
-			"hidden": true
 		}
 	]
 }

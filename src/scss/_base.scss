@@ -6,8 +6,8 @@
 /// Base tables styles - add to <table>
 @mixin oTableBase() {
 	@include oTypographyBody;
-	background-color: _oTableBrandProperty('table-background');
-	border: _oTableBrandProperty('table-border-width', 'table-border-style', 'table-border-color');
+	background-color: oBrandGet('o-table', 'table-background');
+	border: oBrandGet('o-table', ('table-border-width' 'table-border-style' 'table-border-color'));
 	border-collapse: collapse;
 	border-spacing: 0;
 	margin: 0 0 20px;
@@ -22,7 +22,7 @@
 	th {
 		@include oTypographySansBold(1);
 		@include oColorsFor(o-table-header, color);
-		background-color: _oTableBrandProperty('header-background');
+		background-color: oBrandGet('o-table', 'header-background');
 	}
 
 	&[data-o-table--js] thead th {
@@ -68,13 +68,12 @@
 		padding: 8px;
 		text-align: left;
 		vertical-align: top;
-		border-bottom: _oTableBrandProperty('table-border-width', 'table-border-style', 'table-border-color');
+		border-bottom: oBrandGet('o-table', ('table-border-width' 'table-border-style' 'table-border-color'));
 	}
 
 	th:not([scope=row]) {
 		vertical-align: bottom;
 	}
-
 }
 
 /// Add to table's wrapper element (if there is one)
