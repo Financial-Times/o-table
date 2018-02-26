@@ -323,7 +323,6 @@ describe('oTable sorting', () => {
 		});
 	});
 
-
 	it('sorts via data-o-table-order alphabetically it is set, regardless of whether cell is <th> or <td>', done => {
 		sandbox.reset();
 		sandbox.init();
@@ -358,6 +357,54 @@ describe('oTable sorting', () => {
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
 			done();
 		});
+	});
+
+	it.only('can be intercepted for a custom sort implementation', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th>Things</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th data-o-table-order="c">snowman</th>
+					</tr>
+					<tr>
+						<th data-o-table-order="a">42</th>
+					</tr>
+					<tr>
+						<th data-o-table-order="b">pangea</th>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		sinon.spy(testOTable, "sortRowsByColumn");
+		oTableEl.addEventListener('oTable.sorting', (event) => {
+			event.preventDefault();
+			// Column index, sort order, and table instance provided by the event.
+			proclaim.equal(event.detail.columnIndex, 0);
+			proclaim.equal(event.detail.sort, 'ASC');
+			proclaim.equal(event.detail.instance, testOTable);
+			// Sorted event can be fired.
+			event.detail.instance.sorted(event.detail.columnIndex, event.detail.sort);
+		});
+
+		oTableEl.addEventListener('oTable.sorted', (event) => {
+			// Standard sort has been intercepted but aria labels are handled for us.
+			setTimeout(() => {
+				proclaim.equal(event.target.getAttribute('aria-sort'), 'ascending');
+				proclaim.isTrue(testOTable.sortRowsByColumn.notCalled);
+				testOTable.sortRowsByColumn.restore();
+				done();
+			}, 0);
+		});
+		click('thead th');
 	});
 
 });

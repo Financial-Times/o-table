@@ -71,6 +71,20 @@ function OTable(rootEl) {
 	}
 }
 
+
+OTable.prototype.updateSortAttributes = function updateSortAttributes(columnIndex, sort) {
+	const sortedColumn = this.tableHeaders[columnIndex];
+	if (!sortedColumn) {
+		throw new Error(`Could not update aria attributes for the sorted table. The sorted column with index ${columnIndex} could not be found.`);
+	}
+	// Update aria attributes.
+	this.tableHeaders.forEach((header) => {
+		header.setAttribute('aria-sort', 'none');
+	});
+	this.rootEl.setAttribute('data-o-table-order', sort);
+	sortedColumn.setAttribute('aria-sort', (sort === 'ASC' ? 'ascending' : 'descending'));
+};
+
 /**
  *
  * @private
@@ -78,19 +92,38 @@ function OTable(rootEl) {
  */
 OTable.prototype._sortByColumn = function _sortByColumn (columnIndex) {
 	return function (event) {
-		let currentSort = event.currentTarget.getAttribute('aria-sort');
-		this.tableHeaders.forEach((header) => {
-			header.setAttribute('aria-sort', 'none');
-		});
-		if (this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending") {
-			this.rootEl.setAttribute('data-o-table-order', 'ASC');
-			event.currentTarget.setAttribute('aria-sort', 'ascending');
-		} else {
-			this.rootEl.setAttribute('data-o-table-order', 'DES');
-			event.currentTarget.setAttribute('aria-sort', 'descending');
+		const currentSort = event.currentTarget.getAttribute('aria-sort');
+		const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
+
+		const customSort = !event.currentTarget.dispatchEvent(new CustomEvent('oTable.sorting', {
+			detail: {
+				sort,
+				columnIndex: columnIndex,
+				instance: this
+			},
+			bubbles: true,
+			cancelable: true
+		}));
+
+		if (!customSort) {
+			this.sortRowsByColumn(columnIndex, sort === "ASC", event.currentTarget.getAttribute('data-o-table-data-type') === 'numeric');
 		}
-		this.sortRowsByColumn(columnIndex, this.rootEl.getAttribute('data-o-table-order') === "ASC", event.currentTarget.getAttribute('data-o-table-data-type') === 'numeric');
+
+		this.updateSortAttributes(columnIndex, sort);
 	}.bind(this);
+};
+
+OTable.prototype.sorted = function (columnIndex, sort) {
+	if (!this.tableHeaders[columnIndex]) {
+		throw new Error(`Could not dispatch the "oTable.sorted" event. The column for index ${columnIndex} could not be found.`);
+	}
+	this.tableHeaders[columnIndex].dispatchEvent(new CustomEvent('oTable.sorted', {
+		detail: {
+			sort,
+			columnIndex
+		},
+		bubbles: true
+	}));
 };
 
 /**
@@ -169,7 +202,6 @@ function descendingSort(...args) {
 OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericValue) {
 	const tbody = this.rootEl.querySelector('tbody');
 	const rows = Array.from(tbody.querySelectorAll('tr'));
-
 	const intlCollator = getIntlCollator();
 	rows.sort(function (a, b) {
 		let aCol = a.children[index];
@@ -188,8 +220,8 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 		}
 
 		if (isNumericValue) {
-			aCol = parseFloat(aCol.replace(/,/g,''));
-			bCol = parseFloat(bCol.replace(/,/g,''));
+			aCol = parseFloat(aCol.replace(/,/g, ''));
+			bCol = parseFloat(bCol.replace(/,/g, ''));
 		}
 
 		if (sortAscending) {
@@ -200,11 +232,11 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 
 	});
 
-	rows.forEach(function(row) {
+	rows.forEach(function (row) {
 		tbody.appendChild(row);
 	});
 
-	this.dispatch('sorted');
+	this.sorted(index, (sortAscending ? 'ASC' : 'DESC'));
 };
 
 /**
