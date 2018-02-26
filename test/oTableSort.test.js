@@ -1,5 +1,6 @@
 /* eslint-env mocha, proclaim */
 import proclaim from 'proclaim';
+import sinon from 'sinon/pkg/sinon';
 
 import * as sandbox from './helpers/sandbox';
 import OTable from './../main';
