@@ -293,7 +293,7 @@ document.addEventListener('oTable.sorting', (event) => {
 });
 ```
 
-###### Get The Sorted Column Heading From A Sort Event
+##### Get The Sorted Column Heading From A Sort Event
 
 `o-table` sort events provide a `columnIndex`. This index maps to a column heading. To retrieve the column heading use `getTableHeader`.
 
