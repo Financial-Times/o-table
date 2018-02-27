@@ -347,6 +347,7 @@ describe('Destroying an oTable instance', () => {
 
 describe("getTableHeader()", () => {
 	let oTableEl;
+	let testOTable;
 
 	beforeEach(() => {
 		sandbox.init();

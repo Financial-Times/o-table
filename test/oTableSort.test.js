@@ -457,14 +457,14 @@ describe('oTable sorting', () => {
 			proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), expectedAriaValue);
 			proclaim.equal(oTableElHeaders[otherHeaderIndex].getAttribute('aria-sort'), 'none');
 			done();
-		}
+		};
 
 		it('by the first column, ASC', (done) => {
 			const sortedHeaderIndex = 0;
 			const otherHeaderIndex = 1;
 			const sort = 'ASC';
 			const expectedAriaValue = 'ascending';
-			oTableEl.addEventListener('oTable.sorted', (e) => {
+			oTableEl.addEventListener('oTable.sorted', () => {
 				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
@@ -475,7 +475,7 @@ describe('oTable sorting', () => {
 			const otherHeaderIndex = 0;
 			const sort = 'DES';
 			const expectedAriaValue = 'descending';
-			oTableEl.addEventListener('oTable.sorted', (e) => {
+			oTableEl.addEventListener('oTable.sorted', () => {
 				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
@@ -486,7 +486,7 @@ describe('oTable sorting', () => {
 			const otherHeaderIndex = 1;
 			const sort = null;
 			const expectedAriaValue = 'none';
-			oTableEl.addEventListener('oTable.sorted', (e) => {
+			oTableEl.addEventListener('oTable.sorted', () => {
 				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
@@ -497,7 +497,7 @@ describe('oTable sorting', () => {
 			const otherHeaderIndex = 1;
 			const sort = null;
 			const expectedAriaValue = 'none';
-			oTableEl.addEventListener('oTable.sorted', (e) => {
+			oTableEl.addEventListener('oTable.sorted', () => {
 				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
