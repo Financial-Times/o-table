@@ -261,7 +261,6 @@ OTable.prototype._sortByColumn = function _sortByColumn(columnIndex) {
 		 * which handled this event called Event.preventDefault(). Otherwise it returns true.
 		 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
 		 */
-		const heading = this.getTableHeader(columnIndex);
 		const customSort = !event.currentTarget.dispatchEvent(new CustomEvent('oTable.sorting', {
 			detail: {
 				sort,

@@ -249,6 +249,13 @@ The following events are fired by `o-table`.
 - `oTable.sorting`
 - `oTable.sorted`
 
+##### oTable.ready
+
+`oTable.ready` fires when the table has been initialised.
+
+The event provides the following properties:
+- `detail.oTable` - The initialised `o-table` instance _(oTable)_.
+
 ##### oTable.sorted
 
 `oTable.sorted` indicates a table has finished sorting. It includes details of the current sort status of the table.
@@ -282,7 +289,7 @@ document.addEventListener('oTable.sorting', (event) => {
 	// Update the table with a custom sort.
 	console.log(`Update the table with sorted data here.`);
 	// Fire the sorted event, passing along the column index and sort.
-	event.detail.instance.sorted(event.detail.columnIndex, event.detail.sort);
+	event.detail.oTable.sorted(event.detail.columnIndex, event.detail.sort);
 });
 ```
 
