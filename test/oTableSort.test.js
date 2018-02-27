@@ -111,16 +111,20 @@ describe('oTable sorting', () => {
 
 	it('alternates sorting between ascending and descending', done => {
 		testOTable = new OTable(oTableEl);
+		// First click ASC
 		click('thead th');
-		click('thead th');
-		oTableEl.addEventListener('oTable.sorted', () => {
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'DES');
-			const rows = oTableEl.querySelectorAll('tbody tr td');
-			proclaim.equal(rows[0].textContent, 'stilton');
-			proclaim.equal(rows[1].textContent, 'red leicester');
-			proclaim.equal(rows[2].textContent, 'cheddar');
-			done();
-		});
+		setTimeout(() => {
+			oTableEl.addEventListener('oTable.sorted', () => {
+				proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'DES');
+				const rows = oTableEl.querySelectorAll('tbody tr td');
+				proclaim.equal(rows[0].textContent, 'stilton');
+				proclaim.equal(rows[1].textContent, 'red leicester');
+				proclaim.equal(rows[2].textContent, 'cheddar');
+				done();
+			});
+			// Second click DES
+			click('thead th');
+		}, 0);
 	});
 
 	it('sorts strings alphabetically', done => {
@@ -391,15 +395,16 @@ describe('oTable sorting', () => {
 			// Column index, sort order, and table instance provided by the event.
 			proclaim.equal(event.detail.columnIndex, 0);
 			proclaim.equal(event.detail.sort, 'ASC');
-			proclaim.equal(event.detail.instance, testOTable);
+			proclaim.equal(event.detail.oTable, testOTable);
 			// Sorted event can be fired.
-			event.detail.instance.sorted(event.detail.columnIndex, event.detail.sort);
+			event.detail.oTable.sorted(event.detail.columnIndex, event.detail.sort);
 		});
 
 		oTableEl.addEventListener('oTable.sorted', (event) => {
 			// Standard sort has been intercepted but aria labels are handled for us.
 			setTimeout(() => {
-				proclaim.equal(event.target.getAttribute('aria-sort'), 'ascending');
+				const sortedHeading = event.detail.oTable.getTableHeader(event.detail.columnIndex);
+				proclaim.equal(sortedHeading.getAttribute('aria-sort'), 'ascending');
 				proclaim.isTrue(testOTable.sortRowsByColumn.notCalled);
 				testOTable.sortRowsByColumn.restore();
 				done();
@@ -408,59 +413,94 @@ describe('oTable sorting', () => {
 		click('thead th');
 	});
 
-	it('can update sort attributes independently', () => {
-		sandbox.reset();
-		sandbox.init();
-		sandbox.setContents(`
-			<table class="o-table" data-o-component="o-table">
-				<thead>
-					<tr>
-						<th>Things</th>
-						<th>Other Things</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th data-o-table-order="c">snowman</th>
-						<th data-o-table-order="c">snowman</th>
-					</tr>
-					<tr>
-						<th data-o-table-order="a">42</th>
-						<th data-o-table-order="a">42</th>
-					</tr>
-					<tr>
-						<th data-o-table-order="b">pangea</th>
-						<th data-o-table-order="b">pangea</th>
-					</tr>
-				</tbody>
-			</table>
-		`);
-		oTableEl = document.querySelector('[data-o-component=o-table]');
-		testOTable = new OTable(oTableEl);
-		const oTableElHeaders = Array.from(oTableEl.querySelectorAll('thead th'));
+	describe('updates sort attributes when sorted', () => {
+		let oTableElHeaders;
 
-		[{
-			sortedHeaderIndex: 0,
-			sort: 'ASC',
-			expectedAriaValue: 'ascending'
-		}, {
-			sortedHeaderIndex: 1,
-			sort: 'DESC',
-			expectedAriaValue: 'descending'
-		}, {
-			sortedHeaderIndex: null,
-			sort: null,
-			expectedAriaValue: 'none'
-		}, {
-			sortedHeaderIndex: 0,
-			sort: null,
-			expectedAriaValue: 'none'
-		}].forEach(data => {
-			const sortedHeaderIndex = data.sortedHeaderIndex || 0;
-			const otherHeaderIndex = 1 - sortedHeaderIndex;
-			testOTable.updateSortAttributes(sortedHeaderIndex, data.sort);
-			proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), data.expectedAriaValue);
+		beforeEach(() => {
+			sandbox.reset();
+			sandbox.init();
+			sandbox.setContents(`
+				<table class="o-table" data-o-component="o-table">
+					<thead>
+						<tr>
+							<th>Things</th>
+							<th>Other Things</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th data-o-table-order="c">snowman</th>
+							<th data-o-table-order="c">snowman</th>
+						</tr>
+						<tr>
+							<th data-o-table-order="a">42</th>
+							<th data-o-table-order="a">42</th>
+						</tr>
+						<tr>
+							<th data-o-table-order="b">pangea</th>
+							<th data-o-table-order="b">pangea</th>
+						</tr>
+					</tbody>
+				</table>
+			`);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
+			testOTable = new OTable(oTableEl);
+			oTableElHeaders = Array.from(oTableEl.querySelectorAll('thead th'));
+		});
+
+		afterEach(() => {
+			oTableElHeaders = undefined;
+		});
+
+		const checkExpectations = function (sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done) {
+			sortedHeaderIndex = sortedHeaderIndex || 0;
+			proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), expectedAriaValue);
 			proclaim.equal(oTableElHeaders[otherHeaderIndex].getAttribute('aria-sort'), 'none');
+			done();
+		}
+
+		it('by the first column, ASC', (done) => {
+			const sortedHeaderIndex = 0;
+			const otherHeaderIndex = 1;
+			const sort = 'ASC';
+			const expectedAriaValue = 'ascending';
+			oTableEl.addEventListener('oTable.sorted', (e) => {
+				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+			});
+			testOTable.sorted(sortedHeaderIndex, sort);
+		});
+
+		it('by the second column, DES', (done) => {
+			const sortedHeaderIndex = 1;
+			const otherHeaderIndex = 0;
+			const sort = 'DES';
+			const expectedAriaValue = 'descending';
+			oTableEl.addEventListener('oTable.sorted', (e) => {
+				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+			});
+			testOTable.sorted(sortedHeaderIndex, sort);
+		});
+
+		it('by the first column but with no sort specified', (done) => {
+			const sortedHeaderIndex = 0;
+			const otherHeaderIndex = 1;
+			const sort = null;
+			const expectedAriaValue = 'none';
+			oTableEl.addEventListener('oTable.sorted', (e) => {
+				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+			});
+			testOTable.sorted(sortedHeaderIndex, sort);
+		});
+
+		it('by no column with no sort specified', (done) => {
+			const sortedHeaderIndex = null;
+			const otherHeaderIndex = 1;
+			const sort = null;
+			const expectedAriaValue = 'none';
+			oTableEl.addEventListener('oTable.sorted', (e) => {
+				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+			});
+			testOTable.sorted(sortedHeaderIndex, sort);
 		});
 	});
 
