@@ -71,77 +71,6 @@ function OTable(rootEl) {
 	}
 }
 
-
-OTable.prototype.updateSortAttributes = function updateSortAttributes(columnIndex, sort) {
-	const sortedColumn = this.tableHeaders[columnIndex];
-	if (!sortedColumn) {
-		throw new Error(`Could not update aria attributes for the sorted table. The sorted column with index ${columnIndex} could not be found.`);
-	}
-	// Update aria attributes.
-	this.tableHeaders.forEach((header) => {
-		header.setAttribute('aria-sort', 'none');
-	});
-	this.rootEl.setAttribute('data-o-table-order', sort);
-	sortedColumn.setAttribute('aria-sort', (sort === 'ASC' ? 'ascending' : 'descending'));
-};
-
-/**
- *
- * @private
- * @param  {Number} columnIndex
- */
-OTable.prototype._sortByColumn = function _sortByColumn (columnIndex) {
-	return function (event) {
-		const currentSort = event.currentTarget.getAttribute('aria-sort');
-		const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
-
-		const customSort = !event.currentTarget.dispatchEvent(new CustomEvent('oTable.sorting', {
-			detail: {
-				sort,
-				columnIndex: columnIndex,
-				instance: this
-			},
-			bubbles: true,
-			cancelable: true
-		}));
-
-		if (!customSort) {
-			this.sortRowsByColumn(columnIndex, sort === "ASC", event.currentTarget.getAttribute('data-o-table-data-type') === 'numeric');
-		}
-
-		this.updateSortAttributes(columnIndex, sort);
-	}.bind(this);
-};
-
-OTable.prototype.sorted = function (columnIndex, sort) {
-	if (!this.tableHeaders[columnIndex]) {
-		throw new Error(`Could not dispatch the "oTable.sorted" event. The column for index ${columnIndex} could not be found.`);
-	}
-	this.tableHeaders[columnIndex].dispatchEvent(new CustomEvent('oTable.sorted', {
-		detail: {
-			sort,
-			columnIndex
-		},
-		bubbles: true
-	}));
-};
-
-/**
- * Duplicate the table headers into each row
- * For use with responsive tables
- *
- * @private
- * @param  {array} rows Table rows
- */
-OTable.prototype._duplicateHeaders = function _duplicateHeaders (rows, headers) {
-	rows.forEach((row) => {
-		const data = Array.from(row.getElementsByTagName('td'));
-		data.forEach((td, dataIndex) => {
-			td.parentNode.insertBefore(headers[dataIndex].cloneNode(true), td);
-		});
-	});
-};
-
 /**
  * Helper function to dispatch namespaced events, namespace defaults to oTable
  * @param  {String} event
@@ -237,6 +166,102 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 	});
 
 	this.sorted(index, (sortAscending ? 'ASC' : 'DESC'));
+};
+
+/**
+ * Update the aria sort attributes on a sorted table.
+ * Useful to reset sort attributes in the case of a custom sort implementation failing.
+ * E.g. One which relies on the network.
+ *
+ * @public
+ * @param {number|null} columnIndex - The index of the currently sorted column, if any.
+ * @param {string|null} sort - The type of sort i.e. ASC or DES, if any.
+ */
+OTable.prototype.updateSortAttributes = function updateSortAttributes(columnIndex, sort) {
+	let ariaSort;
+	switch (sort) {
+		case 'ASC':
+			ariaSort = 'ascending';
+			break;
+		case 'DESC':
+			ariaSort = 'descending';
+			break;
+		default:
+			ariaSort = 'none';
+			break;
+	}
+	// Set aria attributes.
+	const sortedHeader = this.tableHeaders[columnIndex];
+	this.tableHeaders.forEach((header) => {
+		const headerSort = (header === sortedHeader ? ariaSort : 'none');
+		header.setAttribute('aria-sort', headerSort);
+	});
+	this.rootEl.setAttribute('data-o-table-order', sort);
+};
+
+/**
+ * Indicated that the table has been sorted by firing by a custom sort implementation.
+ * Fires the `oTable.sorted` event.
+ *
+ * @public
+ * @param {number|null} columnIndex - The index of the currently sorted column, if any.
+ * @param {string|null} sort - The type of sort i.e. ASC or DES, if any.
+ */
+OTable.prototype.sorted = function (columnIndex, sort) {
+	this._timeoutID = setTimeout(() => {
+		const target = this.tableHeaders[columnIndex] || this.rootEl;
+		target.dispatchEvent(new CustomEvent('oTable.sorted', {
+			detail: {
+				sort,
+				columnIndex
+			},
+			bubbles: true
+		}));
+	}, 0);
+};
+
+/**
+ * Duplicate the table headers into each row
+ * For use with responsive tables
+ *
+ * @private
+ * @param  {array} rows Table rows
+ */
+OTable.prototype._duplicateHeaders = function _duplicateHeaders(rows, headers) {
+	rows.forEach((row) => {
+		const data = Array.from(row.getElementsByTagName('td'));
+		data.forEach((td, dataIndex) => {
+			td.parentNode.insertBefore(headers[dataIndex].cloneNode(true), td);
+		});
+	});
+};
+
+/**
+ *
+ * @private
+ * @param {Number} columnIndex
+ */
+OTable.prototype._sortByColumn = function _sortByColumn(columnIndex) {
+	return function (event) {
+		const currentSort = event.currentTarget.getAttribute('aria-sort');
+		const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
+
+		const customSort = !event.currentTarget.dispatchEvent(new CustomEvent('oTable.sorting', {
+			detail: {
+				sort,
+				columnIndex: columnIndex,
+				instance: this
+			},
+			bubbles: true,
+			cancelable: true
+		}));
+
+		if (!customSort) {
+			this.sortRowsByColumn(columnIndex, sort === "ASC", event.currentTarget.getAttribute('data-o-table-data-type') === 'numeric');
+		}
+
+		this.updateSortAttributes(columnIndex, sort);
+	}.bind(this);
 };
 
 /**

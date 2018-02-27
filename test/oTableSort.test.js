@@ -360,7 +360,7 @@ describe('oTable sorting', () => {
 		});
 	});
 
-	it.only('can be intercepted for a custom sort implementation', done => {
+	it('can be intercepted for a custom sort implementation', done => {
 		sandbox.reset();
 		sandbox.init();
 		sandbox.setContents(`
@@ -406,6 +406,62 @@ describe('oTable sorting', () => {
 			}, 0);
 		});
 		click('thead th');
+	});
+
+	it('can update sort attributes independently', () => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th>Things</th>
+						<th>Other Things</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th data-o-table-order="c">snowman</th>
+						<th data-o-table-order="c">snowman</th>
+					</tr>
+					<tr>
+						<th data-o-table-order="a">42</th>
+						<th data-o-table-order="a">42</th>
+					</tr>
+					<tr>
+						<th data-o-table-order="b">pangea</th>
+						<th data-o-table-order="b">pangea</th>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		const oTableElHeaders = Array.from(oTableEl.querySelectorAll('thead th'));
+
+		[{
+			sortedHeaderIndex: 0,
+			sort: 'ASC',
+			expectedAriaValue: 'ascending'
+		}, {
+			sortedHeaderIndex: 1,
+			sort: 'DESC',
+			expectedAriaValue: 'descending'
+		}, {
+			sortedHeaderIndex: null,
+			sort: null,
+			expectedAriaValue: 'none'
+		}, {
+			sortedHeaderIndex: 0,
+			sort: null,
+			expectedAriaValue: 'none'
+		}].forEach(data => {
+			const sortedHeaderIndex = data.sortedHeaderIndex || 0;
+			const otherHeaderIndex = 1 - sortedHeaderIndex;
+			testOTable.updateSortAttributes(sortedHeaderIndex, data.sort);
+			proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), data.expectedAriaValue);
+			proclaim.equal(oTableElHeaders[otherHeaderIndex].getAttribute('aria-sort'), 'none');
+		});
 	});
 
 });
