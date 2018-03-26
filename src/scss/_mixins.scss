@@ -56,7 +56,6 @@
 		@include oTableResponsiveScroll;
 	}
 
-
 	@include oBrandConfigureFor('o-table', 'compact') {
 		.#{$classname}--compact {
 			@include oTableCompact;
