@@ -18,7 +18,7 @@ Styling for tables.
 Add an `o-table` class to any table you wish to apply the styles to:
 
 ```html
-<table class="o-table">
+<table class="o-table" data-o-component="o-table">
 	...
 </table>
 ```
@@ -26,7 +26,7 @@ Add an `o-table` class to any table you wish to apply the styles to:
 Where a `td` contains numeric data, or a `th` is for cells containing numeric data, also add the class `.o-table__cell--numeric` and a `data-o-table-data-type="numeric"` attribute (the latter allows the column to be sorted correctly):
 
 ```html
-<table class="o-table">
+<table class="o-table" data-o-component="o-table">
 	<tr>
 		<th>Index</th>
 		<th data-o-table-data-type="numeric" class="o-table__cell--numeric">Value</th>
@@ -42,7 +42,7 @@ Where a `td` contains numeric data, or a `th` is for cells containing numeric da
 Where table headings (`th`) are used as row headings, `scope="row"` attributes must be set on the `th`:
 
 ```html
-<table class="o-table">
+<table class="o-table" data-o-component="o-table">
 	<tr>
 		<th scope="row">FTSE 100</th>
 		<td data-o-table-data-type="numeric" class="o-table__cell--numeric">6685.52</td>
@@ -54,7 +54,7 @@ Where table headings (`th`) are used as row headings, `scope="row"` attributes m
 When they're are not present, browsers will implicitly wrap table contents in `tbody` tags, including the header row. It is therefore advisable (and when row-stripes are required, essential) to use `thead`, `tbody` (and if appropriate, `tfoot`) tags in your markup:
 
 ```html
-<table class="o-table">
+<table class="o-table" data-o-component="o-table">
 	<thead>
 		<tr>
 			<th>Index</th>
@@ -71,13 +71,39 @@ When they're are not present, browsers will implicitly wrap table contents in `t
 </table>
 ```
 
+#### Disable sort on one or more columns
+
+Adding `data-o-table-heading-disable-sort` to a table column heading will disable and hide the sort interface on that column heading. This is useful for columns of a table which do not provide sortable data, such as an edit button related to the data in its row.
+
+```html
+<table class="o-table" data-o-component="o-table">
+	<thead>
+		<tr>
+			<th>Heading One</th>
+			<th>Heading Two</th>
+			<!-- do not show the actions column as sortable -->
+			<th data-o-table-heading-disable-sort>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Item One</td>
+			<td>Item Two</td>
+			<td>
+				<a href="#edit">edit</a>
+			</td>
+		</tr>
+	</tbody>
+</table>
+```
+
 #### Small screen rendering
 
 Where there is not enough horizontal space for a table to fit, it can be made horizontally scrollable by wrapping it in an element with a class of `o-table-wrapper`:
 
 ```html
 <div class="o-table-wrapper">
-	<table class="o-table">
+	<table class="o-table" data-o-component="o-table">
 		...
 	</table>
 </div>
@@ -197,7 +223,9 @@ If you are wanting to sort by a custom pattern, you can apply the sorting values
 ``` html
 <table class="o-table" data-o-component="o-table">
 	<thead>
-		<th>Things</th>
+		<tr>
+			<th>Things</th>
+		</tr>
 	</thead>
 	<tbody>
 		<tr>
@@ -211,6 +239,71 @@ If you are wanting to sort by a custom pattern, you can apply the sorting values
 		</tr>
 	</tbody>
 </table>
+```
+
+#### Events
+
+The following events are fired by `o-table`.
+
+- `oTable.ready`
+- `oTable.sorting`
+- `oTable.sorted`
+
+##### oTable.ready
+
+`oTable.ready` fires when the table has been initialised.
+
+The event provides the following properties:
+- `detail.oTable` - The initialised `o-table` instance _(oTable)_.
+
+##### oTable.sorted
+
+`oTable.sorted` indicates a table has finished sorting. It includes details of the current sort status of the table.
+
+The event provides the following properties:
+- `detail.sort` - The sort e.g. "ASC" _(String)_.
+- `detail.columnIndex` - The index of the sorted column heading _(Number)_.
+- `detail.oTable` - The effected `o-table` instance _(oTable)_.
+
+```js
+document.addEventListener('oTable.sorted', (event) => {
+	console.log(`The target table was just sorted by column ${event.detail.columnIndex} in an ${event.detail.sort} order.`);
+});
+```
+
+##### oTable.sorting
+
+This event is fired just before a table sorts based on user interaction. It may be prevented to implement custom sort functionality. This may be useful to sort a paginated table server-side.
+
+The event provides the following properties:
+- `detail.sort` - The sort requested e.g. "ASC" _(String)_.
+- `detail.columnIndex` - The index of the column heading which will be sorted _(Number)_.
+- `detail.oTable` - The effected `o-table` instance _(oTable)_.
+
+When intercepting the default sort the `sorted` method must be called with relevant parameters when the custom sort is completed.
+
+```js
+document.addEventListener('oTable.sorting', (event) => {
+	// Prevent default sorting.
+	event.preventDefault();
+	// Update the table with a custom sort.
+	console.log(`Update the table with sorted data here.`);
+	// Fire the sorted event, passing along the column index and sort.
+	event.detail.oTable.sorted(event.detail.columnIndex, event.detail.sort);
+});
+```
+
+##### Get The Sorted Column Heading From A Sort Event
+
+`o-table` sort events provide a `columnIndex`. This index maps to a column heading. To retrieve the column heading use `getTableHeader`.
+
+```js
+document.addEventListener('oTable.sorting', (event) => {
+	const table = event.detail.oTable;
+	const columnIndex = event.detail.columnIndex;
+	// Get the table header from the column index.
+	console.log(table.getTableHeader(columnIndex));
+});
 ```
 
 ## Troubleshooting
