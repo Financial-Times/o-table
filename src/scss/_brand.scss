@@ -17,6 +17,7 @@
 	'variables': (
 		table-background: oColorsGetPaletteColor('white'),
 		table-stripe-background: oColorsGetPaletteColor('slate-white-5'),
+		table-row-heading-background: oColorsGetPaletteColor('slate-white-5'),
 		table-header-color: oColorsGetPaletteColor('black-90'),
 		table-border-color: oColorsGetPaletteColor('black-20'),
 		table-caption-border-color: oColorsGetPaletteColor('black-30'),
@@ -24,7 +25,8 @@
 	),
 	'settings': (
 		'stripe': true,
-		'compact': true
+		'compact': true,
+		'row-headings': true
 	)
 ));
 
