@@ -5,7 +5,7 @@
 
 /// Add this to the table element to get row stripes
 @mixin oTableRowStripes() {
-	@include oBrandConfigureFor('o-table--row-headings') {
+	@include oBrandConfigureFor($component: 'o-table', $variant: 'row-headings') {
 		background-color: oBrandGet('table-background');
 
 		tbody th {
