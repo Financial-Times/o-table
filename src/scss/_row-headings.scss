@@ -3,8 +3,9 @@
 /// @link http://registry.origami.ft.com/components/o-table
 ////
 
-/// Add this to the table element to get row stripes
-@mixin oTableRowStripes() {
+//// @access private
+//// @outputs Highlights table headings.
+@mixin oTableRowHeadings() {
 	@include oBrandConfigureFor($component: 'o-table', $variant: 'row-headings') {
 		background-color: oBrandGet('table-background');
 

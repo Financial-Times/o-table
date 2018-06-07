@@ -56,6 +56,12 @@
 		@include oTableResponsiveScroll;
 	}
 
+	@include oBrandConfigureFor('o-table', 'row-headings') {
+		.#{$classname}--row-headings {
+			@include _oTableRowHeadings;
+		}
+	}
+
 	@include oBrandConfigureFor('o-table', 'compact') {
 		.#{$classname}--compact {
 			@include oTableCompact;
