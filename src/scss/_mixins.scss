@@ -56,6 +56,12 @@
 		@include oTableResponsiveScroll;
 	}
 
+	@if _oTableSupports('row-headings') {
+		.#{$classname}--row-headings {
+			@include _oTableRowHeadings;
+		}
+	}
+
 	@if _oTableSupports('compact') {
 		.#{$classname}--compact {
 			@include oTableCompact;

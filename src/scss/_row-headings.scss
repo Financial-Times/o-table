@@ -5,12 +5,8 @@
 
 //// @access private
 //// @outputs Highlights table headings.
-@mixin oTableRowHeadings() {
-	@include oBrandConfigureFor($component: 'o-table', $variant: 'row-headings') {
-		background-color: oBrandGet('table-background');
-
-		tbody th {
-			background-color: oBrandGet('table-row-heading-background');
-		}
+@mixin _oTableRowHeadings() {
+	tbody th {
+		background-color: _oTableGet('table-alternate-background');
 	}
 }
