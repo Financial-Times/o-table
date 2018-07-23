@@ -61,6 +61,7 @@
 		{
 			"title": "Row headings",
 			"name": "row-headings",
+			"brands": ["internal"],
 			"template": "demos/src/row-headings.mustache",
 			"description": ""
 		},

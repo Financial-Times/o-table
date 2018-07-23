@@ -58,7 +58,7 @@
 
 	@if _oTableSupports('row-headings') {
 		.#{$classname}--row-headings {
-			@include _oTableRowHeadings;
+			@include oTableRowHeadings;
 		}
 	}
 

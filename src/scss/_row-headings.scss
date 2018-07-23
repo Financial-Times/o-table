@@ -3,9 +3,9 @@
 /// @link http://registry.origami.ft.com/components/o-table
 ////
 
-//// @access private
+//// @brand internal
 //// @outputs Highlights table headings.
-@mixin _oTableRowHeadings() {
+@mixin oTableRowHeadings() {
 	tbody th {
 		background-color: _oTableGet('table-alternate-background');
 	}
