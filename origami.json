@@ -65,6 +65,12 @@
 			"template": "demos/src/row-headings.mustache",
 			"description": ""
 		},
+        {
+          "title": "Cell styles",
+          "name": "cell-styles",
+          "template": "demos/src/cell-styles.mustache",
+          "description": ""
+        },
 		{
 			"title": "Responsive Flat",
 			"name": "responsive-flat",
