@@ -1,4 +1,4 @@
-var formatCell = require('./formatter');
+const formatCell = require('./formatter');
 
 /**
  * Initialises an o-table components inside the element passed as the first parameter
@@ -22,6 +22,17 @@ function OTable(rootEl) {
 		this.listeners = [];
 		this.isResponsive = false;
 		this.rootEl.setAttribute('data-o-table--js', '');
+
+		// Map "data-o-table-order" to "data-o-table-sort-value".
+		const cellsWithOrder = this.rootEl.querySelectorAll('td[data-o-table-order]');
+		if (cellsWithOrder.length > 0) {
+			console.warn('o-table: "data-o-table-order" is deprecated, to provide a custom sort value for a table cell use "data-o-table-order" instead.');
+			cellsWithOrder.forEach(cell => {
+				if (cell.getAttribute('data-o-table-order') !== null) {
+					cell.setAttribute('data-o-table-sort-value', cell.getAttribute('data-o-table-order'));
+				}
+			});
+		}
 
 		this.tableHeaders = Array.from(this.rootEl.querySelectorAll('thead th'));
 		const tableRows = Array.from(this.rootEl.getElementsByTagName('tr'));
@@ -148,23 +159,6 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 		let aCol = a.children[index];
 		let bCol = b.children[index];
 
-		// if (aCol.getAttribute('data-o-table-order') !== null) {
-		// 	aCol = aCol.getAttribute('data-o-table-order');
-		// 	bCol = bCol.getAttribute('data-o-table-order');
-		// 	if (!isNaN(parseInt(aCol, 10))) {
-		// 		aCol = parseInt(aCol, 10);
-		// 		bCol = parseInt(bCol, 10);
-		// 	}
-		// } else {
-		// 	aCol = aCol.textContent;
-		// 	bCol = bCol.textContent;
-		// }
-
-		// if (isNumericValue) {
-		// 	aCol = parseFloat(aCol.replace(/,/g, ''));
-		// 	bCol = parseFloat(bCol.replace(/,/g, ''));
-		// }
-
 		aCol = formatCell({ cell: aCol, isNumericValue });
 		bCol = formatCell({ cell: bCol, isNumericValue });
 
@@ -277,7 +271,9 @@ OTable.prototype._sortByColumn = function _sortByColumn(columnIndex) {
 		}));
 
 		if (!customSort) {
-			this.sortRowsByColumn(columnIndex, sort === "ASC", event.currentTarget.getAttribute('data-o-table-data-type') === 'numeric');
+			const numericDataTypes = ['currency', 'percent', 'number', 'numeric'];
+			const columnDataType = event.currentTarget.getAttribute('data-o-table-data-type');
+			this.sortRowsByColumn(columnIndex, sort === "ASC", numericDataTypes.includes(columnDataType));
 		}
 
 		/**

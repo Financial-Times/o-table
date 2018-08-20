@@ -140,7 +140,7 @@ describe('oTable sorting', () => {
 		});
 	});
 
-	it('sorts columns marked as numeric, numerically', done => {
+	it('sorts columns marked as "numeric", numerically', done => {
 		sandbox.reset();
 		sandbox.init();
 		sandbox.setContents(`
@@ -183,6 +183,146 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[3].textContent, '12.03');
 			proclaim.equal(rows[4].textContent, '480,000');
 			proclaim.equal(rows[5].textContent, '1,216,000');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('sorts columns marked as "number", numerically', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="number">Price</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-o-table-data-type="number">12.03</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="number">480,000</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="number"></td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			proclaim.equal(rows[0].textContent, '');
+			proclaim.equal(rows[1].textContent, '12.03');
+			proclaim.equal(rows[2].textContent, '480,000');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('sorts columns marked as "percent"', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="percent">Percent</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-o-table-data-type="percent">5%</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="percent">20%</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="percent">5.5%</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			proclaim.equal(rows[0].textContent, '5%');
+			proclaim.equal(rows[1].textContent, '5.5%');
+			proclaim.equal(rows[2].textContent, '20%');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('sorts abbreviated currency marked as "currency"', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="currency">Price</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-o-table-data-type="currency">$140</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">£4</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">€5.46</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">￥155</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">Rmb100bn</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">DKr10</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">CFA Fr830</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">HK$12</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">E£5</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">Rp3,400</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="currency">13 colons</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			proclaim.equal(rows[0].textContent, '£4');
+			proclaim.equal(rows[1].textContent, 'E£5');
+			proclaim.equal(rows[2].textContent, '€5.46');
+			proclaim.equal(rows[3].textContent, 'DKr10');
+			proclaim.equal(rows[4].textContent, 'HK$12');
+			proclaim.equal(rows[5].textContent, '13 colons');
+			proclaim.equal(rows[6].textContent, '$140');
+			proclaim.equal(rows[7].textContent, '￥155');
+			proclaim.equal(rows[8].textContent, 'CFA Fr830');
+			proclaim.equal(rows[9].textContent, 'Rp3,400');
+			proclaim.equal(rows[10].textContent, 'Rmb100bn');
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
 			done();
 		});

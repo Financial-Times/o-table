@@ -224,7 +224,18 @@ const OTable = require('o-table');
 oTable = new OTable(document.body);
 ```
 
-Sorting numbers works if the column has been declared as a numeric column via `data-o-table-data-type="numeric" class="o-table__cell--numeric"`.
+Sorting on non-string values such as numbers works if the column type has been declared. E.g. for a column of numbers add the following to `o-table`:
+`data-o-table-data-type="number" class="o-table__cell--numeric"`.
+
+Other data types for `data-o-table-data-type` include:
+
+| type     | description                                                                                   | examples                               |
+|----------|-----------------------------------------------------------------------------------------------|----------------------------------------|
+| number   | Any number which may include number formatting and abbreviation.                              | "1,200", "100", "3.2", "1bn", "2tn"    |
+| percent  | Any percentage with or without the symbol "%".                                                | "3.3%", "200%", "50%"                  |
+| currency | Any currency, which may include number formatting, number abbreviation, and currency symbols. | "$84m", "£36bn", "HK$90bn", "Rp14.595" |
+| numeric  | A column which may be treated as numeric which does not fit a more specific  type.                 | "101 dalmatians" |
+
 
 ##### Sorting declaratively
 If you are wanting to sort by a custom pattern, you can apply the sorting values to each row as a data attribute:
