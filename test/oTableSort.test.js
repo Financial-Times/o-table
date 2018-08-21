@@ -224,6 +224,43 @@ describe('oTable sorting', () => {
 		});
 	});
 
+	it('retains an en-dash range symbol when formatting numeric values (range sort is not implicity supported, sorts by first number only)', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="number">Ranges</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-o-table-data-type="number">200–300</td>
+					</tr>
+					<tr>
+						<!-- hyphen is treated as an en-dash -->
+						<td data-o-table-data-type="number">2.3-3m</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="number">1m–2m</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			proclaim.equal(rows[0].getAttribute('data-o-table-sort-value'), '2.3–3000000');
+			proclaim.equal(rows[1].getAttribute('data-o-table-sort-value'), '200–300');
+			proclaim.equal(rows[2].getAttribute('data-o-table-sort-value'), '1000000–2000000');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
 	it('sorts columns marked as "percent"', done => {
 		sandbox.reset();
 		sandbox.init();

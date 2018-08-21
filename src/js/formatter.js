@@ -72,7 +72,7 @@ function removeDigitGroupSeparators(text) {
  * @returns {String} Text with number characters only.
  */
 function extractNumber(text) {
-	return text.replace(/([^\d.,-\-]+)/g, '');
+	return text.replace(/-/g, '–').replace(/([^\d.,\–]+)/g, '');
 }
 
 // This object is used to keep the running order of filter methods
