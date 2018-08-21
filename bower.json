@@ -5,7 +5,8 @@
         "o-grid": "^4.0.6",
         "o-icons": ">=4.0.0 <6",
         "o-typography": "^5.0.0",
-        "o-brand": ">=2.2.0 <4"
+        "o-brand": ">=2.2.0 <4",
+        "dayjs": "https://github.com/iamkun/dayjs.git#^1.7.5"
     },
     "main": [
         "main.scss",

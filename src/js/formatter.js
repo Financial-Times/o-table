@@ -1,3 +1,5 @@
+import dayjs from 'dayjs/src'
+
 /**
  * Extracts the contents of links (<a>) keeping the HTML content intact.
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
@@ -75,14 +77,78 @@ function extractNumber(text) {
 	return text.replace(/-/g, '–').replace(/([^\d.,\–]+)/g, '');
 }
 
+function dateToUnixEpoch(text) {
+	const date = dayjs(text);
+	return date.unix().toString();
+}
+
+/**
+ * Adds the current year to a date for sorting purposes if one has not been provided.
+ * @example Example assume the current year is 2018/
+ *  addYear('Feb 6') //Feb 6 2018
+ *  addYear('May 4') //May 4 2018
+ * @param {String} text The string to operate on
+ * @returns {String} Text without source/reference asterisk.
+ */
+function addYear(text) {
+	if (!text.match(/\d{4}/)) {
+		text = `${text} ${new Date().getFullYear()}`;
+	}
+	return text;
+}
+
+function ftDateToUnixEpoch(text) {
+	// FT style for writing dates is June 23 2016 (no commas, month date year), August 17, September 12 2012, January 2012.
+	return text.replace(/^([A-Za-z]{3,})(?:[\s])(?=[\d])((?:\d{1,2})?(?![\d]))?(?:\s)?(\d{4})?/, (match, month, day, year, offset, text) => {
+		const months = [
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December'
+		];
+		day = day ? parseInt(day.replace(/[^\d]/, '')) : null;
+		year = year ? parseInt(year.replace(/[^\d]/, '')) : null;
+		const monthIndex = month ? months.findIndex((name) => name.includes(month)) : null;
+
+		const date = new Date(year, monthIndex, day)
+		return isNaN(date.getTime()) ? text : date.getTime().toString();
+	});
+
+	// if (!text.match(/\d{4}/)) {
+	// 	text = `${text} ${new Date().getFullYear()}`;
+	// }
+	return text;
+}
+
+/**
+ * Removes and number of asterisk's which are at the end of the line.
+ * @example
+ *  extractNumber('Durian*') //Durian
+ *  extractNumber('1,439,165.43**') //1,439,165.43
+ * @param {String} text The string to operate on
+ * @returns {String} Text without source/reference asterisk.
+ */
+function removeRefereneAsterisk(text) {
+	return text.replace(/\*+$/, '');
+}
+
 // This object is used to keep the running order of filter methods
 const filters = {
 	dom: [removeLinks],
 	numeric: [removeDigitGroupSeparators, expandAbbreviations, extractNumber],
-	text: []
+	date: [addYear, ftDateToUnixEpoch],
+	text: [text => text.trim(), removeRefereneAsterisk]
 };
 
-export default function formatCell({ cell, isNumericValue = false }){
+export default function formatCell({ cell, isNumericValue = false, type = null }){
 	let cellClone = cell.cloneNode({ deep: true });
 	let sortValue = cell.getAttribute('data-o-table-sort-value');
 	if(sortValue !== null){
@@ -92,9 +158,14 @@ export default function formatCell({ cell, isNumericValue = false }){
 	// Extract value from dom node and format for sort.
 	filters.dom.forEach(fn => { cellClone = fn(cellClone); });
 	sortValue = extractText(cellClone);
+	// Format text.
+	filters.text.forEach(fn => { sortValue = fn(sortValue); });
 	// Format numeric value.
 	if (isNumericValue) {
 		filters.numeric.forEach(fn => { sortValue = fn(sortValue); });
+	}
+	if (type === 'date') {
+		filters.date.forEach(fn => { sortValue = fn(sortValue); });
 	}
 
 	cell.setAttribute('data-o-table-sort-value', sortValue);

@@ -151,7 +151,7 @@ function descendingSort(...args) {
  * @param  {bool} Whether the values in this column are numeric, if they are numeric we convert the contents into numbers
  * @returns undefined
  */
-OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericValue) {
+OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericValue, type = null) {
 	const tbody = this.rootEl.querySelector('tbody');
 	const rows = Array.from(tbody.querySelectorAll('tr'));
 	const intlCollator = getIntlCollator();
@@ -159,8 +159,8 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 		let aCol = a.children[index];
 		let bCol = b.children[index];
 
-		aCol = formatCell({ cell: aCol, isNumericValue });
-		bCol = formatCell({ cell: bCol, isNumericValue });
+		aCol = formatCell({ cell: aCol, isNumericValue, type });
+		bCol = formatCell({ cell: bCol, isNumericValue, type });
 
 		if (sortAscending) {
 			return ascendingSort(aCol, bCol, isNumericValue, intlCollator);
@@ -273,7 +273,7 @@ OTable.prototype._sortByColumn = function _sortByColumn(columnIndex) {
 		if (!customSort) {
 			const numericDataTypes = ['currency', 'percent', 'number', 'numeric'];
 			const columnDataType = event.currentTarget.getAttribute('data-o-table-data-type');
-			this.sortRowsByColumn(columnIndex, sort === "ASC", numericDataTypes.includes(columnDataType));
+			this.sortRowsByColumn(columnIndex, sort === "ASC", numericDataTypes.includes(columnDataType), columnDataType);
 		}
 
 		/**
