@@ -297,6 +297,95 @@ describe('oTable sorting', () => {
 		});
 	});
 
+	it('sorts FT style times marked as "date"', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="date">Times</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-o-table-data-type="date">7pm</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">7am</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">6.30am</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">6.30pm</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			proclaim.equal(rows[0].textContent, '6.30am');
+			proclaim.equal(rows[1].textContent, '7am');
+			proclaim.equal(rows[2].textContent, '6.30pm');
+			proclaim.equal(rows[3].textContent, '7pm');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('sorts FT style dates marked as "date"', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="date">Times</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<!–– assumes current year ––>
+						<td data-o-table-data-type="date">August 17</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">September 12 2012</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">January 2012</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">March 12 2015 1am</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">April 20 2014 1.30pm</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="date">April 20 2014 2.30pm</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			proclaim.equal(rows[0].textContent, 'January 2012');
+			proclaim.equal(rows[1].textContent, 'September 12 2012');
+			proclaim.equal(rows[2].textContent, 'March 12 2015 1am');
+			proclaim.equal(rows[3].textContent, 'April 20 2014 1.30pm');
+			proclaim.equal(rows[4].textContent, 'April 20 2014 2.30pm');
+			proclaim.equal(rows[5].textContent, 'August 17'); // assumes current year
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
 	it('sorts abbreviated currency marked as "currency"', done => {
 		sandbox.reset();
 		sandbox.init();

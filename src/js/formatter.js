@@ -1,5 +1,3 @@
-import dayjs from 'dayjs/src'
-
 /**
  * Extracts the contents of links (<a>) keeping the HTML content intact.
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
@@ -68,8 +66,8 @@ function removeDigitGroupSeparators(text) {
  *  extractNumber('Rmb100') //100
  *  extractNumber('CFA Fr830') //830
  *  extractNumber('HK$12') //12
- *  extractNumber('HK$12-HK$20') //12-20
- *  extractNumber('Rp3,400') //3,400
+ *  extractNumber('HK$12-HK$20') //12–20
+ *  extractNumber('1534956593-1534956620') //1534956593–1534956620
  * @param {String} text The string to operate on
  * @returns {String} Text with number characters only.
  */
@@ -77,62 +75,58 @@ function extractNumber(text) {
 	return text.replace(/-/g, '–').replace(/([^\d.,\–]+)/g, '');
 }
 
-function dateToUnixEpoch(text) {
-	const date = dayjs(text);
-	return date.unix().toString();
-}
-
 /**
- * Adds the current year to a date for sorting purposes if one has not been provided.
- * @example Example assume the current year is 2018/
- *  addYear('Feb 6') //Feb 6 2018
- *  addYear('May 4') //May 4 2018
+ * Parses FT style date and time and formats as a number for sorting.
+ * FT date or date and time returns a UNIX epoch (UTC).
+ * FT time returns a positive float for pm, negative for am.
+ * @example
+ *  extractNumber('August 17') //UNIX epoch, assumes current year
+ *  extractNumber('September 12 2012') //UNIX epoch
+ *  extractNumber('January 2012') //UNIX epoch, first of month
+ *  extractNumber('March 12 2015 1am') //UNIX epoch including time
+ *  extractNumber('April 20 2014 1.30pm') //UNIX epoch including time
+ *  extractNumber('1am') //-1
+ *  extractNumber('1.30am') //-1.3
+ *  extractNumber('1.40pm') //1.4
+ *  extractNumber('3pm') //3
  * @param {String} text The string to operate on
- * @returns {String} Text without source/reference asterisk.
+ * @returns {Number} Number representation of date and/or time for sorting.
  */
-function addYear(text) {
-	if (!text.match(/\d{4}/)) {
-		text = `${text} ${new Date().getFullYear()}`;
+function ftDateTimeToUnixEpoch(text) {
+	const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+	// FT style for writing dates: is June 23 2016 (no commas, month date year)
+	const date = text.match(/^([A-Za-z]{3,})(?:[\s])(?=[\d])((?:\d{1,2})?(?![\d]))?(?:\s)?(\d{4})?/);
+	// FT style for writing time:
+	// The 12 hour clock should be used: 1am, 9.30pm
+	const time = text.match(/(?:\s|^)(\d{1,2}(?:[.](\d{2}))?)(pm|am)$/);
+	// Get date.
+	const month = date && date[1] ? date[1] : null;
+	const monthIndex = month ? months.findIndex((name) => name.includes(month)) : null;
+	const day = date && date[2] ? parseInt(date[2]) : null;
+	let year = date && date[3] ? parseInt(date[3]) : null;
+	if (month && !year) {
+		// For sorting purposes, assume a month is for this year if not otherwise specified.
+		year = (new Date(Date.UTC())).getFullYear();
 	}
-	return text;
-}
-
-function ftDateToUnixEpoch(text) {
-	// FT style for writing dates is June 23 2016 (no commas, month date year), August 17, September 12 2012, January 2012.
-	return text.replace(/^([A-Za-z]{3,})(?:[\s])(?=[\d])((?:\d{1,2})?(?![\d]))?(?:\s)?(\d{4})?/, (match, month, day, year, offset, text) => {
-		const months = [
-			'January',
-			'February',
-			'March',
-			'April',
-			'May',
-			'June',
-			'July',
-			'August',
-			'September',
-			'October',
-			'November',
-			'December'
-		];
-		day = day ? parseInt(day.replace(/[^\d]/, '')) : null;
-		year = year ? parseInt(year.replace(/[^\d]/, '')) : null;
-		const monthIndex = month ? months.findIndex((name) => name.includes(month)) : null;
-
-		const date = new Date(year, monthIndex, day)
-		return isNaN(date.getTime()) ? text : date.getTime().toString();
-	});
-
-	// if (!text.match(/\d{4}/)) {
-	// 	text = `${text} ${new Date().getFullYear()}`;
-	// }
-	return text;
+	// Get time.
+	const hour = time && time[1] ? parseInt(time[1]) : null;
+	const minute = time && time[2] ? parseInt(time[2]) : 0;
+	const period = time ? time[3] : null;
+	const timeModifier = period === 'am' ? -1 : 1;
+	// Sort number for FT formated time.
+	if (hour && !(year && monthIndex)) {
+		return parseFloat(`${hour}.${minute}`) * timeModifier;
+	}
+	// Unix epoch to sort FT formated date.
+	const dateObj = new Date(Date.UTC(year, monthIndex, day, hour, minute));
+	return isNaN(dateObj.getTime()) ? text : dateObj.getTime();
 }
 
 /**
  * Removes and number of asterisk's which are at the end of the line.
  * @example
- *  extractNumber('Durian*') //Durian
- *  extractNumber('1,439,165.43**') //1,439,165.43
+ *  removeRefereneAsterisk('Durian*') //Durian
+ *  removeRefereneAsterisk('1,439,165.43**') //1,439,165.43
  * @param {String} text The string to operate on
  * @returns {String} Text without source/reference asterisk.
  */
@@ -142,33 +136,29 @@ function removeRefereneAsterisk(text) {
 
 // This object is used to keep the running order of filter methods
 const filters = {
-	dom: [removeLinks],
 	numeric: [removeDigitGroupSeparators, expandAbbreviations, extractNumber],
-	date: [addYear, ftDateToUnixEpoch],
-	text: [text => text.trim(), removeRefereneAsterisk]
+	date: [ftDateTimeToUnixEpoch],
+	all: [removeLinks, extractText, removeRefereneAsterisk]
 };
 
-export default function formatCell({ cell, isNumericValue = false, type = null }){
+export default function formatCell({ cell, type = null }) {
+	const numericTypes = ['currency', 'percent', 'number'];
+	const isNumericType = numericTypes.includes(type);
 	let cellClone = cell.cloneNode({ deep: true });
 	let sortValue = cell.getAttribute('data-o-table-sort-value');
-	if(sortValue !== null){
-		return isNumericValue ? parseFloat(sortValue) : sortValue;
+	if(sortValue === null){
+		sortValue = cellClone;
+		// Extract value from dom node and format for sort.
+		filters.all.forEach(fn => { sortValue = fn(sortValue); });
+		// Format types which are treated as numeric for sorting.
+		if (isNumericType) {
+			filters.numeric.forEach(fn => { sortValue = fn(sortValue); });
+		}
+		// Format types.
+		if (filters[type]) {
+			filters[type].forEach(fn => { sortValue = fn(sortValue); });
+		}
+		cell.setAttribute('data-o-table-sort-value', sortValue);
 	}
-
-	// Extract value from dom node and format for sort.
-	filters.dom.forEach(fn => { cellClone = fn(cellClone); });
-	sortValue = extractText(cellClone);
-	// Format text.
-	filters.text.forEach(fn => { sortValue = fn(sortValue); });
-	// Format numeric value.
-	if (isNumericValue) {
-		filters.numeric.forEach(fn => { sortValue = fn(sortValue); });
-	}
-	if (type === 'date') {
-		filters.date.forEach(fn => { sortValue = fn(sortValue); });
-	}
-
-	cell.setAttribute('data-o-table-sort-value', sortValue);
-
-	return isNumericValue ? parseFloat(sortValue) : sortValue;
+	return isNaN(sortValue) || !isNumericType ? sortValue : parseFloat(sortValue);
 }

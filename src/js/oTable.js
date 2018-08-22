@@ -128,12 +128,12 @@ function getIntlCollator() {
 	}
 }
 
-function ascendingSort(a, b, isNumericValue, intlCollator) {
+function ascendingSort(a, b, intlCollator) {
 	if ((typeof a === 'string' || a instanceof String) && (typeof b === 'string' || b instanceof String)) {
 		return intlCollator ? intlCollator.compare(a, b) : a.localeCompare(b);
-	} else if ((isNumericValue && isNaN(a)) || a < b) {
+	} else if ((!isNaN(b) && isNaN(a)) || a < b) {
 		return -1;
-	} else if ((isNumericValue && isNaN(b)) || b < a) {
+	} else if ((!isNaN(a) && isNaN(b)) || b < a) {
 		return 1;
 	} else {
 		return 0;
@@ -146,12 +146,20 @@ function descendingSort(...args) {
 
 /**
  * Sorts the table by a specific column
- * @param  {number} The index of the column to sort the table by
- * @param  {bool} Which direction to sort in, ascending or descending
- * @param  {bool} Whether the values in this column are numeric, if they are numeric we convert the contents into numbers
+ * @param {number} index The index of the column to sort the table by
+ * @param {bool} sortAscending Which direction to sort in, ascending or descending
+ * @param {bool} isNumericValue Deprecated: Set `type` instead.
+ * @param {string} type What type of data the column holds to enable sorting of numeric values, dates, etc.
  * @returns undefined
  */
-OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericValue, type = null) {
+OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericValue = null, type = null) {
+	if (isNumericValue !== null) {
+		console.warn(`"sortRowsByColumn" argument "isNumericValue" is deprecated. Set "type" to a valid type such as "numeric". More specific types are listed in the README https://github.com/Financial-Times/o-table#sorting.`);
+	}
+	// If type is not set but deprecated "isNumericValue" is, set the type to numeric.
+	if (isNumericValue) {
+		type = type || 'numeric';
+	}
 	const tbody = this.rootEl.querySelector('tbody');
 	const rows = Array.from(tbody.querySelectorAll('tr'));
 	const intlCollator = getIntlCollator();
@@ -159,15 +167,14 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 		let aCol = a.children[index];
 		let bCol = b.children[index];
 
-		aCol = formatCell({ cell: aCol, isNumericValue, type });
-		bCol = formatCell({ cell: bCol, isNumericValue, type });
+		aCol = formatCell({ cell: aCol, type });
+		bCol = formatCell({ cell: bCol, type });
 
 		if (sortAscending) {
-			return ascendingSort(aCol, bCol, isNumericValue, intlCollator);
+			return ascendingSort(aCol, bCol, intlCollator);
 		} else {
-			return descendingSort(aCol, bCol, isNumericValue, intlCollator);
+			return descendingSort(aCol, bCol, intlCollator);
 		}
-
 	});
 
 	rows.forEach(function (row) {
@@ -271,9 +278,8 @@ OTable.prototype._sortByColumn = function _sortByColumn(columnIndex) {
 		}));
 
 		if (!customSort) {
-			const numericDataTypes = ['currency', 'percent', 'number', 'numeric'];
 			const columnDataType = event.currentTarget.getAttribute('data-o-table-data-type');
-			this.sortRowsByColumn(columnIndex, sort === "ASC", numericDataTypes.includes(columnDataType), columnDataType);
+			this.sortRowsByColumn(columnIndex, sort === "ASC", null, columnDataType);
 		}
 
 		/**
