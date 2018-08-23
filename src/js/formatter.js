@@ -1,26 +1,44 @@
 /**
- * Extracts the contents of links (<a>) keeping the HTML content intact.
+ * Extracts the contents of img alt text.
+ * @example String argument for example purposes only, to represent a HTMLElement.
+ * 	extractAltFromImages('<img alt="text">'); // text
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
  * @returns {HTMLElement} the parameter
  */
-function removeLinks(cell){
-	const links = Array.from(cell.getElementsByTagName('a'));
-	links.forEach(link => {
-		const contents = link.innerHTML;
-		link.insertAdjacentHTML('beforebegin', contents);
-		link.remove();
+function extractAltFromImages(cell){
+	const images = Array.from(cell.getElementsByTagName('img'));
+	images.forEach(image => {
+		const contents = image.getAttribute('alt');
+		image.insertAdjacentHTML('beforebegin', contents);
+		image.remove();
 	});
 
 	return cell;
 }
 
 /**
- * Returns the text represantation of an HTML node
+ * Returns the text represantation of an HTML node.
+ * If a node contains no content `aria-label` or `title` attributes of <a>, <span>, or <i> child nodes are used.
+ * @example String argument for example purposes only, to represent a HTMLElement.
+ * 	extractText('<i class="o-icons-icon o-icons-icon--mail"><a href="mailto:example@ft.com" title="Email Example at example@ft.com"></a>'); //Email Example at example@ft.com
+ * 	extractText('<span class="o-icons-icon o-icons-icon--tick">Correct</span>); //Correct
+* 	extractText('<span class="o-icons-icon o-icons-icon--tick" title="Correct"></span>); //Correct
+* 	extractText('<span class="o-icons-icon o-icons-icon--tick" aria-label="Correct"></span>); //Correct
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
  * @returns {HTMLElement} text representation of the HTML node
  */
 function extractText(cell){
-	return cell.textContent.trim();
+	let text = cell.textContent.trim();
+	// No text found, check aria labels and titles.
+	// Useful for icon-only cells.
+	if (text === '') {
+		const nodes = cell.querySelectorAll('a, span, i');
+		text = Array.from(nodes).reduce((accumulator, node) => {
+			const nodeText = node.getAttribute('aria-label') || node.getAttribute('title');
+			return nodeText ? `${accumulator} ${nodeText}` : accumulator;
+		}, '');
+	}
+	return text.trim();
 }
 
 /**
@@ -176,7 +194,7 @@ function removeEmptyCellIndicators(text) {
 const filters = {
 	numeric: [removeDigitGroupSeparators, expandAbbreviations, extractDigitsIfFound, extractNumberFromRange],
 	date: [ftDateTimeToUnixEpoch],
-	all: [removeLinks, extractText, removeRefereneAsterisk, removeEmptyCellIndicators]
+	all: [extractAltFromImages, extractText, removeRefereneAsterisk, removeEmptyCellIndicators]
 };
 
 export default function formatCell({ cell, type = null }) {

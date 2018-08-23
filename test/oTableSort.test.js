@@ -579,6 +579,94 @@ describe('oTable sorting', () => {
 		});
 	});
 
+	it('sorts strings from "<span>", "<a>", "<i>" tags and "<img>" tag "alt" attributes ', done => {
+		const items = [
+			'<a href="#">y</a>',
+			'<span><a href="#">v</a></span>',
+			'<i class="o-icons-icon">x</i>',
+			'<img src="#" alt="w">',
+			'<span>z</span>'
+		];
+		const expectedSortedRows = [
+			'<span><a href="#">v</a></span>',
+			'<img src="#" alt="w">',
+			'<i class="o-icons-icon">x</i>',
+			'<a href="#">y</a>',
+			'<span>z</span>'
+		];
+
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th>Things</th>
+					</tr>
+				</thead>
+				<tbody>
+					${items.reduce((output, item) => output + `<tr><td>${item}</td></tr>`, '')}
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
+				({ innerHTML }) => innerHTML
+			);
+			proclaim.deepEqual(rows, expectedSortedRows);
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('falls back to the "aria-label" or "title" of "<span>", "<a>", or "<i>" tags if a table cell has no content otherwise', done => {
+		const items = [
+			'<i class="o-icons-icon o-icons-icon--mail"><a href="#" title="d"></a>',
+			'<span class="o-icons-icon o-icons-icon--tick">e</span>',
+			'<span class="o-icons-icon o-icons-icon--tick" title="a"></span>',
+			'<span class="o-icons-icon o-icons-icon--tick" aria-label="c"></span>',
+			'<i class="o-icons-icon o-icons-icon--tick" title="z" aria-label="b"></i>'
+		];
+		const expectedSortValuesInOrder = [
+			'a',
+			'b',
+			'c',
+			'd',
+			'e',
+		];
+
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th>Things</th>
+					</tr>
+				</thead>
+				<tbody>
+					${items.reduce((output, item) => output + `<tr><td>${item}</td></tr>`, '')}
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
+				(td) => td.getAttribute('data-o-table-sort-value')
+			);
+			proclaim.deepEqual(rows, expectedSortValuesInOrder);
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
 	it('sorts localised strings alphabetically', done => {
 		const items = ['café', 'apple', 'caffeine', 'Æ'];
 		const expectedSortedRows = ['Æ', 'apple', 'café', 'caffeine'];
