@@ -24,7 +24,7 @@ function OTable(rootEl) {
 		this.rootEl.setAttribute('data-o-table--js', '');
 
 		// Map "data-o-table-order" to "data-o-table-sort-value".
-		const cellsWithOrder = this.rootEl.querySelectorAll('td[data-o-table-order]');
+		const cellsWithOrder = this.rootEl.querySelectorAll('td[data-o-table-order], th[data-o-table-order]');
 		if (cellsWithOrder.length > 0) {
 			console.warn('o-table: "data-o-table-order" is deprecated, to provide a custom sort value for a table cell use "data-o-table-order" instead.');
 			cellsWithOrder.forEach(cell => {
@@ -169,14 +169,12 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 
 		aCol = formatCell({ cell: aCol, type });
 		bCol = formatCell({ cell: bCol, type });
-
 		if (sortAscending) {
 			return ascendingSort(aCol, bCol, intlCollator);
 		} else {
 			return descendingSort(aCol, bCol, intlCollator);
 		}
 	});
-
 	rows.forEach(function (row) {
 		tbody.appendChild(row);
 	});

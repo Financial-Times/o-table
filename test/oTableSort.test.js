@@ -385,8 +385,8 @@ describe('oTable sorting', () => {
 		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
-			proclaim.equal(rows[0].textContent, '6.30am');
-			proclaim.equal(rows[1].textContent, '7am');
+			proclaim.equal(rows[0].textContent, '7am');
+			proclaim.equal(rows[1].textContent, '6.30am');
 			proclaim.equal(rows[2].textContent, '6.30pm');
 			proclaim.equal(rows[3].textContent, '7pm');
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');

@@ -93,7 +93,7 @@ function removeDigitGroupSeparators(text) {
  * @returns {String} Text with digits characters only.
  */
 function extractDigitsIfFound(text) {
-	const digitsAndRange = text.replace(/-/g, '–').replace(/([^\d.,\–]+)/g, '');
+	const digitsAndRange = text.replace(/([^\d.,\-\–]+)/g, '');
 	if (digitsAndRange === '') {
 		return text;
 	}
@@ -217,5 +217,5 @@ export default function formatCell({ cell, type = null }) {
 		cell.setAttribute('data-o-table-sort-value', sortValue);
 	}
 	const sortValueIsNumber = sortValue !== '' && !isNaN(sortValue);
-	return isNumericColumn && sortValueIsNumber ? parseFloat(sortValue) : sortValue;
+	return sortValueIsNumber ? parseFloat(sortValue) : sortValue;
 }
