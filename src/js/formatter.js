@@ -62,17 +62,39 @@ function removeDigitGroupSeparators(text) {
 /**
  * Returns the text with non-number charactors removed (e.g. currency symbols).
  * Does not effect range charactors e.g. "–" will be maintained.
+ * If no digits were found to remove, returns the text unchanged.
  * @example
- *  extractNumber('Rmb100') //100
- *  extractNumber('CFA Fr830') //830
- *  extractNumber('HK$12') //12
- *  extractNumber('HK$12-HK$20') //12–20
- *  extractNumber('1534956593-1534956620') //1534956593–1534956620
+ *  extractDigitsIfFound('Rmb100') //100
+ *  extractDigitsIfFound('CFA Fr830') //830
+ *  extractDigitsIfFound('HK$12') //12
+ *  extractDigitsIfFound('HK$12-HK$20') //12–20
+ *  extractDigitsIfFound('1534956593-1534956620') //1534956593–1534956620
+ *  extractDigitsIfFound('Some text') //Some text
+ *  extractDigitsIfFound('Some text 123') //123
  * @param {String} text The string to operate on
- * @returns {String} Text with number characters only.
+ * @returns {String} Text with digits characters only.
  */
-function extractNumber(text) {
-	return text.replace(/-/g, '–').replace(/([^\d.,\–]+)/g, '');
+function extractDigitsIfFound(text) {
+	const digitsAndRange = text.replace(/-/g, '–').replace(/([^\d.,\–]+)/g, '');
+	if (digitsAndRange === '') {
+		return text;
+	}
+	return digitsAndRange;
+}
+
+/**
+ * Returns a number from a range
+ * @example
+ *  removeRange('1534956593–1534956620') //1534956593
+ *  removeRange('123–345') //123
+ *  removeRange('123') //123
+ *  removeRange('No numbers') //No numbers
+ * @param {String} text The string to operate on
+ * @returns {Number}
+ */
+function extractNumberFromRange(text) {
+	const number = parseFloat(text);
+	return isNaN(number) ? text : number;
 }
 
 /**
@@ -80,15 +102,15 @@ function extractNumber(text) {
  * FT date or date and time returns a UNIX epoch (UTC).
  * FT time returns a positive float for pm, negative for am.
  * @example
- *  extractNumber('August 17') //UNIX epoch, assumes current year
- *  extractNumber('September 12 2012') //UNIX epoch
- *  extractNumber('January 2012') //UNIX epoch, first of month
- *  extractNumber('March 12 2015 1am') //UNIX epoch including time
- *  extractNumber('April 20 2014 1.30pm') //UNIX epoch including time
- *  extractNumber('1am') //-1
- *  extractNumber('1.30am') //-1.3
- *  extractNumber('1.40pm') //1.4
- *  extractNumber('3pm') //3
+ *  ftDateTimeToUnixEpoch('August 17') //UNIX epoch, assumes current year
+ *  ftDateTimeToUnixEpoch('September 12 2012') //UNIX epoch
+ *  ftDateTimeToUnixEpoch('January 2012') //UNIX epoch, first of month
+ *  ftDateTimeToUnixEpoch('March 12 2015 1am') //UNIX epoch including time
+ *  ftDateTimeToUnixEpoch('April 20 2014 1.30pm') //UNIX epoch including time
+ *  ftDateTimeToUnixEpoch('1am') //-1
+ *  ftDateTimeToUnixEpoch('1.30am') //-1.3
+ *  ftDateTimeToUnixEpoch('1.40pm') //1.4
+ *  ftDateTimeToUnixEpoch('3pm') //3
  * @param {String} text The string to operate on
  * @returns {Number} Number representation of date and/or time for sorting.
  */
@@ -102,15 +124,15 @@ function ftDateTimeToUnixEpoch(text) {
 	// Get date.
 	const month = date && date[1] ? date[1] : null;
 	const monthIndex = month ? months.findIndex((name) => name.includes(month)) : null;
-	const day = date && date[2] ? parseInt(date[2]) : null;
-	let year = date && date[3] ? parseInt(date[3]) : null;
+	const day = date && date[2] ? parseInt(date[2], 10) : null;
+	let year = date && date[3] ? parseInt(date[3], 10) : null;
 	if (month && !year) {
 		// For sorting purposes, assume a month is for this year if not otherwise specified.
-		year = (new Date(Date.UTC())).getFullYear();
+		year = (new Date()).getFullYear();
 	}
 	// Get time.
-	const hour = time && time[1] ? parseInt(time[1]) : null;
-	const minute = time && time[2] ? parseInt(time[2]) : 0;
+	const hour = time && time[1] ? parseInt(time[1], 10) : null;
+	const minute = time && time[2] ? parseInt(time[2], 10) : 0;
 	const period = time ? time[3] : null;
 	const timeModifier = period === 'am' ? -1 : 1;
 	// Sort number for FT formated time.
@@ -134,16 +156,32 @@ function removeRefereneAsterisk(text) {
 	return text.replace(/\*+$/, '');
 }
 
+/**
+ * Removes indicators of an empty cell.
+ * @example
+ *  removeEmptyCellIndicators('n/a'); //
+ *  removeEmptyCellIndicators('-'); //
+ *  removeEmptyCellIndicators('Cell-content'); //Cell-content
+ * @param {String} text The string to operate on
+ * @returns {String} An empty string or the original text.
+ */
+function removeEmptyCellIndicators(text) {
+	// Remove n/a
+	text = text.replace(/^n[./]a[.]?$/i, '');
+	// Remove -
+	return text === '-' ? '' : text;
+}
+
 // This object is used to keep the running order of filter methods
 const filters = {
-	numeric: [removeDigitGroupSeparators, expandAbbreviations, extractNumber],
+	numeric: [removeDigitGroupSeparators, expandAbbreviations, extractDigitsIfFound, extractNumberFromRange],
 	date: [ftDateTimeToUnixEpoch],
-	all: [removeLinks, extractText, removeRefereneAsterisk]
+	all: [removeLinks, extractText, removeRefereneAsterisk, removeEmptyCellIndicators]
 };
 
 export default function formatCell({ cell, type = null }) {
-	const numericTypes = ['currency', 'percent', 'number'];
-	const isNumericType = numericTypes.includes(type);
+	const numericTypes = ['currency', 'percent', 'number', 'numeric'];
+	const isNumericColumn = numericTypes.includes(type);
 	let cellClone = cell.cloneNode({ deep: true });
 	let sortValue = cell.getAttribute('data-o-table-sort-value');
 	if(sortValue === null){
@@ -151,14 +189,15 @@ export default function formatCell({ cell, type = null }) {
 		// Extract value from dom node and format for sort.
 		filters.all.forEach(fn => { sortValue = fn(sortValue); });
 		// Format types which are treated as numeric for sorting.
-		if (isNumericType) {
+		if (isNumericColumn) {
 			filters.numeric.forEach(fn => { sortValue = fn(sortValue); });
 		}
-		// Format types.
-		if (filters[type]) {
+		// Format types (numeric has already been processed).
+		if (filters[type] && type !== 'numeric') {
 			filters[type].forEach(fn => { sortValue = fn(sortValue); });
 		}
 		cell.setAttribute('data-o-table-sort-value', sortValue);
 	}
-	return isNaN(sortValue) || !isNumericType ? sortValue : parseFloat(sortValue);
+	const sortValueIsNumber = sortValue !== '' && !isNaN(sortValue);
+	return isNumericColumn && sortValueIsNumber ? parseFloat(sortValue) : sortValue;
 }

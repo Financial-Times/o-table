@@ -152,6 +152,9 @@ describe('oTable sorting', () => {
 				</thead>
 				<tbody>
 					<tr>
+						<td data-o-table-data-type="numeric"></td>
+					</tr>
+					<tr>
 						<td data-o-table-data-type="numeric">12.03</td>
 					</tr>
 					<tr>
@@ -165,9 +168,6 @@ describe('oTable sorting', () => {
 					</tr>
 					<tr>
 						<td data-o-table-data-type="numeric">1,216,000</td>
-					</tr>
-					<tr>
-						<td data-o-table-data-type="numeric"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -208,6 +208,10 @@ describe('oTable sorting', () => {
 					<tr>
 						<td data-o-table-data-type="number"></td>
 					</tr>
+					<tr>
+						<!-- hyphen is treated as an empty cell -->
+						<td data-o-table-data-type="number">-</td>
+					</tr>
 				</tbody>
 			</table>
 		`);
@@ -216,15 +220,68 @@ describe('oTable sorting', () => {
 		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
-			proclaim.equal(rows[0].textContent, '');
-			proclaim.equal(rows[1].textContent, '12.03');
-			proclaim.equal(rows[2].textContent, '480,000');
+			proclaim.equal(rows[1].textContent, '-');
+			proclaim.equal(rows[2].textContent, '12.03');
+			proclaim.equal(rows[3].textContent, '480,000');
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
 			done();
 		});
 	});
 
-	it('retains an en-dash range symbol when formatting numeric values (range sort is not implicity supported, sorts by first number only)', done => {
+	it('Sorts non-numeric fields in a numeric column first.', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="number">Price</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-o-table-data-type="number">12.03</td>
+					</tr>
+					<tr>
+						<!-- N/A -->
+						<td data-o-table-data-type="number">N/A</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="number">Some Text</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="number">480,000</td>
+					</tr>
+					<tr>
+						<td data-o-table-data-type="number"></td>
+					</tr>
+					<tr>
+						<!-- hyphen is treated as an empty cell -->
+						<td data-o-table-data-type="number">-</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			// "n/a" and "-" treated as blank and come first in an ASC order.
+			proclaim.equal(rows[0].textContent, 'N/A');
+			proclaim.equal(rows[1].textContent, '');
+			proclaim.equal(rows[2].textContent, '-');
+			// Non-numeric fields come next.
+			proclaim.equal(rows[3].textContent, 'Some Text');
+			// Followed by numeric fields.
+			proclaim.equal(rows[4].textContent, '12.03');
+			proclaim.equal(rows[5].textContent, '480,000');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('removes en-dash range symbol when formatting numeric values (range sort is not implicity supported, sorts by first number only)', done => {
 		sandbox.reset();
 		sandbox.init();
 		sandbox.setContents(`
@@ -253,9 +310,9 @@ describe('oTable sorting', () => {
 		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
-			proclaim.equal(rows[0].getAttribute('data-o-table-sort-value'), '2.3–3000000');
-			proclaim.equal(rows[1].getAttribute('data-o-table-sort-value'), '200–300');
-			proclaim.equal(rows[2].getAttribute('data-o-table-sort-value'), '1000000–2000000');
+			proclaim.equal(rows[0].textContent, '2.3-3m');
+			proclaim.equal(rows[1].textContent, '200–300');
+			proclaim.equal(rows[2].textContent, '1m–2m');
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
 			done();
 		});
@@ -377,9 +434,9 @@ describe('oTable sorting', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, 'January 2012');
 			proclaim.equal(rows[1].textContent, 'September 12 2012');
-			proclaim.equal(rows[2].textContent, 'March 12 2015 1am');
-			proclaim.equal(rows[3].textContent, 'April 20 2014 1.30pm');
-			proclaim.equal(rows[4].textContent, 'April 20 2014 2.30pm');
+			proclaim.equal(rows[2].textContent, 'April 20 2014 1.30pm');
+			proclaim.equal(rows[3].textContent, 'April 20 2014 2.30pm');
+			proclaim.equal(rows[4].textContent, 'March 12 2015 1am');
 			proclaim.equal(rows[5].textContent, 'August 17'); // assumes current year
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
 			done();
@@ -485,6 +542,38 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, '42');
 			proclaim.equal(rows[1].textContent, 'pangea');
 			proclaim.equal(rows[2].textContent, 'snowman');
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
+	it('sorts "n/a" and "-" as if empty cells (first in ASC order)', done => {
+		const items = ['café', 'apple', 'N/A', 'n.a.', '-', '','caffeine', 'Æ'];
+		const expectedSortedRows = ['N/A', 'n.a.', '-', '', 'Æ', 'apple', 'café', 'caffeine'];
+
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th>Localised Things</th>
+					</tr>
+				</thead>
+				<tbody>
+					${items.reduce((output, item) => output + `<tr><td>${item}</td></tr>`, '')}
+				</tbody>
+			</table>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
+				({ textContent }) => textContent
+			);
+			proclaim.deepEqual(rows, expectedSortedRows);
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
 			done();
 		});
