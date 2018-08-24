@@ -1,5 +1,5 @@
-const formatCell = require('./formatter');
-
+const SortFormatter = require('./sort-formatter');
+const tableSortFormatter = new SortFormatter();
 /**
  * Initialises an o-table components inside the element passed as the first parameter
  *
@@ -26,7 +26,7 @@ function OTable(rootEl) {
 		// Map "data-o-table-order" to "data-o-table-sort-value".
 		const cellsWithOrder = this.rootEl.querySelectorAll('td[data-o-table-order], th[data-o-table-order]');
 		if (cellsWithOrder.length > 0) {
-			console.warn('o-table: "data-o-table-order" is deprecated, to provide a custom sort value for a table cell use "data-o-table-order" instead.');
+			console.warn('o-table: "data-o-table-order" is deprecated, to provide a custom sort value for a table cell use "data-o-table-sort-value" instead.');
 			cellsWithOrder.forEach(cell => {
 				if (cell.getAttribute('data-o-table-order') !== null) {
 					cell.setAttribute('data-o-table-sort-value', cell.getAttribute('data-o-table-order'));
@@ -100,6 +100,15 @@ OTable.prototype.dispatch = function (event, data = {}, namespace = 'oTable') {
 };
 
 /**
+ * Set a custom sort filter for a given table cell data type.
+ * @see {@link SortFormatter#setFormatter} for `formatFunction` details.
+ * @access public
+ */
+OTable.prototype.setSortFormatterForType = (type, formatFunction) => {
+	tableSortFormatter.setFormatter(type, formatFunction);
+};
+
+/**
  * Gets a table header for a given column index.
  *
  * @public
@@ -154,7 +163,7 @@ function descendingSort(...args) {
  */
 OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericValue = null, type = null) {
 	if (isNumericValue !== null) {
-		console.warn(`"sortRowsByColumn" argument "isNumericValue" is deprecated. Set "type" to a valid type such as "numeric". More specific types are listed in the README https://github.com/Financial-Times/o-table#sorting.`);
+		console.warn(`"sortRowsByColumn" argument "isNumericValue" is deprecated. Set "type" to a valid type such as "numeric" or "text". More specific types are listed in the README https://github.com/Financial-Times/o-table#sorting.`);
 	}
 	// If type is not set but deprecated "isNumericValue" is, set the type to numeric.
 	if (isNumericValue) {
@@ -166,9 +175,8 @@ OTable.prototype.sortRowsByColumn = function (index, sortAscending, isNumericVal
 	rows.sort(function (a, b) {
 		let aCol = a.children[index];
 		let bCol = b.children[index];
-
-		aCol = formatCell({ cell: aCol, type });
-		bCol = formatCell({ cell: bCol, type });
+		aCol = tableSortFormatter.formatCell({ cell: aCol, type });
+		bCol = tableSortFormatter.formatCell({ cell: bCol, type });
 		if (sortAscending) {
 			return ascendingSort(aCol, bCol, intlCollator);
 		} else {

@@ -3,6 +3,7 @@
  * @example String argument for example purposes only, to represent a HTMLElement.
  * 	extractAltFromImages('<img alt="text">'); // text
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
+ * @access private
  * @returns {HTMLElement} the parameter
  */
 function extractAltFromImages(cell){
@@ -25,6 +26,7 @@ function extractAltFromImages(cell){
 * 	extractText('<span class="o-icons-icon o-icons-icon--tick" title="Correct"></span>); //Correct
 * 	extractText('<span class="o-icons-icon o-icons-icon--tick" aria-label="Correct"></span>); //Correct
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
+ * @access private
  * @returns {HTMLElement} text representation of the HTML node
  */
 function extractText(cell){
@@ -50,6 +52,7 @@ function extractText(cell){
  *  expandAbbreviations('1tn') //1000000000000
  *  expandAbbreviations('5m-10m') //5000000-10000000
  * @param {String} text The string to operate on
+ * @access private
  * @returns {String} Text with any supported abbreviations expanded
  */
 function expandAbbreviations(text) {
@@ -71,6 +74,7 @@ function expandAbbreviations(text) {
  *  removeDigitGroupSeparator('40') //40
  *  removeDigitGroupSeparator('4,000,000') //4000000
  * @param {String} text The string to operate on
+ * @access private
  * @returns {String} Text with digit group separators (commas) removed.
  */
 function removeDigitGroupSeparators(text) {
@@ -90,6 +94,7 @@ function removeDigitGroupSeparators(text) {
  *  extractDigitsIfFound('Some text') //Some text
  *  extractDigitsIfFound('Some text 123') //123
  * @param {String} text The string to operate on
+ * @access private
  * @returns {String} Text with digits characters only.
  */
 function extractDigitsIfFound(text) {
@@ -108,6 +113,7 @@ function extractDigitsIfFound(text) {
  *  removeRange('123') //123
  *  removeRange('No numbers') //No numbers
  * @param {String} text The string to operate on
+ * @access private
  * @returns {Number}
  */
 function extractNumberFromRange(text) {
@@ -129,7 +135,9 @@ function extractNumberFromRange(text) {
  *  ftDateTimeToUnixEpoch('1.30am') //-1.3
  *  ftDateTimeToUnixEpoch('1.40pm') //1.4
  *  ftDateTimeToUnixEpoch('3pm') //3
+ *  ftDateTimeToUnixEpoch('Not a known date') //Note a known date
  * @param {String} text The string to operate on
+ * @access private
  * @returns {Number} Number representation of date and/or time for sorting.
  */
 function ftDateTimeToUnixEpoch(text) {
@@ -168,6 +176,7 @@ function ftDateTimeToUnixEpoch(text) {
  *  removeRefereneAsterisk('Durian*') //Durian
  *  removeRefereneAsterisk('1,439,165.43**') //1,439,165.43
  * @param {String} text The string to operate on
+ * @access private
  * @returns {String} Text without source/reference asterisk.
  */
 function removeRefereneAsterisk(text) {
@@ -181,6 +190,7 @@ function removeRefereneAsterisk(text) {
  *  removeEmptyCellIndicators('-'); //
  *  removeEmptyCellIndicators('Cell-content'); //Cell-content
  * @param {String} text The string to operate on
+ * @access private
  * @returns {String} An empty string or the original text.
  */
 function removeEmptyCellIndicators(text) {
@@ -190,32 +200,97 @@ function removeEmptyCellIndicators(text) {
 	return text === '-' ? '' : text;
 }
 
+/**
+ * Group of filters to extract text from a cell.
+ * @param {HTMLElement} cell The node to extract sortable text from.
+ * @access private
+ * @returns {String} The node content to sort on.
+ */
+function extractNodeContent(cell) {
+	const steps = [extractAltFromImages, extractText, removeRefereneAsterisk, removeEmptyCellIndicators];
+	let text = cell;
+	steps.forEach(step => { text = step(text); });
+	return typeof text === 'string' ? text : '';
+}
+
+/**
+ * Group of filters to extract a number for sorting.
+ * @param {String} text The string to operate on
+ * @access private
+ * @returns {Number|String} A number if one could a extracted, string otherwise.
+ */
+function extractNumber(text) {
+	const steps = [removeDigitGroupSeparators, expandAbbreviations, extractDigitsIfFound, extractNumberFromRange];
+	steps.forEach(step => { text = step(text); });
+	return text;
+}
+
 // This object is used to keep the running order of filter methods
 const filters = {
-	numeric: [removeDigitGroupSeparators, expandAbbreviations, extractDigitsIfFound, extractNumberFromRange],
-	date: [ftDateTimeToUnixEpoch],
-	all: [extractAltFromImages, extractText, removeRefereneAsterisk, removeEmptyCellIndicators]
+	text: [extractNodeContent],
+	number: [extractNodeContent, extractNumber],
+	percent: [extractNodeContent, extractNumber],
+	currency: [extractNodeContent, extractNumber],
+	numeric: [extractNodeContent, extractNumber],
+	date: [extractNodeContent, ftDateTimeToUnixEpoch]
 };
 
-export default function formatCell({ cell, type = null }) {
-	const numericTypes = ['currency', 'percent', 'number', 'numeric'];
-	const isNumericColumn = numericTypes.includes(type);
-	let cellClone = cell.cloneNode({ deep: true });
-	let sortValue = cell.getAttribute('data-o-table-sort-value');
-	if(sortValue === null){
-		sortValue = cellClone;
-		// Extract value from dom node and format for sort.
-		filters.all.forEach(fn => { sortValue = fn(sortValue); });
-		// Format types which are treated as numeric for sorting.
-		if (isNumericColumn) {
-			filters.numeric.forEach(fn => { sortValue = fn(sortValue); });
-		}
-		// Format types (numeric has already been processed).
-		if (filters[type] && type !== 'numeric') {
-			filters[type].forEach(fn => { sortValue = fn(sortValue); });
-		}
-		cell.setAttribute('data-o-table-sort-value', sortValue);
+/**
+ * Methods to format table cells for sorting.
+ * @access public
+ */
+class SortFormatter {
+
+	/**
+	 * The `formatFunction` take the table cell HTMLElement,
+	 * and converts it to a String or Number of sorting.
+	 *
+	 * @callback formatFunction
+	 * @param {HTMLElement} cell
+	 * @return {String|Object}
+	 */
+
+	/**
+	 * @param {String} type The data type of the cell to apply the filter function to.
+	 * @param {formatFunction} formatFunction The function to take the cell and return a sortable value (string/number).
+	 * @example
+	 *  mySortFormatter.setFormatter('emoji-time', (cell) => {
+	 *  	const text = cell.textContent.trim();
+	 *  	if (text === '🌑') {
+	 *  		return 1;
+	 *  	}
+	 *  	if (text === '🌤️️') {
+	 *  		return 2;
+	 *  	}
+	 *  	return 0;
+	 *  });
+	 * @access public
+	 */
+	setFormatter(type, formatFunction) {
+		filters[type] = [formatFunction];
 	}
-	const sortValueIsNumber = sortValue !== '' && !isNaN(sortValue);
-	return sortValueIsNumber ? parseFloat(sortValue) : sortValue;
+
+	/**
+	 * @param {HTMLElement} cell
+	 * @param {String} type The data type of the cell, e.g. date, number, currency. Custom types are supported.
+	 * @see {@link setFormatter} to support add support for a custom type.
+	 * @access public
+	 * @return {String|Number} A representation of cell which can be used for sorting.
+	 */
+	formatCell({ cell, type = 'text' }) {
+		type = type || 'text';
+		let cellClone = cell.cloneNode({ deep: true });
+		let sortValue = cell.getAttribute('data-o-table-sort-value');
+		if (sortValue === null) {
+			if (filters[type]) {
+				sortValue = cellClone;
+				filters[type].forEach(fn => { sortValue = fn(sortValue); });
+			}
+			cell.setAttribute('data-o-table-sort-value', sortValue);
+		}
+		const sortValueIsNumber = sortValue !== '' && !isNaN(sortValue);
+		return sortValueIsNumber ? parseFloat(sortValue) : sortValue;
+	}
 }
+
+export default SortFormatter;

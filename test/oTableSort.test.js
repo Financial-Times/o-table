@@ -667,6 +667,56 @@ describe('oTable sorting', () => {
 		});
 	});
 
+	it('sorts custom data types according to a given formatter', done => {
+		sandbox.reset();
+		sandbox.init();
+		sandbox.setContents(`
+			<table class="o-table" data-o-component="o-table">
+				<thead>
+					<tr>
+						<th data-o-table-data-type="emoji-time">Emoji Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>🌑</td>
+					</tr>
+					<tr>
+						<td>🌤</td>
+					</tr>
+					<tr>
+						<td>🌑</td>
+					</tr>
+					<tr>
+						<td>🌤</td>
+					</tr>
+				</tbody>
+			</table>
+		`);
+		OTable.prototype.setSortFormatterForType('emoji-time', (cell) => {
+			const text = cell.textContent.trim();
+			if (text === '🌑') {
+				return 1;
+			}
+			if (text === '🌤') {
+				return 2;
+			}
+			return 0;
+		});
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		click('thead th');
+
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
+				(td) => td.textContent
+			);
+			proclaim.deepEqual(rows, ['🌑', '🌑', '🌤', '🌤']);
+			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
+			done();
+		});
+	});
+
 	it('sorts localised strings alphabetically', done => {
 		const items = ['café', 'apple', 'caffeine', 'Æ'];
 		const expectedSortedRows = ['Æ', 'apple', 'café', 'caffeine'];
