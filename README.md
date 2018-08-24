@@ -324,7 +324,7 @@ A custom sort may also be provided client side.
 const OTable = require('o-table');
 // Set a filter for custom data type "emoji-time".
 // The return value may be a string or number.
-OTable.prototype.setSortFormatterForType('emoji-time', (cell) => {
+OTable.setSortFormatterForType('emoji-time', (cell) => {
 	const text = cell.textContent.trim();
 	if (text === '🌑') {
 		return 1;

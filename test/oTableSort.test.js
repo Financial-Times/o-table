@@ -693,7 +693,7 @@ describe('oTable sorting', () => {
 				</tbody>
 			</table>
 		`);
-		OTable.prototype.setSortFormatterForType('emoji-time', (cell) => {
+		OTable.setSortFormatterForType('emoji-time', (cell) => {
 			const text = cell.textContent.trim();
 			if (text === '🌑') {
 				return 1;
