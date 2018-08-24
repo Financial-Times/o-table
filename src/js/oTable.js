@@ -105,7 +105,7 @@ class OTable {
 			}
 
 			if (this.isResponsive) {
-				this._duplicateHeaders(tableRows, this.tableHeaders);
+				OTable._duplicateHeaders(tableRows, this.tableHeaders);
 			}
 
 			this.dispatch('ready', {
@@ -127,7 +127,7 @@ class OTable {
 				bubbles: true
 			}));
 		}, 0);
-	};
+	}
 
 	/**
 	 * Gets a table header for a given column index.
@@ -137,7 +137,7 @@ class OTable {
 	 */
 	getTableHeader(columnIndex) {
 		return this.tableHeaders[columnIndex] || null;
-	};
+	}
 
 	/**
 	 * Helper function to remove all event handlers which were added during instantiation of the component
@@ -150,7 +150,7 @@ class OTable {
 			th.removeEventListener('click', this.listeners[columnIndex]);
 			th.removeEventListener('keydown', this.listeners[columnIndex]);
 		});
-	};
+	}
 
 	/**
 	 * Sorts the table by a specific column
@@ -187,7 +187,7 @@ class OTable {
 		});
 
 		this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
-	};
+	}
 
 	/**
 	 * Indicated that the table has been sorted by firing by a custom sort implementation.
@@ -204,7 +204,7 @@ class OTable {
 			columnIndex,
 			oTable: this
 		});
-	};
+	}
 
 	/**
 	 * Destroys the instance, removing any event listeners that were added during instatiation of the component
@@ -218,7 +218,7 @@ class OTable {
 		this.rootEl.removeAttribute('data-o-table--js');
 		this.removeEventListeners();
 		delete this.rootEl;
-	};
+	}
 
 	/**
 	 * @private
@@ -260,7 +260,7 @@ class OTable {
 			this._updateSortAttributes(columnIndex, sort);
 
 		}.bind(this);
-	};
+	}
 
 	/**
 	 * Update the aria sort attributes on a sorted table.
@@ -293,23 +293,7 @@ class OTable {
 			});
 			this.rootEl.setAttribute('data-o-table-order', sort);
 		}
-	};
-
-	/**
-	 * Duplicate the table headers into each row
-	 * For use with responsive tables
-	 *
-	 * @private
-	 * @param  {array} rows Table rows
-	 */
-	_duplicateHeaders(rows, headers) {
-		rows.forEach((row) => {
-			const data = Array.from(row.getElementsByTagName('td'));
-			data.forEach((td, dataIndex) => {
-				td.parentNode.insertBefore(headers[dataIndex].cloneNode(true), td);
-			});
-		});
-	};
+	}
 
 	/**
 	 * Initialises all o-table components inside the element passed as the first parameter
@@ -329,7 +313,7 @@ class OTable {
 		return tableEls.map(el => {
 			return new OTable(el);
 		});
-	};
+	}
 
 	/**
 	 * Set a custom sort filter for a given table cell data type.
@@ -338,7 +322,7 @@ class OTable {
 	 */
 	static setSortFormatterForType(type, formatFunction) {
 		tableSortFormatter.setFormatter(type, formatFunction);
-	};
+	}
 
 	static wrap(tableSelector, wrapClass) {
 		tableSelector = typeof tableSelector === "string" ? tableSelector : ".o-table";
@@ -359,7 +343,23 @@ class OTable {
 				}
 			}
 		}
-	};
+	}
+
+	/**
+	 * Duplicate the table headers into each row
+	 * For use with responsive tables
+	 *
+	 * @private
+	 * @param  {array} rows Table rows
+	 */
+	static _duplicateHeaders(rows, headers) {
+		rows.forEach((row) => {
+			const data = Array.from(row.getElementsByTagName('td'));
+			data.forEach((td, dataIndex) => {
+				td.parentNode.insertBefore(headers[dataIndex].cloneNode(true), td);
+			});
+		});
+	}
 }
 
 module.exports = OTable;

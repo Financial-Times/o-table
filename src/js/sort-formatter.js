@@ -225,21 +225,23 @@ function extractNumber(text) {
 	return text;
 }
 
-// This object is used to keep the running order of filter methods
-const filters = {
-	text: [extractNodeContent],
-	number: [extractNodeContent, extractNumber],
-	percent: [extractNodeContent, extractNumber],
-	currency: [extractNodeContent, extractNumber],
-	numeric: [extractNodeContent, extractNumber],
-	date: [extractNodeContent, ftDateTimeToUnixEpoch]
-};
-
 /**
  * Methods to format table cells for sorting.
  * @access public
  */
 class SortFormatter {
+
+	constructor () {
+		// This object is used to keep the running order of filter methods
+		this.filters = {
+			text: [extractNodeContent],
+			number: [extractNodeContent, extractNumber],
+			percent: [extractNodeContent, extractNumber],
+			currency: [extractNodeContent, extractNumber],
+			numeric: [extractNodeContent, extractNumber],
+			date: [extractNodeContent, ftDateTimeToUnixEpoch]
+		};
+	}
 
 	/**
 	 * The `formatFunction` take the table cell HTMLElement,
@@ -267,7 +269,7 @@ class SortFormatter {
 	 * @access public
 	 */
 	setFormatter(type, formatFunction) {
-		filters[type] = [formatFunction];
+		this.filters[type] = [formatFunction];
 	}
 
 	/**
@@ -282,9 +284,9 @@ class SortFormatter {
 		let cellClone = cell.cloneNode({ deep: true });
 		let sortValue = cell.getAttribute('data-o-table-sort-value');
 		if (sortValue === null) {
-			if (filters[type]) {
+			if (this.filters[type]) {
 				sortValue = cellClone;
-				filters[type].forEach(fn => { sortValue = fn(sortValue); });
+				this.filters[type].forEach(fn => { sortValue = fn(sortValue); });
 			}
 			cell.setAttribute('data-o-table-sort-value', sortValue);
 		}
