@@ -290,11 +290,13 @@ Or to provide an arbitrary sort order:
 </table>
 ```
 
-Note: `data-o-table-order` has been deprecated in favour of `data-o-table-sort-value`.
+Note: `data-o-table-order` has been deprecated in favour of `data-o-table-sort-value` to specify a sort value.
 
 ##### Custom sort (imperative)
 
-A custom sort may also be provided client side.
+A custom sort may also be implemented client side with a formatter function. The formatter accepts the table cell (HTMLElement) and returns a sort value (Number or String) for that cell.
+
+E.g. for a custom data type `emoji-time`.
 
 ```html
 <table class="o-table" data-o-component="o-table">
@@ -318,7 +320,9 @@ A custom sort may also be provided client side.
 		</tr>
 	</tbody>
 </table>
-```
+``` 
+
+You may assign the emoji a numerical sort value:
 
 ``` js
 const OTable = require('o-table');
@@ -336,6 +340,32 @@ OTable.setSortFormatterForType('emoji-time', (cell) => {
 });
 OTable.init();
 ```
+
+Which for an ascending sort, will result in:
+
+```html
+<table class="o-table" data-o-component="o-table" data-o-table-order="ASC">
+	<thead>
+		<tr>
+			<th data-o-table-data-type="emoji-time" aria-sort="ascending">Emoji Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td data-o-table-sort-value=1>🌑</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value=1>🌑</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value=2>🌤️️</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value=2>🌤️️</td>
+		</tr>
+	</tbody>
+</table>
+``` 
 
 #### Events
 
