@@ -298,7 +298,7 @@ Rather than specify `data-o-table-sort-value` [declaritively](#custom-sort-decla
 
 For example we could add support for a custom data type `emoji-time`.
 
-```html
+``` html
 <table class="o-table" data-o-component="o-table">
 	<thead>
 		<tr>
@@ -320,7 +320,7 @@ For example we could add support for a custom data type `emoji-time`.
 		</tr>
 	</tbody>
 </table>
-``` 
+```
 
 To do that call `setSortFormatterForType` with the custom data type and a formatter function.
 The formatter accepts the table cell (HTMLElement) and returns a sort value (Number or String) for that cell.
@@ -367,7 +367,7 @@ Which for an ascending sort, will result in:
 		</tr>
 	</tbody>
 </table>
-``` 
+```
 
 #### Events
 
