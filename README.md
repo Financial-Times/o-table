@@ -294,9 +294,9 @@ Note: `data-o-table-order` has been deprecated in favour of `data-o-table-sort-v
 
 ##### Custom sort (imperative)
 
-A custom sort may also be implemented client side with a formatter function. The formatter accepts the table cell (HTMLElement) and returns a sort value (Number or String) for that cell.
+Rather than specify `data-o-table-sort-value` [declaritively](#custom-sort-declarative), a formatter function may be provided client-side to generate sort values for a given data type.
 
-E.g. for a custom data type `emoji-time`.
+For example we could add support for a custom data type `emoji-time`.
 
 ```html
 <table class="o-table" data-o-component="o-table">
@@ -322,7 +322,9 @@ E.g. for a custom data type `emoji-time`.
 </table>
 ``` 
 
-You may assign the emoji a numerical sort value:
+To do that call `setSortFormatterForType` with the custom data type and a formatter function.
+The formatter accepts the table cell (HTMLElement) and returns a sort value (Number or String) for that cell.
+In this case we add support for our custom type `emoji-time` by assigning the emoji a numerical sort value.
 
 ``` js
 const OTable = require('o-table');
