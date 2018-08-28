@@ -160,9 +160,9 @@ function ftDateTimeToNumber(text) {
 	const hour = time && time[1] ? parseInt(time[1], 10) : null;
 	const minute = time && time[2] ? parseInt(time[2], 10) : 0;
 	const period = time ? time[3] : null;
-	const twentyFourHour = period === 'pm' ? hour + 12 : hour;
+	const twentyFourHour = hour && period === 'pm' ? hour + 12 : hour;
 	// Sort number for FT formated time.
-	if (twentyFourHour && !(year && monthIndex)) {
+	if (hour && !(year && monthIndex)) {
 		return parseFloat(`${twentyFourHour}.${minute}`);
 	}
 	// Unix epoch to sort FT formated date.
