@@ -126,21 +126,21 @@ function extractNumberFromRange(text) {
  * FT date or date and time returns a UNIX epoch (UTC).
  * FT time returns a positive float for pm, negative for am.
  * @example
- *  ftDateTimeToUnixEpoch('August 17') //UNIX epoch, assumes current year
- *  ftDateTimeToUnixEpoch('September 12 2012') //UNIX epoch
- *  ftDateTimeToUnixEpoch('January 2012') //UNIX epoch, first of month
- *  ftDateTimeToUnixEpoch('March 12 2015 1am') //UNIX epoch including time
- *  ftDateTimeToUnixEpoch('April 20 2014 1.30pm') //UNIX epoch including time
- *  ftDateTimeToUnixEpoch('1am') //-1
- *  ftDateTimeToUnixEpoch('1.30am') //-1.3
- *  ftDateTimeToUnixEpoch('1.40pm') //1.4
- *  ftDateTimeToUnixEpoch('3pm') //3
- *  ftDateTimeToUnixEpoch('Not a known date') //Note a known date
+ *  ftDateTimeToNumber('August 17') //UNIX epoch, assumes current year
+ *  ftDateTimeToNumber('September 12 2012') //UNIX epoch
+ *  ftDateTimeToNumber('January 2012') //UNIX epoch, first of month
+ *  ftDateTimeToNumber('March 12 2015 1am') //UNIX epoch including time
+ *  ftDateTimeToNumber('April 20 2014 1.30pm') //UNIX epoch including time
+ *  ftDateTimeToNumber('1am') //1
+ *  ftDateTimeToNumber('1.30am') //1.3
+ *  ftDateTimeToNumber('1.40pm') //13.4
+ *  ftDateTimeToNumber('3pm') //15
+ *  ftDateTimeToNumber('Not a known date') //Note a known date
  * @param {String} text The string to operate on
  * @access private
  * @returns {Number} Number representation of date and/or time for sorting.
  */
-function ftDateTimeToUnixEpoch(text) {
+function ftDateTimeToNumber(text) {
 	const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 	// FT style for writing dates: is June 23 2016 (no commas, month date year)
 	const date = text.match(/^([A-Za-z]{3,})(?:[\s])(?=[\d])((?:\d{1,2})?(?![\d]))?(?:\s)?(\d{4})?/);
@@ -160,13 +160,13 @@ function ftDateTimeToUnixEpoch(text) {
 	const hour = time && time[1] ? parseInt(time[1], 10) : null;
 	const minute = time && time[2] ? parseInt(time[2], 10) : 0;
 	const period = time ? time[3] : null;
-	const timeModifier = period === 'am' ? -1 : 1;
+	const twentyFourHour = period === 'pm' ? hour + 12 : hour;
 	// Sort number for FT formated time.
-	if (hour && !(year && monthIndex)) {
-		return parseFloat(`${hour}.${minute}`) * timeModifier;
+	if (twentyFourHour && !(year && monthIndex)) {
+		return parseFloat(`${twentyFourHour}.${minute}`);
 	}
 	// Unix epoch to sort FT formated date.
-	const dateObj = new Date(Date.UTC(year, monthIndex, day, hour, minute));
+	const dateObj = new Date(Date.UTC(year, monthIndex, day, twentyFourHour, minute));
 	return isNaN(dateObj.getTime()) ? text : dateObj.getTime();
 }
 
@@ -239,7 +239,7 @@ class SortFormatter {
 			percent: [extractNodeContent, extractNumber],
 			currency: [extractNodeContent, extractNumber],
 			numeric: [extractNodeContent, extractNumber],
-			date: [extractNodeContent, ftDateTimeToUnixEpoch]
+			date: [extractNodeContent, ftDateTimeToNumber]
 		};
 	}
 

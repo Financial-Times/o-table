@@ -385,8 +385,8 @@ describe('oTable sorting', () => {
 		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
-			proclaim.equal(rows[0].textContent, '7am');
-			proclaim.equal(rows[1].textContent, '6.30am');
+			proclaim.equal(rows[0].textContent, '6.30am');
+			proclaim.equal(rows[1].textContent, '7am');
 			proclaim.equal(rows[2].textContent, '6.30pm');
 			proclaim.equal(rows[3].textContent, '7pm');
 			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
@@ -419,7 +419,7 @@ describe('oTable sorting', () => {
 						<td data-o-table-data-type="date">March 12 2015 1am</td>
 					</tr>
 					<tr>
-						<td data-o-table-data-type="date">April 20 2014 1.30pm</td>
+						<td data-o-table-data-type="date">April 20 2014 3.30am</td>
 					</tr>
 					<tr>
 						<td data-o-table-data-type="date">April 20 2014 2.30pm</td>
@@ -434,7 +434,7 @@ describe('oTable sorting', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, 'January 2012');
 			proclaim.equal(rows[1].textContent, 'September 12 2012');
-			proclaim.equal(rows[2].textContent, 'April 20 2014 1.30pm');
+			proclaim.equal(rows[2].textContent, 'April 20 2014 3.30am');
 			proclaim.equal(rows[3].textContent, 'April 20 2014 2.30pm');
 			proclaim.equal(rows[4].textContent, 'March 12 2015 1am');
 			proclaim.equal(rows[5].textContent, 'August 17'); // assumes current year
