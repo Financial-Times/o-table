@@ -182,8 +182,11 @@ class OTable {
 				return descendingSort(aCol, bCol, intlCollator);
 			}
 		});
-		rows.forEach(function (row) {
-			tbody.appendChild(row);
+
+		window.requestAnimationFrame(() => {
+			rows.forEach(function (row) {
+				tbody.appendChild(row);;
+			});
 		});
 
 		this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
@@ -285,14 +288,16 @@ class OTable {
 				break;
 		}
 		// Set aria attributes.
-		const sortedHeader = this.getTableHeader(columnIndex);
-		if (!sortedHeader || sortedHeader.getAttribute('aria-sort') !== ariaSort) {
-			this.tableHeaders.forEach((header) => {
-				const headerSort = (header === sortedHeader ? ariaSort : 'none');
-				header.setAttribute('aria-sort', headerSort);
-			});
-			this.rootEl.setAttribute('data-o-table-order', sort);
-		}
+		window.requestAnimationFrame(() => {
+			const sortedHeader = this.getTableHeader(columnIndex);
+			if (!sortedHeader || sortedHeader.getAttribute('aria-sort') !== ariaSort) {
+				this.tableHeaders.forEach((header) => {
+					const headerSort = (header === sortedHeader ? ariaSort : 'none');
+					header.setAttribute('aria-sort', headerSort);
+				});
+				this.rootEl.setAttribute('data-o-table-order', sort);
+			}
+		});
 	}
 
 	/**
