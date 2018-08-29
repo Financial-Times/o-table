@@ -8,7 +8,7 @@
 	@include oTypographyBody;
 	border-collapse: collapse;
 	border-spacing: 0;
-	margin: 0 0 20px;
+	margin: 0;
 	width: 100%;
 
 	caption {
@@ -54,6 +54,7 @@
 	td {
 		@include oTypographySans(1);
 		color: _oTableGet('table-data-color');
+		scroll-snap-align: none center;
 		&:empty:before {
 			@include oIconsGetIcon('minus', $container-width: 15,  $container-height: 15, $iconset-version: 1);
 			content: '';
@@ -63,7 +64,7 @@
 
 	th,
 	td {
-		padding: 8px;
+		padding: 10px;
 		text-align: left;
 		vertical-align: top;
 	}
@@ -77,4 +78,113 @@
 @mixin oTableWrapper {
 	overflow: auto;
 	width: 100%;
+	scroll-snap-type: x proximity;
+}
+
+@mixin oTableControlsContainer {
+
+	$bottom-margin: 10px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: $bottom-margin;
+	left: 0;
+	pointer-events: none;
+
+	&--dock {
+		&:after,
+		&:before {
+			position: absolute;
+			content: '';
+			bottom: 0;
+			height: 40px;
+			width: $bottom-margin + 40px;
+			pointer-events: none;
+			border-color: oButtonsGetColor('default', 'background', $theme: 'primary');
+			border-style: solid;
+			width: 1px;
+		}
+
+		&:before {
+			left: 0;
+			border-width: 0 40px 0 9px;
+		}
+
+		&:after {
+			right: 0;
+			border-width: 0 9px 0 40px;
+		}
+	}
+
+	.o-table-control {
+		display: inline-block;
+		background: _oTableGet('table-background');
+		pointer-events: all;
+		transition: 1s opacity ease-in-out;
+	}
+
+	.o-table-control--forward,
+	.o-table-control--back {
+		@supports (pointer-events: none) and (position: sticky) {
+			position: sticky;
+			top: calc(50vh - 20px);
+			transition: opacity 0.3s $o-visual-effects-transition-fade;
+		}
+		z-index: 1;
+	}
+
+	.o-table-control--more {
+		position: absolute;
+		left: 51px;
+		right: 51px;
+		bottom: 0;
+		text-align: center;
+	}
+
+	.o-table-control--hide {
+		opacity: 0;
+	}
+
+	.o-table-control--more button {
+		width: 100%;
+	}
+
+	.o-table-control--back {
+		float: left;
+		margin: 0 10px;
+	}
+
+	.o-table-control--forward {
+		float: right;
+		margin: 0 10px;
+	}
+}
+
+@mixin oTableFadeOverlay {
+	@supports (pointer-events: none) {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) 10px),
+		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) 10px);
+	}
+
+	&:after {
+		content: '';
+		position: absolute;
+		height: 80px;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: linear-gradient(to top, _oTableGet('table-background') 30px, rgba(_oTableGet('table-background'), 0) 80px);
+		pointer-events: none;
+	}
+
+	@at-root .o-table-container--expanded &:after {
+		content: unset;
+	}
+
 }

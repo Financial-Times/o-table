@@ -11,6 +11,26 @@
 	.#{$classname}-wrapper {
 		@include oTableWrapper;
 	}
+
+	tr[aria-hidden="true"] {
+		display: none;
+	}
+
+	.o-table-container {
+		position: relative;
+	}
+
+	.o-table-container--expanded {
+		padding-bottom: 50px;
+	}
+
+	.#{$classname}-control-overlay {
+		@include oTableControlsContainer;
+	}
+
+	.#{$classname}-fade-overlay {
+		@include oTableFadeOverlay;
+	}
 	.#{$classname} {
 		@include oTableBase;
 		.#{$classname}__caption,

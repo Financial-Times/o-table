@@ -29,6 +29,28 @@ function wrapElement(targetEl, wrapEl) {
 	wrapEl.appendChild(targetEl);
 }
 
+function updateControls(wrapper, controlOverlay, fadeOverlay) {
+	const forwardButton = controlOverlay.querySelector('.o-table-control--forward');
+	const backButton = controlOverlay.querySelector('.o-table-control--back');
+
+	const fromEnd = wrapper.scrollWidth - wrapper.clientWidth - wrapper.scrollLeft;
+	const fromStart = wrapper.scrollLeft;
+
+	// forwardButton.style.visibility = fromEnd === 0 ? 'hidden' : 'unset';
+	if (fromEnd === 0) {
+		forwardButton.querySelector('button').setAttribute('disabled', true);
+	} else {
+		forwardButton.querySelector('button').removeAttribute('disabled');
+	}
+
+	// backButton.style.visibility = fromStart === 0 ? 'hidden' : 'unset';
+	if (fromStart === 0) {
+		backButton.querySelector('button').setAttribute('disabled', true);
+	} else {
+		backButton.querySelector('button').removeAttribute('disabled');
+	}
+}
+
 class OTable {
 	/**
 	 * Initialises o-table component(s).
@@ -65,9 +87,96 @@ class OTable {
 			}
 
 			const thead = this.rootEl.querySelector('thead');
+			const tbody = this.rootEl.querySelector('tbody');
 			this.tableHeaders = Array.from(thead.querySelectorAll('th'));
-			const tableRows = Array.from(this.rootEl.getElementsByTagName('tr'));
+			this.tableRows = Array.from(tbody.getElementsByTagName('tr'));
 
+
+			const wrapper = this.rootEl.closest('.o-table-wrapper');
+			const container = this.rootEl.closest('.o-table-container');
+			const controlOverlay = container.querySelector('.o-table-control-overlay');
+			const fadeOverlay = container.querySelector('.o-table-fade-overlay');
+			const moreButton = controlOverlay.querySelector('.o-table-control--more');
+			// start
+			if (moreButton) {
+				moreButton.addEventListener('click', () => {
+					const currentExpandedState = this.rootEl.getAttribute('aria-expanded');
+					const expand = Boolean(currentExpandedState === "false");
+					const viewportTopOffset = moreButton.getBoundingClientRect().top;
+					this.rootEl.setAttribute('aria-expanded', expand);
+					const visbleRowCount = expand ? this.tableRows.length : Math.min(this.tableRows.length, 10);
+					this.tableRows.forEach((row, index) => {
+						row.setAttribute('aria-hidden', (index <= visbleRowCount ? 'false' : 'true'));
+					});
+					if (expand) {
+						moreButton.querySelector('button').textContent = 'Show fewer';
+						container.classList.add('o-table-container--expanded');
+					} else {
+						moreButton.querySelector('button').textContent = `Show ${this.tableRows.length - visbleRowCount} more`;
+						container.classList.remove('o-table-container--expanded');
+					}
+					if (!expand) {
+						window.scrollBy({
+							top: moreButton.getBoundingClientRect().top - viewportTopOffset,
+						});
+					}
+				});
+			}
+
+			controlOverlay.querySelector('.o-table-control--forward').addEventListener('click', () => {
+				wrapper.scrollBy({
+					left: (document.body.clientWidth / 2),
+					behavior: 'smooth'
+				});
+			});
+
+			controlOverlay.querySelector('.o-table-control--back').addEventListener('click', () => {
+				wrapper.scrollBy({
+					left: -(document.body.clientWidth / 2),
+					behavior: 'smooth'
+				});
+			});
+
+			if (window.IntersectionObserver && wrapper && controlOverlay) {
+				const backButton = controlOverlay.querySelector('.o-table-control--back');
+				const forwardButton = controlOverlay.querySelector('.o-table-control--forward');
+
+				var controlFadeObserver = new IntersectionObserver((entries) => {
+					entries.forEach(entry => {
+						entry.target.classList.toggle('o-table-control--hide', entry.intersectionRatio !== 1);
+					});
+				}, {
+					root: controlOverlay,
+					threshold: 1.0,
+					rootMargin: `-50px 0px ${ moreButton ? '50px' : '0px' } 0px`
+				});
+				controlFadeObserver.observe(backButton);
+				controlFadeObserver.observe(forwardButton);
+
+				let scrollTimeout = false;
+				wrapper.addEventListener('scroll', () => {
+					if (! scrollTimeout) {
+						scrollTimeout = true;
+						setTimeout(() => {
+							updateControls(wrapper, controlOverlay, fadeOverlay);
+							scrollTimeout = false;
+						}, 33);
+					}
+				});
+
+				updateControls(wrapper, controlOverlay, fadeOverlay);
+
+				this.rootEl.addEventListener('oTable.sorted', () => {
+					const currentExpandedState = this.rootEl.getAttribute('aria-expanded');
+					if (currentExpandedState === 'false') {
+						const visbleRowCount = Math.min(this.tableRows.length, 10);
+						this.tableRows.forEach((row, index) => {
+							row.setAttribute('aria-hidden', (index <= visbleRowCount ? 'false' : 'true'));
+						});
+					}
+				});
+			}
+			// end
 			this.tableHeaders.forEach((th, columnIndex) => {
 				// Do not sort headers with attribute.
 				if (th.hasAttribute('data-o-table-heading-disable-sort')) {
@@ -106,7 +215,7 @@ class OTable {
 			}
 
 			if (this.isResponsive) {
-				OTable._duplicateHeaders(tableRows, this.tableHeaders);
+				OTable._duplicateHeaders(this.tableRows, this.tableHeaders);
 			}
 
 			this.dispatch('ready', {
@@ -168,9 +277,8 @@ class OTable {
 			type = type || 'numeric';
 		}
 		const tbody = this.rootEl.querySelector('tbody');
-		const rows = Array.from(tbody.querySelectorAll('tr'));
 		const intlCollator = getIntlCollator();
-		rows.sort(function (a, b) {
+		this.tableRows.sort(function (a, b) {
 			let aCol = a.children[index];
 			let bCol = b.children[index];
 			aCol = tableSortFormatter.formatCell({ cell: aCol, type });
@@ -183,7 +291,7 @@ class OTable {
 		});
 
 		window.requestAnimationFrame(() => {
-			rows.forEach(function (row) {
+			this.tableRows.forEach(function (row) {
 				tbody.appendChild(row);
 			});
 			this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
