@@ -294,7 +294,7 @@ Note: `data-o-table-order` has been deprecated in favour of `data-o-table-sort-v
 
 ##### Custom sort (imperative)
 
-Rather than specify `data-o-table-sort-value` [declaritively](#custom-sort-declarative), a formatter function may be provided client-side to generate sort values for a given data type.
+Rather than specify `data-o-table-sort-value` [declaratively](#custom-sort-declarative), a formatter function may be provided client-side to generate sort values for a given data type.
 
 For example we could add support for a custom data type `emoji-time`.
 

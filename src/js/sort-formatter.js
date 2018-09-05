@@ -82,8 +82,8 @@ function removeDigitGroupSeparators(text) {
 }
 
 /**
- * Returns the text with non-number charactors removed (e.g. currency symbols).
- * Does not effect range charactors e.g. "–" will be maintained.
+ * Returns the text with non-number characters removed (e.g. currency symbols).
+ * Does not effect range characters e.g. "–" will be maintained.
  * If no digits were found to remove, returns the text unchanged.
  * @example
  *  extractDigitsIfFound('Rmb100') //100
