@@ -900,7 +900,7 @@ describe('oTable sorting', () => {
 	describe('updates sort attributes when sorted', () => {
 		let oTableElHeaders;
 
-		const checkHeaderExpectations = function (sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done) {
+		const checkHeaderExpectations = function (sortedHeaderIndex, otherHeaderIndex, expectedAriaValue) {
 			return new Promise((resolve) => {
 				setTimeout(() => {
 					sortedHeaderIndex = sortedHeaderIndex || 0;
@@ -953,7 +953,9 @@ describe('oTable sorting', () => {
 			const sort = 'ASC';
 			const expectedAriaValue = 'ascending';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {
+					done();
+				});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
@@ -964,7 +966,9 @@ describe('oTable sorting', () => {
 			const sort = 'DES';
 			const expectedAriaValue = 'descending';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {
+					done();
+				});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
@@ -975,7 +979,9 @@ describe('oTable sorting', () => {
 			const sort = null;
 			const expectedAriaValue = 'none';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {
+					done();
+				});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
@@ -986,7 +992,9 @@ describe('oTable sorting', () => {
 			const sort = null;
 			const expectedAriaValue = 'none';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {
+					done();
+				});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
