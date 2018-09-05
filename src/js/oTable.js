@@ -185,7 +185,7 @@ class OTable {
 
 		window.requestAnimationFrame(() => {
 			rows.forEach(function (row) {
-				tbody.appendChild(row);;
+				tbody.appendChild(row);
 			});
 		});
 
