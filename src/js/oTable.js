@@ -187,9 +187,8 @@ class OTable {
 			rows.forEach(function (row) {
 				tbody.appendChild(row);
 			});
+			this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
 		});
-
-		this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
 	}
 
 	/**

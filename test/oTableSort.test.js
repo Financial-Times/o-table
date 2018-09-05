@@ -9,6 +9,16 @@ describe('oTable sorting', () => {
 	let oTableEl;
 	let testOTable;
 
+	const assertExpectedSort = (oTableEl, sort) => {
+		return new Promise((resolve) => {
+			// Timeout allows for dom to update (window.requestAnimationFrame)
+			setTimeout(() => {
+				proclaim.equal(oTableEl.getAttribute('data-o-table-order'), sort);
+				resolve(true);
+			}, 10);
+		});
+	};
+
 	const click = element => {
 		// TODO - Add a click polyfill to polyfill-service
 		const click = document.createEvent('MouseEvent');
@@ -104,8 +114,7 @@ describe('oTable sorting', () => {
 		testOTable = new OTable(oTableEl);
 		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -115,16 +124,15 @@ describe('oTable sorting', () => {
 		click('thead th');
 		setTimeout(() => {
 			oTableEl.addEventListener('oTable.sorted', () => {
-				proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'DES');
 				const rows = oTableEl.querySelectorAll('tbody tr td');
 				proclaim.equal(rows[0].textContent, 'stilton');
 				proclaim.equal(rows[1].textContent, 'red leicester');
 				proclaim.equal(rows[2].textContent, 'cheddar');
-				done();
+				assertExpectedSort(oTableEl, 'DES').then(() => done());
 			});
 			// Second click DES
 			click('thead th');
-		}, 0);
+		}, 10);
 	});
 
 	it('sorts strings alphabetically', done => {
@@ -135,8 +143,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, 'cheddar');
 			proclaim.equal(rows[1].textContent, 'red leicester');
 			proclaim.equal(rows[2].textContent, 'stilton');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -183,8 +190,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[3].textContent, '12.03');
 			proclaim.equal(rows[4].textContent, '480,000');
 			proclaim.equal(rows[5].textContent, '1,216,000');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -223,8 +229,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[1].textContent, '-');
 			proclaim.equal(rows[2].textContent, '12.03');
 			proclaim.equal(rows[3].textContent, '480,000');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -276,8 +281,7 @@ describe('oTable sorting', () => {
 			// Followed by numeric fields.
 			proclaim.equal(rows[4].textContent, '12.03');
 			proclaim.equal(rows[5].textContent, '480,000');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -313,8 +317,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, '2.3-3m');
 			proclaim.equal(rows[1].textContent, '200–300');
 			proclaim.equal(rows[2].textContent, '1m–2m');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -349,8 +352,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, '5%');
 			proclaim.equal(rows[1].textContent, '5.5%');
 			proclaim.equal(rows[2].textContent, '20%');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -389,8 +391,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[1].textContent, '7am');
 			proclaim.equal(rows[2].textContent, '6.30pm');
 			proclaim.equal(rows[3].textContent, '7pm');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -438,8 +439,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[3].textContent, 'April 20 2014 2.30pm');
 			proclaim.equal(rows[4].textContent, 'March 12 2015 1am');
 			proclaim.equal(rows[5].textContent, 'August 17'); // assumes current year
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -506,8 +506,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[8].textContent, 'CFA Fr830');
 			proclaim.equal(rows[9].textContent, 'Rp3,400');
 			proclaim.equal(rows[10].textContent, 'Rmb100bn');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -542,8 +541,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, '42');
 			proclaim.equal(rows[1].textContent, 'pangea');
 			proclaim.equal(rows[2].textContent, 'snowman');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -574,8 +572,7 @@ describe('oTable sorting', () => {
 				({ textContent }) => textContent
 			);
 			proclaim.deepEqual(rows, expectedSortedRows);
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -618,8 +615,7 @@ describe('oTable sorting', () => {
 				({ innerHTML }) => innerHTML
 			);
 			proclaim.deepEqual(rows, expectedSortedRows);
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -662,8 +658,7 @@ describe('oTable sorting', () => {
 				(td) => td.getAttribute('data-o-table-sort-value')
 			);
 			proclaim.deepEqual(rows, expectedSortValuesInOrder);
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -712,8 +707,7 @@ describe('oTable sorting', () => {
 				(td) => td.textContent
 			);
 			proclaim.deepEqual(rows, ['🌑', '🌑', '🌤', '🌤']);
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -744,8 +738,7 @@ describe('oTable sorting', () => {
 				({ textContent }) => textContent
 			);
 			proclaim.deepEqual(rows, expectedSortedRows);
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -780,8 +773,7 @@ describe('oTable sorting', () => {
 				({ textContent }) => textContent
 			);
 			proclaim.deepEqual(rows, expectedSortedRows);
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -816,8 +808,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, 'pangea');
 			proclaim.equal(rows[1].textContent, 'snowman');
 			proclaim.equal(rows[2].textContent, '42');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -852,8 +843,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[0].textContent, '42');
 			proclaim.equal(rows[1].textContent, 'pangea');
 			proclaim.equal(rows[2].textContent, 'snowman');
-			proclaim.equal(oTableEl.getAttribute('data-o-table-order'), 'ASC');
-			done();
+			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
 	});
 
@@ -900,6 +890,7 @@ describe('oTable sorting', () => {
 				proclaim.equal(sortedHeading.getAttribute('aria-sort'), 'ascending');
 				proclaim.isTrue(testOTable.sortRowsByColumn.notCalled);
 				testOTable.sortRowsByColumn.restore();
+
 				done();
 			}, 0);
 		});
@@ -908,6 +899,17 @@ describe('oTable sorting', () => {
 
 	describe('updates sort attributes when sorted', () => {
 		let oTableElHeaders;
+
+		const checkHeaderExpectations = function (sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done) {
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					sortedHeaderIndex = sortedHeaderIndex || 0;
+					proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), expectedAriaValue);
+					proclaim.equal(oTableElHeaders[otherHeaderIndex].getAttribute('aria-sort'), 'none');
+					resolve(true);
+				}, 10);
+			});
+		};
 
 		beforeEach(() => {
 			sandbox.reset();
@@ -945,20 +947,13 @@ describe('oTable sorting', () => {
 			oTableElHeaders = undefined;
 		});
 
-		const checkExpectations = function (sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done) {
-			sortedHeaderIndex = sortedHeaderIndex || 0;
-			proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), expectedAriaValue);
-			proclaim.equal(oTableElHeaders[otherHeaderIndex].getAttribute('aria-sort'), 'none');
-			done();
-		};
-
 		it('by the first column, ASC', (done) => {
 			const sortedHeaderIndex = 0;
 			const otherHeaderIndex = 1;
 			const sort = 'ASC';
 			const expectedAriaValue = 'ascending';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
@@ -969,7 +964,7 @@ describe('oTable sorting', () => {
 			const sort = 'DES';
 			const expectedAriaValue = 'descending';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
@@ -980,7 +975,7 @@ describe('oTable sorting', () => {
 			const sort = null;
 			const expectedAriaValue = 'none';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
@@ -991,7 +986,7 @@ describe('oTable sorting', () => {
 			const sort = null;
 			const expectedAriaValue = 'none';
 			oTableEl.addEventListener('oTable.sorted', () => {
-				checkExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue, done);
+				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {done()});
 			});
 			testOTable.sorted(sortedHeaderIndex, sort);
 		});
