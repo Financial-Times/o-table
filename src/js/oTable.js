@@ -31,7 +31,7 @@ function wrapElement(targetEl, wrapEl) {
 
 class OTable {
 	/**
-	 * Initialises o-table component(s). 
+	 * Initialises o-table component(s).
 	 *
 	 * @param {(HTMLElement|string)} [el=document.body] - o-table element, or element where to search for an o-table element to initialise. You can pass an HTMLElement or a selector string
 	 * @returns {OTable} - A single OTable instance
@@ -64,7 +64,8 @@ class OTable {
 				});
 			}
 
-			this.tableHeaders = Array.from(this.rootEl.querySelectorAll('thead th'));
+			const thead = this.rootEl.querySelector('thead');
+			this.tableHeaders = Array.from(thead.querySelectorAll('th'));
 			const tableRows = Array.from(this.rootEl.getElementsByTagName('tr'));
 
 			this.tableHeaders.forEach((th, columnIndex) => {
@@ -144,9 +145,7 @@ class OTable {
 	 * @returns {undefined}
 	 */
 	removeEventListeners() {
-		const tableHeaders = Array.from(this.rootEl.querySelectorAll('thead th'));
-
-		tableHeaders.forEach((th, columnIndex) => {
+		this.tableHeaders.forEach((th, columnIndex) => {
 			th.removeEventListener('click', this.listeners[columnIndex]);
 			th.removeEventListener('keydown', this.listeners[columnIndex]);
 		});

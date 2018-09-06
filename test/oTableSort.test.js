@@ -107,7 +107,7 @@ describe('oTable sorting', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[1].textContent, 'c', 'The table column sorted with a click when sort was disabled for its header.');
 			done();
-		}, 100);
+		}, 50);
 	});
 
 	it('adds a sort order data attribute to the root element of the component', done => {
@@ -120,19 +120,23 @@ describe('oTable sorting', () => {
 
 	it('alternates sorting between ascending and descending', done => {
 		testOTable = new OTable(oTableEl);
-		// First click ASC
-		click('thead th');
-		setTimeout(() => {
-			oTableEl.addEventListener('oTable.sorted', () => {
+		let firedCount = 0;
+		oTableEl.addEventListener('oTable.sorted', () => {
+			firedCount = firedCount + 1;
+			if (firedCount == 2) {
 				const rows = oTableEl.querySelectorAll('tbody tr td');
 				proclaim.equal(rows[0].textContent, 'stilton');
 				proclaim.equal(rows[1].textContent, 'red leicester');
 				proclaim.equal(rows[2].textContent, 'cheddar');
 				assertExpectedSort(oTableEl, 'DES').then(() => done());
-			});
-			// Second click DES
+			}
+		});
+		// First click ASC
+		click('thead th');
+		// Second click DES
+		setTimeout(() => {
 			click('thead th');
-		}, 10);
+		}, 50);
 	});
 
 	it('sorts strings alphabetically', done => {
@@ -892,7 +896,7 @@ describe('oTable sorting', () => {
 				testOTable.sortRowsByColumn.restore();
 
 				done();
-			}, 0);
+			}, 50);
 		});
 		click('thead th');
 	});
@@ -907,7 +911,7 @@ describe('oTable sorting', () => {
 					proclaim.equal(oTableElHeaders[sortedHeaderIndex].getAttribute('aria-sort'), expectedAriaValue);
 					proclaim.equal(oTableElHeaders[otherHeaderIndex].getAttribute('aria-sort'), 'none');
 					resolve(true);
-				}, 10);
+				}, 50);
 			});
 		};
 
