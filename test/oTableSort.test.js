@@ -123,7 +123,7 @@ describe('oTable sorting', () => {
 		let firedCount = 0;
 		oTableEl.addEventListener('oTable.sorted', () => {
 			firedCount = firedCount + 1;
-			if (firedCount == 2) {
+			if (firedCount === 2) {
 				const rows = oTableEl.querySelectorAll('tbody tr td');
 				proclaim.equal(rows[0].textContent, 'stilton');
 				proclaim.equal(rows[1].textContent, 'red leicester');
