@@ -31,9 +31,9 @@ function wrapElement(targetEl, wrapEl) {
 
 class OTable {
 	/**
-	 * Initialises an o-table components inside the element passed as the first parameter
+	 * Initialises o-table component(s). 
 	 *
-	 * @param {(HTMLElement|string)} [el=document.body] - Element where to search for the o-table component. You can pass an HTMLElement or a selector string
+	 * @param {(HTMLElement|string)} [el=document.body] - o-table element, or element where to search for an o-table element to initialise. You can pass an HTMLElement or a selector string
 	 * @returns {OTable} - A single OTable instance
 	 */
 	constructor(rootEl) {
