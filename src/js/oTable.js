@@ -23,6 +23,28 @@ function descendingSort(...args) {
 	return 0 - ascendingSort.apply(this, args);
 }
 
+function addWrapper(tableRootElement) {
+	// Wrap table elements in wrapper.
+	let wrapEl = tableRootElement.closest('.o-table-wrapper');
+	if (!wrapEl) {
+		wrapEl = document.createElement('div');
+		wrapEl.setAttribute('class', 'o-table-wrapper');
+		wrapElement(tableRootElement, wrapEl);
+	}
+	return wrapEl;
+}
+
+function addContainer(tableRootElement) {
+	// Wrap table wrappers in container.
+	let containerElement = tableRootElement.closest('.o-table-container');
+	if (!containerElement) {
+		containerElement = document.createElement('div');
+		containerElement.setAttribute('class', 'o-table-container');
+		wrapElement(tableRootElement.closest('.o-table-wrapper'), containerElement);
+	}
+	return containerElement;
+}
+
 function wrapElement(targetEl, wrapEl) {
 	const parentEl = targetEl.parentNode;
 	parentEl.insertBefore(wrapEl, targetEl);
@@ -51,7 +73,6 @@ class OTable {
 		if (this.rootEl !== undefined) {
 			this.listeners = [];
 			this.isResponsive = false;
-			this.expanded = true;
 			this.rootEl.setAttribute('data-o-table--js', '');
 
 			// Map "data-o-table-order" to "data-o-table-sort-value".
@@ -72,10 +93,16 @@ class OTable {
 
 			this.wrapper = this.rootEl.closest('.o-table-wrapper');
 			this.container = this.rootEl.closest('.o-table-container');
+			this.addControls();
 			const controlOverlay = this.container.querySelector('.o-table-control-overlay');
 			const fadeOverlay = this.container.querySelector('.o-table-fade-overlay');
 			this.moreButton = controlOverlay.querySelector('.o-table-control--more');
 			// start
+
+			if (!this.expanded) {
+				this.contractTable();
+			}
+
 			if (this.moreButton) {
 				this.moreButton.addEventListener('click', () => {
 					if (this.expanded) {
@@ -127,7 +154,9 @@ class OTable {
 					}
 				}.bind(this));
 
-				this._updateControls(controlOverlay);
+				setTimeout(function() {
+					this._updateControls(controlOverlay);
+				}.bind(this), 1); // Allow for table to be wraped.
 			}
 			// end
 			this.tableHeaders.forEach((th, columnIndex) => {
@@ -178,32 +207,53 @@ class OTable {
 	}
 
 	_updateRowVisibility() {
-		const hiddenRows = this.expanded ? [] : this.tableRows.slice(this.contractedRowCount, this.tableRows.length);
+		const hiddenRows = this.hiddenRows;
 		this.tableRows.forEach((row) => {
 			row.setAttribute('aria-hidden', hiddenRows && hiddenRows.includes(row) ? 'true' : 'false');
 		});
-		if (hiddenRows) {
-			// Calculate contracted table height.
-			// Extra height to tease half of the first hidden row.
-			const tableHeight = this.rootEl.getBoundingClientRect().height;
-			const hiddenRowsHeight = hiddenRows.reduce((accumulatedHeight, row) => {
-				return accumulatedHeight + row.getBoundingClientRect().height;
-			}, 0);
-			const moreButtonheight = this.moreButton.getBoundingClientRect().height;
-			const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
-			const contractedHeight = tableHeight + moreButtonheight + extraHeight - hiddenRowsHeight;
-			this.wrapper.style.height = `${contractedHeight}px`;
+	}
+
+	addControls() {
+		if (!this.wapper || !this.container) {
+			this.wrap();
 		}
+		this.container.insertAdjacentHTML('beforeend', `
+			<div class="o-table-fade-overlay"></div>
+			<div class="o-table-control-overlay o-table-control-overlay--dock">
+				<div aria-hidden="true" class="o-table-control o-table-control--back">
+					<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
+				</div>
+
+				<div aria-hidden="true" class="o-table-control o-table-control--forward">
+					<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
+				</div>
+
+				<div aria-hidden="true" class="o-table-control o-table-control--more">
+					<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
+				</div>
+			</div>
+		`);
 	}
 
 	contractTable() {
 		this.expanded = false;
+		const hiddenRows = this.hiddenRows;
 		const originalButtonTopOffset = this.moreButton.getBoundingClientRect().top;
+		// Calculate contracted table height.
+		// Extra height to tease half of the first hidden row.
+		const tableHeight = this.rootEl.getBoundingClientRect().height;
+		const hiddenRowsHeight = hiddenRows.reduce((accumulatedHeight, row) => {
+			return accumulatedHeight + row.getBoundingClientRect().height;
+		}, 0);
+		const moreButtonheight = this.moreButton.getBoundingClientRect().height;
+		const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
+		const contractedHeight = tableHeight + moreButtonheight + extraHeight - hiddenRowsHeight;
+		// Contract table.
 		window.requestAnimationFrame(() => {
 			this._updateRowVisibility();
-			this.moreButton.querySelector('button').textContent = `Show ${this.tableRows.length - this.contractedRowCount} more`;
+			this.wrapper.style.height = `${contractedHeight}px`;
+			this.moreButton.querySelector('button').textContent = `Show more`;
 			this.container.classList.remove('o-table-container--expanded');
-			this.rootEl.setAttribute('aria-expanded', false);
 			// Keep more/fewer button in viewport when contracting table.
 			window.scrollBy({
 				top: this.moreButton.getBoundingClientRect().top - originalButtonTopOffset,
@@ -218,12 +268,27 @@ class OTable {
 			this.moreButton.querySelector('button').textContent = 'Show fewer';
 			this.wrapper.style.height = '';
 			this.tableRows.forEach(row => row.setAttribute('aria-hidden', false));
-			this.rootEl.setAttribute('aria-expanded', true);
 		});
 	}
 
 	get contractedRowCount() {
-		return Math.min(this.tableRows.length, 10);
+		const configuredRowCount = this.rootEl.getAttribute('data-o-table-contracted-row-count');
+		const minRowCount = isNaN(parseInt(configuredRowCount)) ? 0 : parseInt(configuredRowCount);
+		return Math.min(this.tableRows.length, minRowCount);
+	}
+
+	get hiddenRows() {
+		return this.expanded ? [] : this.tableRows.slice(this.contractedRowCount, this.tableRows.length);
+	}
+
+	get expanded() {
+		const configuredValue = this.rootEl.getAttribute('data-o-table-expanded');
+		return Boolean(configuredValue !== 'false');
+	}
+
+	set expanded(value) {
+		this.rootEl.setAttribute('aria-expanded', value);
+		this.rootEl.setAttribute('data-o-table-expanded', Boolean(value));
 	}
 
 	/**
@@ -416,14 +481,15 @@ class OTable {
 		const fromEnd = this.wrapper.scrollWidth - this.wrapper.clientWidth - this.wrapper.scrollLeft;
 		const fromStart = this.wrapper.scrollLeft;
 
-		// forwardButton.style.visibility = fromEnd === 0 ? 'hidden' : 'unset';
+		this.container.style.setProperty('--o-table-fade-from-end', `${Math.min(fromEnd, 10)}px`);
+		this.container.style.setProperty('--o-table-fade-from-start', `${Math.min(fromStart, 10)}px`);
+
 		if (fromEnd === 0) {
 			forwardButton.querySelector('button').setAttribute('disabled', true);
 		} else {
 			forwardButton.querySelector('button').removeAttribute('disabled');
 		}
 
-		// backButton.style.visibility = fromStart === 0 ? 'hidden' : 'unset';
 		if (fromStart === 0) {
 			backButton.querySelector('button').setAttribute('disabled', true);
 		} else {
@@ -460,25 +526,17 @@ class OTable {
 		tableSortFormatter.setFormatter(type, formatFunction);
 	}
 
-	static wrap(tableSelector, wrapClass) {
-		tableSelector = typeof tableSelector === "string" ? tableSelector : ".o-table";
-		wrapClass = typeof wrapClass === "string" ? wrapClass : "o-table-wrapper";
+	static wrap() {
+		const tableElements = document.querySelectorAll('.o-table');
+		tableElements.forEach(element => {
+			addWrapper(element);
+			addContainer(element);
+		});
+	}
 
-		const matchingEls = document.querySelectorAll(tableSelector);
-		let wrapEl;
-
-		if (matchingEls.length > 0) {
-			wrapEl = document.createElement('div');
-			wrapEl.setAttribute("class", wrapClass);
-
-			for (let c = 0, l = matchingEls.length; c < l; c++) {
-				const tableEl = matchingEls[c];
-
-				if (!tableEl.parentNode.matches("." + wrapClass)) {
-					wrapElement(tableEl, wrapEl.cloneNode(false));
-				}
-			}
-		}
+	wrap() {
+		this.wrapper = addWrapper(this.rootEl) || this.wrapper;
+		this.container = addContainer(this.rootEl) || this.container;
 	}
 
 	/**

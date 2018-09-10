@@ -169,8 +169,8 @@
 		bottom: 0;
 		left: 0;
 		pointer-events: none;
-		background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) 10px),
-		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) 10px);
+		background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-start)),
+		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
 	}
 
 	&:after {
@@ -187,5 +187,4 @@
 	@at-root .o-table-container--expanded &:after {
 		content: unset;
 	}
-
 }
