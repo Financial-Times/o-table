@@ -29,28 +29,6 @@ function wrapElement(targetEl, wrapEl) {
 	wrapEl.appendChild(targetEl);
 }
 
-function updateControls(wrapper, controlOverlay, fadeOverlay) {
-	const forwardButton = controlOverlay.querySelector('.o-table-control--forward');
-	const backButton = controlOverlay.querySelector('.o-table-control--back');
-
-	const fromEnd = wrapper.scrollWidth - wrapper.clientWidth - wrapper.scrollLeft;
-	const fromStart = wrapper.scrollLeft;
-
-	// forwardButton.style.visibility = fromEnd === 0 ? 'hidden' : 'unset';
-	if (fromEnd === 0) {
-		forwardButton.querySelector('button').setAttribute('disabled', true);
-	} else {
-		forwardButton.querySelector('button').removeAttribute('disabled');
-	}
-
-	// backButton.style.visibility = fromStart === 0 ? 'hidden' : 'unset';
-	if (fromStart === 0) {
-		backButton.querySelector('button').setAttribute('disabled', true);
-	} else {
-		backButton.querySelector('button').removeAttribute('disabled');
-	}
-}
-
 class OTable {
 	/**
 	 * Initialises o-table component(s).
@@ -73,6 +51,7 @@ class OTable {
 		if (this.rootEl !== undefined) {
 			this.listeners = [];
 			this.isResponsive = false;
+			this.expanded = true;
 			this.rootEl.setAttribute('data-o-table--js', '');
 
 			// Map "data-o-table-order" to "data-o-table-sort-value".
@@ -91,72 +70,37 @@ class OTable {
 			this.tableHeaders = Array.from(thead.querySelectorAll('th'));
 			this.tableRows = Array.from(tbody.getElementsByTagName('tr'));
 
-
-			const wrapper = this.rootEl.closest('.o-table-wrapper');
-			const container = this.rootEl.closest('.o-table-container');
-			const controlOverlay = container.querySelector('.o-table-control-overlay');
-			const fadeOverlay = container.querySelector('.o-table-fade-overlay');
-			const moreButton = controlOverlay.querySelector('.o-table-control--more');
+			this.wrapper = this.rootEl.closest('.o-table-wrapper');
+			this.container = this.rootEl.closest('.o-table-container');
+			const controlOverlay = this.container.querySelector('.o-table-control-overlay');
+			const fadeOverlay = this.container.querySelector('.o-table-fade-overlay');
+			this.moreButton = controlOverlay.querySelector('.o-table-control--more');
 			// start
-			if (moreButton) {
-				moreButton.addEventListener('click', () => {
-					const currentExpandedState = this.rootEl.getAttribute('aria-expanded');
-					const expand = Boolean(currentExpandedState === "false");
-					const minVisibleRowCount = 10;
-					const visbleRowCount = expand ? this.tableRows.length : Math.min(this.tableRows.length, minVisibleRowCount);
-					const hiddenRows = this.tableRows.slice(visbleRowCount, this.tableRows.length);
-					// Update aria attributes.
-					this.rootEl.setAttribute('aria-expanded', expand);
-					this.tableRows.forEach((row) => {
-						row.setAttribute('aria-hidden', (hiddenRows.includes(row) ? 'true' : 'false'));
-					});
-					if (expand) {
-						// Expand table.
-						window.requestAnimationFrame(() => {
-							moreButton.querySelector('button').textContent = 'Show fewer';
-							container.classList.add('o-table-container--expanded');
-							wrapper.style.height = 'unset';
-						});
+			if (this.moreButton) {
+				this.moreButton.addEventListener('click', () => {
+					if (this.expanded) {
+						this.contractTable();
 					} else {
-						// Calculate contracted table height.
-						/// Extra height to tease half of the first hidden row.
-						const originalButtonTopOffset = moreButton.getBoundingClientRect().top;
-						const tableHeight = this.rootEl.getBoundingClientRect().height;
-						const hiddenRowsHeight = hiddenRows.reduce((accumulatedHeight, row) => {
-							return accumulatedHeight + row.getBoundingClientRect().height;
-						}, 0);
-						const moreButtonheight = moreButton.getBoundingClientRect().height;
-						const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
-						const contactedTableHeight = tableHeight + moreButtonheight + extraHeight - hiddenRowsHeight;
-						// Contract table.
-						window.requestAnimationFrame(() => {
-							wrapper.style.height = `${contactedTableHeight}px`;
-							container.classList.remove('o-table-container--expanded');
-							moreButton.querySelector('button').textContent = `Show ${this.tableRows.length - visbleRowCount} more`;
-							// Keep more/fewer button in viewport when contracting table.
-							window.scrollBy({
-								top: moreButton.getBoundingClientRect().top - originalButtonTopOffset,
-							});
-						});
+						this.expandTable();
 					}
 				});
 			}
 
 			controlOverlay.querySelector('.o-table-control--forward').addEventListener('click', () => {
-				wrapper.scrollBy({
+				this.wrapper.scrollBy({
 					left: (document.body.clientWidth / 2),
 					behavior: 'smooth'
 				});
 			});
 
 			controlOverlay.querySelector('.o-table-control--back').addEventListener('click', () => {
-				wrapper.scrollBy({
+				this.wrapper.scrollBy({
 					left: -(document.body.clientWidth / 2),
 					behavior: 'smooth'
 				});
 			});
 
-			if (window.IntersectionObserver && wrapper && controlOverlay) {
+			if (window.IntersectionObserver && this.wrapper && controlOverlay) {
 				const backButton = controlOverlay.querySelector('.o-table-control--back');
 				const forwardButton = controlOverlay.querySelector('.o-table-control--forward');
 
@@ -167,33 +111,23 @@ class OTable {
 				}, {
 					root: controlOverlay,
 					threshold: 1.0,
-					rootMargin: `-50px 0px ${ moreButton ? '50px' : '0px' } 0px`
+					rootMargin: `-50px 0px ${ this.moreButton ? '50px' : '0px' } 0px`
 				});
 				controlFadeObserver.observe(backButton);
 				controlFadeObserver.observe(forwardButton);
 
 				let scrollTimeout = false;
-				wrapper.addEventListener('scroll', () => {
+				this.wrapper.addEventListener('scroll', function() {
 					if (! scrollTimeout) {
 						scrollTimeout = true;
-						setTimeout(() => {
-							updateControls(wrapper, controlOverlay, fadeOverlay);
+						setTimeout(function() {
+							this._updateControls(controlOverlay);
 							scrollTimeout = false;
-						}, 33);
+						}.bind(this), 33);
 					}
-				});
+				}.bind(this));
 
-				updateControls(wrapper, controlOverlay, fadeOverlay);
-
-				this.rootEl.addEventListener('oTable.sorted', () => {
-					const currentExpandedState = this.rootEl.getAttribute('aria-expanded');
-					if (currentExpandedState === 'false') {
-						const visbleRowCount = Math.min(this.tableRows.length, 10);
-						this.tableRows.forEach((row, index) => {
-							row.setAttribute('aria-hidden', (index <= visbleRowCount ? 'false' : 'true'));
-						});
-					}
-				});
+				this._updateControls(controlOverlay);
 			}
 			// end
 			this.tableHeaders.forEach((th, columnIndex) => {
@@ -241,6 +175,55 @@ class OTable {
 				oTable: this
 			});
 		}
+	}
+
+	_updateRowVisibility() {
+		const hiddenRows = this.expanded ? [] : this.tableRows.slice(this.contractedRowCount, this.tableRows.length);
+		this.tableRows.forEach((row) => {
+			row.setAttribute('aria-hidden', hiddenRows && hiddenRows.includes(row) ? 'true' : 'false');
+		});
+		if (hiddenRows) {
+			// Calculate contracted table height.
+			// Extra height to tease half of the first hidden row.
+			const tableHeight = this.rootEl.getBoundingClientRect().height;
+			const hiddenRowsHeight = hiddenRows.reduce((accumulatedHeight, row) => {
+				return accumulatedHeight + row.getBoundingClientRect().height;
+			}, 0);
+			const moreButtonheight = this.moreButton.getBoundingClientRect().height;
+			const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
+			const contractedHeight = tableHeight + moreButtonheight + extraHeight - hiddenRowsHeight;
+			this.wrapper.style.height = `${contractedHeight}px`;
+		}
+	}
+
+	contractTable() {
+		this.expanded = false;
+		const originalButtonTopOffset = this.moreButton.getBoundingClientRect().top;
+		window.requestAnimationFrame(() => {
+			this._updateRowVisibility();
+			this.moreButton.querySelector('button').textContent = `Show ${this.tableRows.length - this.contractedRowCount} more`;
+			this.container.classList.remove('o-table-container--expanded');
+			this.rootEl.setAttribute('aria-expanded', false);
+			// Keep more/fewer button in viewport when contracting table.
+			window.scrollBy({
+				top: this.moreButton.getBoundingClientRect().top - originalButtonTopOffset,
+			});
+		});
+	}
+
+	expandTable() {
+		this.expanded = true;
+		window.requestAnimationFrame(() => {
+			this.container.classList.add('o-table-container--expanded');
+			this.moreButton.querySelector('button').textContent = 'Show fewer';
+			this.wrapper.style.height = '';
+			this.tableRows.forEach(row => row.setAttribute('aria-hidden', false));
+			this.rootEl.setAttribute('aria-expanded', true);
+		});
+	}
+
+	get contractedRowCount() {
+		return Math.min(this.tableRows.length, 10);
 	}
 
 	/**
@@ -313,6 +296,7 @@ class OTable {
 			this.tableRows.forEach(function (row) {
 				tbody.appendChild(row);
 			});
+			this._updateRowVisibility();
 			this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
 		});
 	}
@@ -423,6 +407,28 @@ class OTable {
 				this.rootEl.setAttribute('data-o-table-order', sort);
 			}
 		});
+	}
+
+	_updateControls(controlOverlay) {
+		const forwardButton = controlOverlay.querySelector('.o-table-control--forward');
+		const backButton = controlOverlay.querySelector('.o-table-control--back');
+
+		const fromEnd = this.wrapper.scrollWidth - this.wrapper.clientWidth - this.wrapper.scrollLeft;
+		const fromStart = this.wrapper.scrollLeft;
+
+		// forwardButton.style.visibility = fromEnd === 0 ? 'hidden' : 'unset';
+		if (fromEnd === 0) {
+			forwardButton.querySelector('button').setAttribute('disabled', true);
+		} else {
+			forwardButton.querySelector('button').removeAttribute('disabled');
+		}
+
+		// backButton.style.visibility = fromStart === 0 ? 'hidden' : 'unset';
+		if (fromStart === 0) {
+			backButton.querySelector('button').setAttribute('disabled', true);
+		} else {
+			backButton.querySelector('button').removeAttribute('disabled');
+		}
 	}
 
 	/**
