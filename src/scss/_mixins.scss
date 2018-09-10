@@ -12,16 +12,12 @@
 		@include oTableWrapper;
 	}
 
-	tr[aria-hidden="true"] {
-		display: none;
-	}
-
 	.o-table-container {
 		position: relative;
 	}
 
 	.o-table-container--expanded {
-		padding-bottom: 50px;
+		padding-bottom: 40px;
 	}
 
 	.#{$classname}-control-overlay {

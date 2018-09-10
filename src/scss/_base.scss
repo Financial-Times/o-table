@@ -76,18 +76,19 @@
 
 /// Add to table's wrapper element (if there is one)
 @mixin oTableWrapper {
-	overflow: auto;
+	overflow-y: hidden;
+	overflow-x: auto;
 	width: 100%;
 	scroll-snap-type: x proximity;
 }
 
 @mixin oTableControlsContainer {
-
 	$bottom-margin: 10px;
+
 	position: absolute;
 	top: 0;
 	right: 0;
-	bottom: $bottom-margin;
+	bottom: 0;
 	left: 0;
 	pointer-events: none;
 

@@ -102,22 +102,41 @@ class OTable {
 				moreButton.addEventListener('click', () => {
 					const currentExpandedState = this.rootEl.getAttribute('aria-expanded');
 					const expand = Boolean(currentExpandedState === "false");
-					const viewportTopOffset = moreButton.getBoundingClientRect().top;
+					const minVisibleRowCount = 10;
+					const visbleRowCount = expand ? this.tableRows.length : Math.min(this.tableRows.length, minVisibleRowCount);
+					const hiddenRows = this.tableRows.slice(visbleRowCount, this.tableRows.length);
+					// Update aria attributes.
 					this.rootEl.setAttribute('aria-expanded', expand);
-					const visbleRowCount = expand ? this.tableRows.length : Math.min(this.tableRows.length, 10);
-					this.tableRows.forEach((row, index) => {
-						row.setAttribute('aria-hidden', (index <= visbleRowCount ? 'false' : 'true'));
+					this.tableRows.forEach((row) => {
+						row.setAttribute('aria-hidden', (hiddenRows.includes(row) ? 'true' : 'false'));
 					});
 					if (expand) {
-						moreButton.querySelector('button').textContent = 'Show fewer';
-						container.classList.add('o-table-container--expanded');
+						// Expand table.
+						window.requestAnimationFrame(() => {
+							moreButton.querySelector('button').textContent = 'Show fewer';
+							container.classList.add('o-table-container--expanded');
+							wrapper.style.height = 'unset';
+						});
 					} else {
-						moreButton.querySelector('button').textContent = `Show ${this.tableRows.length - visbleRowCount} more`;
-						container.classList.remove('o-table-container--expanded');
-					}
-					if (!expand) {
-						window.scrollBy({
-							top: moreButton.getBoundingClientRect().top - viewportTopOffset,
+						// Calculate contracted table height.
+						/// Extra height to tease half of the first hidden row.
+						const originalButtonTopOffset = moreButton.getBoundingClientRect().top;
+						const tableHeight = this.rootEl.getBoundingClientRect().height;
+						const hiddenRowsHeight = hiddenRows.reduce((accumulatedHeight, row) => {
+							return accumulatedHeight + row.getBoundingClientRect().height;
+						}, 0);
+						const moreButtonheight = moreButton.getBoundingClientRect().height;
+						const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
+						const contactedTableHeight = tableHeight + moreButtonheight + extraHeight - hiddenRowsHeight;
+						// Contract table.
+						window.requestAnimationFrame(() => {
+							wrapper.style.height = `${contactedTableHeight}px`;
+							container.classList.remove('o-table-container--expanded');
+							moreButton.querySelector('button').textContent = `Show ${this.tableRows.length - visbleRowCount} more`;
+							// Keep more/fewer button in viewport when contracting table.
+							window.scrollBy({
+								top: moreButton.getBoundingClientRect().top - originalButtonTopOffset,
+							});
 						});
 					}
 				});
