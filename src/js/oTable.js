@@ -99,7 +99,7 @@ class OTable {
 			this.moreButton = controlOverlay.querySelector('.o-table-control--more');
 			// start
 
-			if (!this.expanded) {
+			if (this.hiddenRows.length > 0 && !this.expanded) {
 				this.contractTable();
 			}
 
@@ -138,7 +138,7 @@ class OTable {
 				}, {
 					root: controlOverlay,
 					threshold: 1.0,
-					rootMargin: `-50px 0px ${ this.moreButton ? '50px' : '0px' } 0px`
+					rootMargin: `-50px 0px ${ this.moreButton ? '0px' : '-10px' } 0px`
 				});
 				controlFadeObserver.observe(backButton);
 				controlFadeObserver.observe(forwardButton);
@@ -151,6 +151,17 @@ class OTable {
 							this._updateControls(controlOverlay);
 							scrollTimeout = false;
 						}.bind(this), 33);
+					}
+				}.bind(this));
+
+				let resizeTimeout = false;
+				window.addEventListener('resize', function() {
+					if (! resizeTimeout) {
+						resizeTimeout = true;
+						setTimeout(function() {
+							this._updateControls(controlOverlay);
+							resizeTimeout = false;
+						}.bind(this), 500);
 					}
 				}.bind(this));
 
@@ -219,18 +230,20 @@ class OTable {
 		}
 		this.container.insertAdjacentHTML('beforeend', `
 			<div class="o-table-fade-overlay"></div>
-			<div class="o-table-control-overlay o-table-control-overlay--dock">
-				<div aria-hidden="true" class="o-table-control o-table-control--back">
+			<div class="o-table-control-overlay">
+				<div class="o-table-control o-table-control--back">
 					<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
 				</div>
 
-				<div aria-hidden="true" class="o-table-control o-table-control--forward">
+				<div class="o-table-control o-table-control--forward">
 					<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
 				</div>
 
-				<div aria-hidden="true" class="o-table-control o-table-control--more">
-					<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
-				</div>
+				${this.hiddenRows.length !== 0 ? `
+					<div class="o-table-control o-table-control--more">
+						<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
+					</div>`
+				: ''}
 			</div>
 		`);
 	}
@@ -245,15 +258,14 @@ class OTable {
 		const hiddenRowsHeight = hiddenRows.reduce((accumulatedHeight, row) => {
 			return accumulatedHeight + row.getBoundingClientRect().height;
 		}, 0);
-		const moreButtonheight = this.moreButton.getBoundingClientRect().height;
 		const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
-		const contractedHeight = tableHeight + moreButtonheight + extraHeight - hiddenRowsHeight;
+		const contractedHeight = tableHeight + extraHeight - hiddenRowsHeight;
 		// Contract table.
 		window.requestAnimationFrame(() => {
 			this._updateRowVisibility();
 			this.wrapper.style.height = `${contractedHeight}px`;
+			this.container.classList.add('o-table-container--contracted');
 			this.moreButton.querySelector('button').textContent = `Show more`;
-			this.container.classList.remove('o-table-container--expanded');
 			// Keep more/fewer button in viewport when contracting table.
 			window.scrollBy({
 				top: this.moreButton.getBoundingClientRect().top - originalButtonTopOffset,
@@ -264,7 +276,7 @@ class OTable {
 	expandTable() {
 		this.expanded = true;
 		window.requestAnimationFrame(() => {
-			this.container.classList.add('o-table-container--expanded');
+			this.container.classList.remove('o-table-container--contracted');
 			this.moreButton.querySelector('button').textContent = 'Show fewer';
 			this.wrapper.style.height = '';
 			this.tableRows.forEach(row => row.setAttribute('aria-hidden', false));
@@ -483,6 +495,20 @@ class OTable {
 
 		this.container.style.setProperty('--o-table-fade-from-end', `${Math.min(fromEnd, 10)}px`);
 		this.container.style.setProperty('--o-table-fade-from-start', `${Math.min(fromStart, 10)}px`);
+
+		if (fromEnd === 0 && fromStart === 0) {
+			this.container.classList.remove('o-table-control-overlay--dock');
+			forwardButton.style.display = 'none';
+			backButton.style.display = 'none';
+		} else {
+			if (this.hiddenRows.length !== 0 && this.moreButton) {
+				this.container.classList.add('o-table-control-overlay--dock');
+			} else {
+				this.container.classList.remove('o-table-control-overlay--dock');
+			}
+			forwardButton.style.display = '';
+			backButton.style.display = '';
+		}
 
 		if (fromEnd === 0) {
 			forwardButton.querySelector('button').setAttribute('disabled', true);

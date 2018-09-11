@@ -92,7 +92,51 @@
 	left: 0;
 	pointer-events: none;
 
-	&--dock {
+	.o-table-control {
+		display: inline-block;
+		background: _oTableGet('table-background');
+		pointer-events: all;
+		transition: 1s opacity ease-in-out;
+	}
+
+	.o-table-control--forward,
+	.o-table-control--back {
+		@supports (pointer-events: none) and (position: sticky) {
+			position: sticky;
+			top: calc(50vh - 20px);
+			transition: opacity 0.3s $o-visual-effects-transition-fade;
+		}
+		z-index: 1;
+	}
+
+	.o-table-control--more {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		text-align: center;
+	}
+
+	.o-table-control--hide {
+		opacity: 0;
+	}
+
+	.o-table-control--more button {
+		width: 100%;
+	}
+
+	.o-table-control--back {
+		float: left;
+		margin: 0 10px;
+	}
+
+	.o-table-control--forward {
+		float: right;
+		margin: 0 10px;
+	}
+
+
+	@at-root .o-table-container--dock & {
 		&:after,
 		&:before {
 			position: absolute;
@@ -115,49 +159,11 @@
 			right: 0;
 			border-width: 0 9px 0 40px;
 		}
-	}
 
-	.o-table-control {
-		display: inline-block;
-		background: _oTableGet('table-background');
-		pointer-events: all;
-		transition: 1s opacity ease-in-out;
-	}
-
-	.o-table-control--forward,
-	.o-table-control--back {
-		@supports (pointer-events: none) and (position: sticky) {
-			position: sticky;
-			top: calc(50vh - 20px);
-			transition: opacity 0.3s $o-visual-effects-transition-fade;
+		.o-table-control--more {
+			left: 51px;
+			right: 51px;
 		}
-		z-index: 1;
-	}
-
-	.o-table-control--more {
-		position: absolute;
-		left: 51px;
-		right: 51px;
-		bottom: 0;
-		text-align: center;
-	}
-
-	.o-table-control--hide {
-		opacity: 0;
-	}
-
-	.o-table-control--more button {
-		width: 100%;
-	}
-
-	.o-table-control--back {
-		float: left;
-		margin: 0 10px;
-	}
-
-	.o-table-control--forward {
-		float: right;
-		margin: 0 10px;
 	}
 }
 
@@ -173,7 +179,7 @@
 		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
 	}
 
-	&:after {
+	@at-root .o-table-container--contracted &:after {
 		content: '';
 		position: absolute;
 		height: 80px;
@@ -182,9 +188,5 @@
 		right: 0;
 		background: linear-gradient(to top, _oTableGet('table-background') 30px, rgba(_oTableGet('table-background'), 0) 80px);
 		pointer-events: none;
-	}
-
-	@at-root .o-table-container--expanded &:after {
-		content: unset;
 	}
 }
