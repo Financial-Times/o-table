@@ -514,7 +514,7 @@ describe('oTable sorting', () => {
 		});
 	});
 
-	it('sorts via data-o-table-order alphabetically it is set', done => {
+	it('sorts via data-o-table-sort-value alphabetically if it is set', done => {
 		sandbox.reset();
 		sandbox.init();
 		sandbox.setContents(`
@@ -526,13 +526,13 @@ describe('oTable sorting', () => {
 				</thead>
 				<tbody>
 					<tr>
-						<td data-o-table-order="c">snowman</td>
+						<td data-o-table-sort-value="c">snowman</td>
 					</tr>
 					<tr>
-						<td data-o-table-order="a">42</td>
+						<td data-o-table-sort-value="a">42</td>
 					</tr>
 					<tr>
-						<td data-o-table-order="b">pangea</td>
+						<td data-o-table-sort-value="b">pangea</td>
 					</tr>
 				</tbody>
 			</table>
@@ -781,7 +781,7 @@ describe('oTable sorting', () => {
 		});
 	});
 
-	it('sorts via data-o-table-order numerically if it is set and numeric', done => {
+	it('sorts via data-o-table-sort-value numerically if it is set and numeric', done => {
 		sandbox.reset();
 		sandbox.init();
 		sandbox.setContents(`
@@ -793,13 +793,13 @@ describe('oTable sorting', () => {
 				</thead>
 				<tbody>
 					<tr>
-						<td data-o-table-order=2>snowman</td>
+						<td data-o-table-sort-value=2>snowman</td>
 					</tr>
 					<tr>
-						<td data-o-table-order=3>42</td>
+						<td data-o-table-sort-value=3>42</td>
 					</tr>
 					<tr>
-						<td data-o-table-order=1>pangea</td>
+						<td data-o-table-sort-value=1>pangea</td>
 					</tr>
 				</tbody>
 			</table>
@@ -816,7 +816,7 @@ describe('oTable sorting', () => {
 		});
 	});
 
-	it('sorts via data-o-table-order alphabetically it is set, regardless of whether cell is <th> or <td>', done => {
+	it('sorts via data-o-table-sort-value alphabetically it is set, regardless of whether cell is <th> or <td>', done => {
 		sandbox.reset();
 		sandbox.init();
 		sandbox.setContents(`
@@ -828,13 +828,13 @@ describe('oTable sorting', () => {
 				</thead>
 				<tbody>
 					<tr>
-						<th data-o-table-order="c">snowman</th>
+						<th data-o-table-sort-value="c">snowman</th>
 					</tr>
 					<tr>
-						<th data-o-table-order="a">42</th>
+						<th data-o-table-sort-value="a">42</th>
 					</tr>
 					<tr>
-						<th data-o-table-order="b">pangea</th>
+						<th data-o-table-sort-value="b">pangea</th>
 					</tr>
 				</tbody>
 			</table>
@@ -863,13 +863,13 @@ describe('oTable sorting', () => {
 				</thead>
 				<tbody>
 					<tr>
-						<th data-o-table-order="c">snowman</th>
+						<th data-o-table-sort-value="c">snowman</th>
 					</tr>
 					<tr>
-						<th data-o-table-order="a">42</th>
+						<th data-o-table-sort-value="a">42</th>
 					</tr>
 					<tr>
-						<th data-o-table-order="b">pangea</th>
+						<th data-o-table-sort-value="b">pangea</th>
 					</tr>
 				</tbody>
 			</table>
@@ -928,16 +928,16 @@ describe('oTable sorting', () => {
 					</thead>
 					<tbody>
 						<tr>
-							<th data-o-table-order="c">snowman</th>
-							<th data-o-table-order="c">snowman</th>
+							<th data-o-table-sort-value="c">snowman</th>
+							<th data-o-table-sort-value="c">snowman</th>
 						</tr>
 						<tr>
-							<th data-o-table-order="a">42</th>
-							<th data-o-table-order="a">42</th>
+							<th data-o-table-sort-value="a">42</th>
+							<th data-o-table-sort-value="a">42</th>
 						</tr>
 						<tr>
-							<th data-o-table-order="b">pangea</th>
-							<th data-o-table-order="b">pangea</th>
+							<th data-o-table-sort-value="b">pangea</th>
+							<th data-o-table-sort-value="b">pangea</th>
 						</tr>
 					</tbody>
 				</table>

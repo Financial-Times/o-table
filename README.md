@@ -290,8 +290,6 @@ Or to provide an arbitrary sort order:
 </table>
 ```
 
-Note: `data-o-table-order` has been deprecated in favour of `data-o-table-sort-value` to specify a sort value.
-
 ##### Custom sort (imperative)
 
 Rather than specify `data-o-table-sort-value` [declaratively](#custom-sort-declarative), a formatter function may be provided client-side to generate sort values for a given data type.
@@ -443,6 +441,11 @@ Known issues:
 
 
 ## Migration guide
+
+### How to upgrade from v5.x.x to v6.x.x?
+- To specify a custom sort order of table cells, `data-o-table-order` has been removed in favour of `data-o-table-sort-value`.
+- The ability to have custom classes which are not `o-table` has been removed -- please [contact us](#contact) if this is a problem for your team.
+- `OTable` instance property `isResponsive` has been removed.
 
 ### How to upgrade from v4.x.x to v5.x.x?
 

@@ -22,11 +22,11 @@ describe("wrap()", () => {
 
 });
 
-describe("wrap() - default classes", () => {
+describe("wrap()", () => {
 
 	beforeEach(() => {
 		sandbox.init();
-		sandbox.setContents('<p>Content before</p><table id="initiallyUnwrappedTable" class="o-table"></table><p>Content middle</p><div class="o-table-wrapper"><table id="initiallyWrappedTable" class="o-table"></table></div><p>Content after</p>');
+		sandbox.setContents('<p>Content before</p><table id="initiallyUnwrappedTable" class="o-table"></table><p>Content middle</p><div class="o-table-container"><div class="o-table-wrapper"><table id="initiallyWrappedTable" class="o-table"></table></div></div><p>Content after</p>');
 		OTable.wrap();
 	});
 
@@ -34,12 +34,8 @@ describe("wrap() - default classes", () => {
 		sandbox.reset();
 	});
 
-	it("wraps table matching selector", () => {
-		proclaim.isTrue(document.getElementById("initiallyUnwrappedTable").parentNode.classList.contains("o-table-wrapper"));
-	});
-
 	it("preserves position in DOM", () => {
-		proclaim.isTrue(document.querySelector(".sandbox").childNodes[1].classList.contains("o-table-wrapper"));
+		proclaim.isTrue(document.querySelector(".sandbox").childNodes[1].classList.contains("o-table-container"));
 		proclaim.equal(document.querySelector(".sandbox").childNodes[1].querySelector('.o-table'), document.getElementById("initiallyUnwrappedTable"));
 	});
 
@@ -50,37 +46,6 @@ describe("wrap() - default classes", () => {
 	it("doesn't re-wrap tables", () => {
 		OTable.wrap();
 		proclaim.isFalse(document.getElementById("initiallyUnwrappedTable").parentNode.parentNode.classList.contains("o-table-wrapper"));
-	});
-
-});
-
-describe("wrap() - custom classes", () => {
-
-	beforeEach(() => {
-		sandbox.init();
-		sandbox.setContents('<p>Content before</p><table id="tableNotToWrap" class="o-table"></table><p>Content middle</p><div class="test-container"><table id="initiallyUnwrappedTable" class="o-table"></table><div class="test-wrapper"><table id="initiallyWrappedTable" class="o-table"></table></div><p>Content after</p></div>');
-		OTable.wrap(".test-container table", "test-wrapper");
-	});
-
-	afterEach(() => {
-		sandbox.reset();
-	});
-
-	it("wraps table matching selector", () => {
-		proclaim.isTrue(document.getElementById("initiallyUnwrappedTable").parentNode.classList.contains("test-wrapper"));
-	});
-
-	it("doesn't wrap tables that don't match selector", () => {
-		proclaim.isFalse(document.getElementById("tableNotToWrap").parentNode.classList.contains("test-wrapper"));
-	});
-
-	it("doesn't wrap already-wrapped tables", () => {
-		proclaim.isFalse(document.getElementById("initiallyWrappedTable").parentNode.parentNode.classList.contains("test-wrapper"));
-	});
-
-	it("doesn't re-wrap tables", () => {
-		OTable.wrap(".test-container table", "test-wrapper");
-		proclaim.isFalse(document.getElementById("initiallyUnwrappedTable").parentNode.parentNode.classList.contains("test-wrapper"));
 	});
 
 });
@@ -161,20 +126,10 @@ describe('An oTable instance', () => {
 		proclaim.isTrue(oTableEl.hasAttribute('data-o-table--js'));
 	});
 
-	it('has an `isResponsive` property set to `false`', () => {
-		testOTable = new OTable(oTableEl);
-		proclaim.isFalse(testOTable.isResponsive);
-	});
-
 	describe('when the table has data-o-table-responsive="flat"', () => {
 
 		beforeEach(() => {
 			oTableEl.setAttribute('data-o-table-responsive','flat');
-		});
-
-		it('has an `isResponsive` property set to `true`', () => {
-			testOTable = new OTable(oTableEl);
-			proclaim.isTrue(testOTable.isResponsive);
 		});
 
 		it('should clone any `<th>` elements into all of the rows in the `<tbody>`', () => {
