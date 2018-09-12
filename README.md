@@ -338,7 +338,7 @@ OTable.init();
 Which for an ascending sort, will result in:
 
 ```html
-<table class="o-table" data-o-component="o-table" data-o-table-order="ASC">
+<table class="o-table" data-o-component="o-table">
 	<thead>
 		<tr>
 			<th data-o-table-data-type="emoji-time" aria-sort="ascending">Emoji Time</th>
@@ -381,7 +381,7 @@ The event provides the following properties:
 `oTable.sorted` indicates a table has finished sorting. It includes details of the current sort status of the table.
 
 The event provides the following properties:
-- `detail.sort` - The sort e.g. "ASC" _(String)_.
+- `detail.sort` - The sort e.g. "ascending" _(String)_.
 - `detail.columnIndex` - The index of the sorted column heading _(Number)_.
 - `detail.oTable` - The effected `o-table` instance _(oTable)_.
 
@@ -396,7 +396,7 @@ document.addEventListener('oTable.sorted', (event) => {
 This event is fired just before a table sorts based on user interaction. It may be prevented to implement custom sort functionality. This may be useful to sort a paginated table server-side.
 
 The event provides the following properties:
-- `detail.sort` - The sort requested e.g. "ASC" _(String)_.
+- `detail.sort` - The sort requested e.g. "ascending" _(String)_.
 - `detail.columnIndex` - The index of the column heading which will be sorted _(Number)_.
 - `detail.oTable` - The effected `o-table` instance _(oTable)_.
 
@@ -441,6 +441,9 @@ Known issues:
 - The ability to have custom classes which are not `o-table` has been removed -- please [contact us](#contact) if this is a problem for your team.
 - `OTable` instance property `isResponsive` has been removed.
 - `OTable.wrap` has been removed, for a style of responsive table add container classes manually.
+- `OTable.sortRowsByColumn` arguments have been updated
+- `table[data-o-table-order]` was used to indicate that a table was sorted, this has been removed.
+- Event data `detail.sort` is now "ascending" rather than "ASC", and "descending" rather than "DES".
 
 ### How to upgrade from v4.x.x to v5.x.x?
 

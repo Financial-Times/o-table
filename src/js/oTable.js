@@ -45,11 +45,10 @@ class OTable {
 		if (this.rootEl !== undefined) {
 			this._sortListeners = [];
 
-			const thead = this.rootEl.querySelector('thead');
-			const tbody = this.rootEl.querySelector('tbody');
-
-			this.tableHeaders = thead ? Array.from(thead.querySelectorAll('th')) : [];
-			this.tableRows = tbody ? Array.from(tbody.getElementsByTagName('tr')) : [];
+			this.thead = this.rootEl.querySelector('thead');
+			this.tbody = this.rootEl.querySelector('tbody');
+			this.tableHeaders = this.thead ? Array.from(this.thead.querySelectorAll('th')) : [];
+			this.tableRows = this.tbody ? Array.from(this.tbody.getElementsByTagName('tr')) : [];
 
 			this._addSortButtonsToHeaders();
 			this._addControls();
@@ -94,7 +93,32 @@ class OTable {
 			th.innerHTML = '';
 			th.appendChild(sortButton);
 			const listener = function(event) {
-				this._sortByColumn(columnIndex);
+				const currentSort = th.getAttribute('aria-sort');
+				const sortOrder = [null, 'none', 'descending'].includes(currentSort) ? 'ascending' : 'descending';
+
+				/**
+				 * Check if sorting has been cancelled on this table in favour of a custom implementation.
+				 *
+				 * The return value is false if event is cancelable and at least one of the event handlers
+				 * which handled this event called Event.preventDefault(). Otherwise it returns true.
+				 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
+				 */
+				const customSort = !th.dispatchEvent(new CustomEvent('oTable.sorting', {
+					detail: {
+						sort: sortOrder,
+						columnIndex,
+						oTable: this
+					},
+					bubbles: true,
+					cancelable: true
+				}));
+
+				// Add class for immediate visual feedback (only update aria when table has sorted successfully).
+				th.classList.add(`o-table-sorting-${sortOrder}`);
+
+				if (!customSort) {
+					this.sortRowsByColumn(columnIndex, sortOrder === "ascending");
+				}
 			}.bind(this);
 			this._sortListeners.push(listener);
 			sortButton.addEventListener('click', listener);
@@ -305,19 +329,12 @@ class OTable {
 	 * Sorts the table by a specific column
 	 * @param {number} index The index of the column to sort the table by
 	 * @param {bool} sortAscending Which direction to sort in, ascending or descending
-	 * @param {bool} isNumericValue Deprecated: Set `type` instead.
-	 * @param {string} type What type of data the column holds to enable sorting of numeric values, dates, etc.
 	 * @returns undefined
 	 */
-	sortRowsByColumn(index, sortAscending, isNumericValue = null, type = null) {
-		if (isNumericValue !== null) {
-			console.warn(`"sortRowsByColumn" argument "isNumericValue" is deprecated. Set "type" to a valid type such as "numeric" or "text". More specific types are listed in the README https://github.com/Financial-Times/o-table#sorting.`);
-		}
-		// If type is not set but deprecated "isNumericValue" is, set the type to numeric.
-		if (isNumericValue) {
-			type = type || 'numeric';
-		}
-		const tbody = this.rootEl.querySelector('tbody');
+	sortRowsByColumn(index, sortAscending) {
+		const tableHeaderElement = this.getTableHeader(index);
+		const type = tableHeaderElement.getAttribute('data-o-table-data-type') || undefined;
+
 		const intlCollator = getIntlCollator();
 		this.tableRows.sort(function (a, b) {
 			let aCol = a.children[index];
@@ -331,13 +348,13 @@ class OTable {
 			}
 		});
 
-		window.requestAnimationFrame(() => {
+		window.requestAnimationFrame(function() {
 			this.tableRows.forEach(function (row) {
-				tbody.appendChild(row);
-			});
+				this.tbody.appendChild(row);
+			}.bind(this));
 			this._updateRowVisibility();
-			this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
-		});
+			this.sorted(index, (sortAscending ? 'ascending' : 'descending'));
+		}.bind(this));
 	}
 
 	/**
@@ -346,14 +363,24 @@ class OTable {
 	 *
 	 * @public
 	 * @param {number|null} columnIndex - The index of the currently sorted column, if any.
-	 * @param {string|null} sort - The type of sort i.e. ASC or DES, if any.
+	 * @param {string|null} sort - The type of sort i.e. ascending or descending, if any.
 	 */
 	sorted(columnIndex, sort) {
-		this._updateSortAttributes(columnIndex, sort);
-		this.dispatch('sorted', {
-			sort,
-			columnIndex,
-			oTable: this
+		// Set aria attributes.
+		sort = sort || 'none';
+		window.requestAnimationFrame(() => {
+			const sortedHeader = this.getTableHeader(columnIndex);
+			this.tableHeaders.forEach((header) => {
+				const headerSort = (header === sortedHeader ? sort : 'none');
+				header.setAttribute('aria-sort', headerSort);
+				header.classList.remove(`o-table-sorting-ascending`);
+				header.classList.remove(`o-table-sorting-descending`);
+			});
+			this.dispatch('sorted', {
+				sort,
+				columnIndex,
+				oTable: this
+			});
 		});
 	}
 
@@ -368,81 +395,6 @@ class OTable {
 		}
 		this.removeEventListeners();
 		delete this.rootEl;
-	}
-
-	/**
-	 * @private
-	 * @param {Number} columnIndex
-	 */
-	_sortByColumn(columnIndex) {
-		const tableHeaderElement = this.getTableHeader(columnIndex);
-		const currentSort = tableHeaderElement.getAttribute('aria-sort');
-		const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
-
-		/**
-		 * Check if sorting has been cancelled on this table in favour of a custom implementation.
-		 *
-		 * The return value is false if event is cancelable and at least one of the event handlers
-		 * which handled this event called Event.preventDefault(). Otherwise it returns true.
-		 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
-		 */
-		const customSort = !tableHeaderElement.dispatchEvent(new CustomEvent('oTable.sorting', {
-			detail: {
-				sort,
-				columnIndex,
-				oTable: this
-			},
-			bubbles: true,
-			cancelable: true
-		}));
-
-		if (!customSort) {
-			const columnDataType = tableHeaderElement.getAttribute('data-o-table-data-type');
-			this.sortRowsByColumn(columnIndex, sort === "ASC", null, columnDataType);
-		}
-
-		/**
-		 * Update aria attributes to provide immediate feedback.
-		 *
-		 * This is called again by the `sorted` method to assure accuracy.
-		 * I.e. if a sort fails previous sort attributes can be restored via the `sorted` method.
-		 */
-		this._updateSortAttributes(columnIndex, sort);
-	}
-
-	/**
-	 * Update the aria sort attributes on a sorted table.
-	 * Useful to reset sort attributes in the case of a custom sort implementation failing.
-	 * E.g. One which relies on the network.
-	 *
-	 * @private
-	 * @param {number|null} columnIndex - The index of the currently sorted column, if any.
-	 * @param {string|null} sort - The type of sort i.e. ASC or DES, if any.
-	 */
-	_updateSortAttributes(columnIndex, sort) {
-		let ariaSort;
-		switch (sort) {
-			case 'ASC':
-				ariaSort = 'ascending';
-				break;
-			case 'DES':
-				ariaSort = 'descending';
-				break;
-			default:
-				ariaSort = 'none';
-				break;
-		}
-		// Set aria attributes.
-		window.requestAnimationFrame(() => {
-			const sortedHeader = this.getTableHeader(columnIndex);
-			if (!sortedHeader || sortedHeader.getAttribute('aria-sort') !== ariaSort) {
-				this.tableHeaders.forEach((header) => {
-					const headerSort = (header === sortedHeader ? ariaSort : 'none');
-					header.setAttribute('aria-sort', headerSort);
-				});
-				this.rootEl.setAttribute('data-o-table-order', sort);
-			}
-		});
 	}
 
 	_updateControls() {
