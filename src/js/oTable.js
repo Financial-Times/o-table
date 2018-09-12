@@ -92,7 +92,7 @@ class OTable {
 			sortButton.setAttribute('title', `sort table by ${heading}`);
 			th.innerHTML = '';
 			th.appendChild(sortButton);
-			const listener = function(event) {
+			const listener = function() {
 				const currentSort = th.getAttribute('aria-sort');
 				const sortOrder = [null, 'none', 'descending'].includes(currentSort) ? 'ascending' : 'descending';
 
@@ -147,8 +147,8 @@ class OTable {
 				${this.hiddenRows.length !== 0 ? `
 					<div class="o-table-control o-table-control--more">
 						<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
-					</div>`
-				: ''}
+					</div>
+				` : ''}
 			</div>
 		`);
 
@@ -158,7 +158,7 @@ class OTable {
 			moreButton: this.container.querySelector('.o-table-control--more'),
 			forwardButton: this.container.querySelector('.o-table-control--forward'),
 			backButton: this.container.querySelector('.o-table-control--back')
-		}
+		};
 
 		if (this.hiddenRows.length > 0 && !this.expanded) {
 			this.contractTable();
@@ -189,15 +189,15 @@ class OTable {
 		});
 
 		if (window.IntersectionObserver && this.wrapper && this.controls.overlay) {
-			var controlFadeObserver = new IntersectionObserver((entries) => {
+			const controlFadeObserver = new IntersectionObserver((entries) => {
 				entries.forEach(entry => {
 					entry.target.classList.toggle('o-table-control--hide', entry.intersectionRatio !== 1);
 				});
 			}, {
-					root: this.controls.overlay,
-					threshold: 1.0,
-					rootMargin: `-50px 0px ${this.controls.moreButton ? '0px' : '-10px'} 0px`
-				});
+				root: this.controls.overlay,
+				threshold: 1.0,
+				rootMargin: `-50px 0px ${this.controls.moreButton ? '0px' : '-10px'} 0px`
+			});
 			controlFadeObserver.observe(this.controls.backButton);
 			controlFadeObserver.observe(this.controls.forwardButton);
 
@@ -272,7 +272,7 @@ class OTable {
 
 	get contractedRowCount() {
 		const configuredRowCount = this.rootEl.getAttribute('data-o-table-contracted-row-count');
-		const minRowCount = isNaN(parseInt(configuredRowCount)) ? 0 : parseInt(configuredRowCount);
+		const minRowCount = isNaN(parseInt(configuredRowCount, 10)) ? 0 : parseInt(configuredRowCount, 10);
 		return Math.min(this.tableRows.length, minRowCount);
 	}
 

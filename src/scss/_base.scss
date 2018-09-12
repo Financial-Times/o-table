@@ -33,7 +33,7 @@
 			// sass-lint:enable no-vendor-prefixes
 			background: none;
 			color: inherit;
-			border: none;
+			border: 0;
 			padding: 0;
 			font: inherit;
 			cursor: pointer;
@@ -160,7 +160,6 @@
 			content: '';
 			bottom: 0;
 			height: 40px;
-			width: $bottom-margin + 40px;
 			pointer-events: none;
 			border-color: oButtonsGetColor('default', 'background', $theme: 'primary');
 			border-style: solid;
