@@ -198,12 +198,6 @@ Class: `o-table--responsive-scroll`, Mixin: `oTableResponsiveScroll`
 
 On a narrow viewpoint the Responsive Scroll version will move the headers to the right hand side of the table, and be fixed. This allows the data to be displayed in a column format which would allow the user to swipe left or right going through the data.
 
-##### Overflow
-
-Class: `o-table--responsive-overflow`, Mixin: `oTableResponsiveOverflow`
-
-On a narrow viewpoint, all this does is add an overflow which would allow the user to scroll through the data in a horizontal way. This is identical to the `oTableWrapper` behaviour.
-
 ### JavaScript
 
 #### Sorting

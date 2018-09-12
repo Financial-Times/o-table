@@ -23,27 +23,42 @@
 		background-color: _oTableGet('header-background');
 	}
 
-	&[data-o-table--js] thead th:not([data-o-table-heading-disable-sort]) {
-		cursor: pointer;
-		user-select: none;
-		padding-right: 20px;
-		&:after {
-			@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
-			content: '';
-			margin-right: -20px;
-			vertical-align: top;
+	thead th:not([data-o-table-heading-disable-sort]) {
+		button {
+			// sass-lint:disable no-vendor-prefixes
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			// sass-lint:enable no-vendor-prefixes
+			background: none;
+			color: inherit;
+			border: none;
+			padding: 0;
+			font: inherit;
+			cursor: pointer;
+			user-select: none;
+			padding-right: 20px;
+			min-width: 60px;
+			text-align: left;
+			&:after {
+				@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+				content: '';
+				margin-right: -20px;
+				vertical-align: top;
+			}
 		}
 		// Show descending icon with DSC sort applied.
-		&[aria-sort='descending'] {
+		&[aria-sort='descending'] button {
 			&:after {
 				@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 				vertical-align: top;
 			}
 		}
 		// Show ascending icon with ASC sort applied or on hover with no sort.
-		&[aria-sort='none']:hover,
-		&:not([aria-sort]):hover,
-		&[aria-sort='ascending'] {
+		&[aria-sort='none'] button:hover,
+		&:not([aria-sort]) button:hover,
+		&[aria-sort='ascending'] button {
 			&:after {
 				@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 				vertical-align: top;

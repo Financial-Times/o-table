@@ -23,6 +23,8 @@ function descendingSort(...args) {
 	return 0 - ascendingSort.apply(this, args);
 }
 
+const tables = [];
+
 class OTable {
 	/**
 	 * Initialises o-table component(s).
@@ -43,44 +45,19 @@ class OTable {
 		}
 
 		if (this.rootEl !== undefined) {
+			tables.push(this);
 			this.listeners = [];
-			this.rootEl.setAttribute('data-o-table--js', '');
 
 			const thead = this.rootEl.querySelector('thead');
 			const tbody = this.rootEl.querySelector('tbody');
-			this.tableHeaders = Array.from(thead.querySelectorAll('th'));
-			this.tableRows = Array.from(tbody.getElementsByTagName('tr'));
 
-			this.wrapper = this.rootEl.closest('.o-table-wrapper');
-			this.container = this.rootEl.closest('.o-table-container');
-			this.addControls();
+			this.tableHeaders = thead ? Array.from(thead.querySelectorAll('th')) : [];
+			this.tableRows = tbody ? Array.from(tbody.getElementsByTagName('tr')) : [];
 
-			this.tableHeaders.forEach((th, columnIndex) => {
-				// Do not sort headers with attribute.
-				if (th.hasAttribute('data-o-table-heading-disable-sort')) {
-					return false;
-				}
+			const typeScroll = this.rootEl.classList.contains('o-table--responsive-scroll');
 
-				th.setAttribute('tabindex', "0");
-
-				const listener = this._sortByColumn(columnIndex);
-				this.listeners.push(listener);
-				th.addEventListener('click', listener);
-				th.addEventListener('keydown', (event) => {
-					const ENTER = 13;
-					const SPACE = 32;
-					if ('code' in event) {
-						// event.code is not fully supported in the browsers we care about but
-						// use it if it exists
-						if (event.code === "Space" || event.code === "Enter") {
-							listener(event);
-						}
-					} else if (event.keyCode === ENTER || event.keyCode === SPACE) {
-						// event.keyCode has been deprecated but there is no alternative
-						listener(event);
-					}
-				});
-			});
+			this._addSortButtonsToHeaders();
+			this._addControls();
 
 			// "o-table--responsive-flat" configuration only works when there is a
 			// `<thead>` block containing the table headers. If there are no headers
@@ -105,8 +82,35 @@ class OTable {
 		});
 	}
 
-	addControls() {
-		if (!this.wapper || !this.container) {
+	_addSortButtonsToHeaders() {
+		if (this.tableHeaders.length === 0) {
+			return;
+		}
+		this.tableHeaders.forEach((th, columnIndex) => {
+			// Do not sort headers with attribute.
+			if (th.hasAttribute('data-o-table-heading-disable-sort')) {
+				return;
+			}
+			const heading = th.textContent;
+			const sortButton = document.createElement('button');
+			sortButton.textContent = heading;
+			// In VoiceOver, button `aria-label` when moving to a new column to read td cells.
+			sortButton.setAttribute('title', `sort table by ${heading}`);
+			th.innerHTML = '';
+			th.appendChild(sortButton);
+			const listener = function(event) {
+				this._sortByColumn(columnIndex);
+			}.bind(this);
+			this.listeners.push(listener);
+			sortButton.addEventListener('click', listener);
+		});
+	}
+
+	_addControls() {
+		this.wrapper = this.rootEl.closest('.o-table-wrapper');
+		this.container = this.rootEl.closest('.o-table-container');
+
+		if (this.controls || !this.wrapper || !this.container) {
 			return;
 		}
 		this.container.insertAdjacentHTML('beforeend', `
@@ -128,9 +132,10 @@ class OTable {
 			</div>
 		`);
 
+
 		this.controls = {
-			controlOverlay: this.container.querySelector('.o-table-control-overlay'),
-			moreButton: this.controlOverlay.querySelector('.o-table-control--more'),
+			overlay: this.container.querySelector('.o-table-control-overlay'),
+			moreButton: this.container.querySelector('.o-table-control--more'),
 			forwardButton: this.container.querySelector('.o-table-control--forward'),
 			backButton: this.container.querySelector('.o-table-control--back')
 		}
@@ -163,13 +168,13 @@ class OTable {
 			});
 		});
 
-		if (window.IntersectionObserver && this.wrapper && this.controlOverlay) {
+		if (window.IntersectionObserver && this.wrapper && this.controls.overlay) {
 			var controlFadeObserver = new IntersectionObserver((entries) => {
 				entries.forEach(entry => {
 					entry.target.classList.toggle('o-table-control--hide', entry.intersectionRatio !== 1);
 				});
 			}, {
-					root: this.controlOverlay,
+					root: this.controls.overlay,
 					threshold: 1.0,
 					rootMargin: `-50px 0px ${this.controls.moreButton ? '0px' : '-10px'} 0px`
 				});
@@ -296,8 +301,7 @@ class OTable {
 	 */
 	removeEventListeners() {
 		this.tableHeaders.forEach((th, columnIndex) => {
-			th.removeEventListener('click', this.listeners[columnIndex]);
-			th.removeEventListener('keydown', this.listeners[columnIndex]);
+			th.querySelector('button').removeEventListener('click', this.listeners[columnIndex]);
 		});
 	}
 
@@ -366,7 +370,6 @@ class OTable {
 			clearTimeout(this._timeoutID);
 			this._timeoutID = undefined;
 		}
-		this.rootEl.removeAttribute('data-o-table--js');
 		this.removeEventListeners();
 		delete this.rootEl;
 	}
@@ -376,41 +379,39 @@ class OTable {
 	 * @param {Number} columnIndex
 	 */
 	_sortByColumn(columnIndex) {
-		return function (event) {
-			const currentSort = event.currentTarget.getAttribute('aria-sort');
-			const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
+		const tableHeaderElement = this.getTableHeader(columnIndex);
+		const currentSort = tableHeaderElement.getAttribute('aria-sort');
+		const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
 
-			/**
-			 * Check if sorting has been cancelled on this table in favour of a custom implementation.
-			 *
-			 * The return value is false if event is cancelable and at least one of the event handlers
-			 * which handled this event called Event.preventDefault(). Otherwise it returns true.
-			 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
-			 */
-			const customSort = !event.currentTarget.dispatchEvent(new CustomEvent('oTable.sorting', {
-				detail: {
-					sort,
-					columnIndex,
-					oTable: this
-				},
-				bubbles: true,
-				cancelable: true
-			}));
+		/**
+		 * Check if sorting has been cancelled on this table in favour of a custom implementation.
+		 *
+		 * The return value is false if event is cancelable and at least one of the event handlers
+		 * which handled this event called Event.preventDefault(). Otherwise it returns true.
+		 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
+		 */
+		const customSort = !tableHeaderElement.dispatchEvent(new CustomEvent('oTable.sorting', {
+			detail: {
+				sort,
+				columnIndex,
+				oTable: this
+			},
+			bubbles: true,
+			cancelable: true
+		}));
 
-			if (!customSort) {
-				const columnDataType = event.currentTarget.getAttribute('data-o-table-data-type');
-				this.sortRowsByColumn(columnIndex, sort === "ASC", null, columnDataType);
-			}
+		if (!customSort) {
+			const columnDataType = tableHeaderElement.getAttribute('data-o-table-data-type');
+			this.sortRowsByColumn(columnIndex, sort === "ASC", null, columnDataType);
+		}
 
-			/**
-			 * Update aria attributes to provide immediate feedback.
-			 *
-			 * This is called again by the `sorted` method to assure accuracy.
-			 * I.e. if a sort fails previous sort attributes can be restored via the `sorted` method.
-			 */
-			this._updateSortAttributes(columnIndex, sort);
-
-		}.bind(this);
+		/**
+		 * Update aria attributes to provide immediate feedback.
+		 *
+		 * This is called again by the `sorted` method to assure accuracy.
+		 * I.e. if a sort fails previous sort attributes can be restored via the `sorted` method.
+		 */
+		this._updateSortAttributes(columnIndex, sort);
 	}
 
 	/**
@@ -512,8 +513,8 @@ class OTable {
 	}
 
 	static wrap() {
-		const tableElements = document.querySelectorAll('.o-table');
-		tableElements.forEach((element) => {
+		tables.forEach((table) => {
+			const element = table.rootEl;
 			const existingContainerElement = element.closest('.o-table-container');
 			const existingWrapperElement = element.closest('.o-table-wrapper');
 
@@ -536,9 +537,7 @@ class OTable {
 			const parentEl = element.parentNode;
 			parentEl.insertBefore(containerElement, element);
 			wrapperElement.appendChild(element);
-
-			this.wrapper = wrapperElement;
-			this.container = containerElement;
+			table._addControls();
 		});
 	}
 

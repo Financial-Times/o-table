@@ -69,9 +69,6 @@
 	.#{$classname}--responsive-flat {
 		@include oTableResponsiveFlat;
 	}
-	.#{$classname}--responsive-overflow {
-		@include oTableResponsiveOverflow;
-	}
 	.#{$classname}--responsive-scroll {
 		@include oTableResponsiveScroll;
 	}

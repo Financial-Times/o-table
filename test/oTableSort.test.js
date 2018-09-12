@@ -20,7 +20,6 @@ describe('oTable sorting', () => {
 	};
 
 	const click = element => {
-		// TODO - Add a click polyfill to polyfill-service
 		const click = document.createEvent('MouseEvent');
 		click.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 		oTableEl.querySelector(element).dispatchEvent(click);
@@ -64,7 +63,6 @@ describe('oTable sorting', () => {
 
 	it('sorts by ascending order first if not told otherwise', done => {
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, 'cheddar');
@@ -72,6 +70,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, 'stilton');
 			done();
 		});
+		click('thead th button');
 	});
 
 	it('does not sort if the heading has an attribute specifying not to', done => {
@@ -112,36 +111,35 @@ describe('oTable sorting', () => {
 
 	it('adds a sort order data attribute to the root element of the component', done => {
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
-			assertExpectedSort(oTableEl, 'ASC').then(() => done());
+			assertExpectedSort(oTableEl, 'ASC').then(() => {
+				done()
+			});
 		});
+		click('thead th button');
 	});
 
 	it('alternates sorting between ascending and descending', done => {
 		testOTable = new OTable(oTableEl);
-		let firedCount = 0;
-		oTableEl.addEventListener('oTable.sorted', () => {
-			firedCount = firedCount + 1;
-			if (firedCount === 2) {
+		// First click ASC
+		click('thead th button');
+		// Second click DES
+		setTimeout(() => {
+			oTableEl.addEventListener('oTable.sorted', () => {
 				const rows = oTableEl.querySelectorAll('tbody tr td');
 				proclaim.equal(rows[0].textContent, 'stilton');
 				proclaim.equal(rows[1].textContent, 'red leicester');
 				proclaim.equal(rows[2].textContent, 'cheddar');
-				assertExpectedSort(oTableEl, 'DES').then(() => done());
-			}
-		});
-		// First click ASC
-		click('thead th');
-		// Second click DES
-		setTimeout(() => {
-			click('thead th');
+				assertExpectedSort(oTableEl, 'DES').then(() => {
+					done();
+				});
+			});
+			click('thead th button');
 		}, 50);
 	});
 
 	it('sorts strings alphabetically', done => {
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, 'cheddar');
@@ -149,6 +147,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, 'stilton');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts columns marked as "numeric", numerically', done => {
@@ -185,7 +184,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, '');
@@ -196,6 +194,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[5].textContent, '1,216,000');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts columns marked as "number", numerically', done => {
@@ -227,7 +226,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[1].textContent, '-');
@@ -235,6 +233,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[3].textContent, '480,000');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('Sorts non-numeric fields in a numeric column first.', done => {
@@ -273,7 +272,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			// "n/a" and "-" treated as blank and come first in an ASC order.
@@ -287,6 +285,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[5].textContent, '480,000');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('removes en-dash range symbol when formatting numeric values (range sort is not implicity supported, sorts by first number only)', done => {
@@ -315,7 +314,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, '2.3-3m');
@@ -323,6 +321,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, '1m–2m');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts columns marked as "percent"', done => {
@@ -350,7 +349,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, '5%');
@@ -358,6 +356,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, '20%');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts FT style times marked as "date"', done => {
@@ -388,7 +387,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, '6.30am');
@@ -397,6 +395,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[3].textContent, '7pm');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts FT style dates marked as "date"', done => {
@@ -434,7 +433,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, 'January 2012');
@@ -445,6 +443,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[5].textContent, 'August 17'); // assumes current year
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts abbreviated currency marked as "currency"', done => {
@@ -496,7 +495,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, '£4');
@@ -512,6 +510,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[10].textContent, 'Rmb100bn');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts via data-o-table-sort-value alphabetically if it is set', done => {
@@ -539,7 +538,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, '42');
@@ -547,6 +545,7 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, 'snowman');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts "n/a" and "-" as if empty cells (first in ASC order)', done => {
@@ -569,8 +568,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
-
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
 				({ textContent }) => textContent
@@ -578,6 +575,7 @@ describe('oTable sorting', () => {
 			proclaim.deepEqual(rows, expectedSortedRows);
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+		click('thead th button');
 	});
 
 	it('sorts strings from "<span>", "<a>", "<i>" tags and "<img>" tag "alt" attributes ', done => {
@@ -612,7 +610,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
@@ -621,6 +618,8 @@ describe('oTable sorting', () => {
 			proclaim.deepEqual(rows, expectedSortedRows);
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('falls back to the "aria-label" or "title" of "<span>", "<a>", or "<i>" tags if a table cell has no content otherwise', done => {
@@ -655,7 +654,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
@@ -664,6 +662,8 @@ describe('oTable sorting', () => {
 			proclaim.deepEqual(rows, expectedSortValuesInOrder);
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('sorts custom data types according to a given formatter', done => {
@@ -704,7 +704,6 @@ describe('oTable sorting', () => {
 		});
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
@@ -713,6 +712,8 @@ describe('oTable sorting', () => {
 			proclaim.deepEqual(rows, ['🌑', '🌑', '🌤', '🌤']);
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('sorts localised strings alphabetically', done => {
@@ -735,7 +736,6 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = Array.from(oTableEl.querySelectorAll('tbody tr td')).map(
@@ -744,6 +744,8 @@ describe('oTable sorting', () => {
 			proclaim.deepEqual(rows, expectedSortedRows);
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('sorts localised strings alphabetically when the Intl.Collator API is not available', done => {
@@ -769,7 +771,6 @@ describe('oTable sorting', () => {
 		const intlBackup = Intl;
 		delete global.Intl;
 		testOTable = new OTable(oTableEl);
-		click('thead th');
 
 		oTableEl.addEventListener('oTable.sorted', () => {
 			global.Intl = intlBackup;
@@ -779,6 +780,8 @@ describe('oTable sorting', () => {
 			proclaim.deepEqual(rows, expectedSortedRows);
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('sorts via data-o-table-sort-value numerically if it is set and numeric', done => {
@@ -806,7 +809,7 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
+
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr td');
 			proclaim.equal(rows[0].textContent, 'pangea');
@@ -814,6 +817,8 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, '42');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('sorts via data-o-table-sort-value alphabetically it is set, regardless of whether cell is <th> or <td>', done => {
@@ -841,7 +846,7 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		click('thead th');
+
 		oTableEl.addEventListener('oTable.sorted', () => {
 			const rows = oTableEl.querySelectorAll('tbody tr th');
 			proclaim.equal(rows[0].textContent, '42');
@@ -849,6 +854,8 @@ describe('oTable sorting', () => {
 			proclaim.equal(rows[2].textContent, 'snowman');
 			assertExpectedSort(oTableEl, 'ASC').then(() => done());
 		});
+
+		click('thead th button');
 	});
 
 	it('can be intercepted for a custom sort implementation', done => {
@@ -898,7 +905,7 @@ describe('oTable sorting', () => {
 				done();
 			}, 50);
 		});
-		click('thead th');
+		click('thead th button');
 	});
 
 	describe('updates sort attributes when sorted', () => {

@@ -26,7 +26,8 @@ describe("wrap()", () => {
 
 	beforeEach(() => {
 		sandbox.init();
-		sandbox.setContents('<p>Content before</p><table id="initiallyUnwrappedTable" class="o-table"></table><p>Content middle</p><div class="o-table-container"><div class="o-table-wrapper"><table id="initiallyWrappedTable" class="o-table"></table></div></div><p>Content after</p>');
+		sandbox.setContents('<p>Content before</p><table id="initiallyUnwrappedTable" class="o-table" data-o-component="o-table"></table><p>Content middle</p><div class="o-table-container"><div class="o-table-wrapper"><table id="initiallyWrappedTable" class="o-table" data-o-component="o-table"></table></div></div><p>Content after</p>');
+		OTable.init();
 		OTable.wrap();
 	});
 
@@ -119,11 +120,6 @@ describe('An oTable instance', () => {
 	it('has the correct prototype', () => {
 		testOTable = new OTable(oTableEl);
 		proclaim.isInstanceOf(testOTable, OTable);
-	});
-
-	it('sets a data attribute on the root element of the component to indicate the JS has executed', () => {
-		testOTable = new OTable(oTableEl);
-		proclaim.isTrue(oTableEl.hasAttribute('data-o-table--js'));
 	});
 
 	describe('when the table has data-o-table-responsive="flat"', () => {
@@ -220,9 +216,7 @@ describe('Init', () => {
 	it('instantiates every o-table piece of markup within the element given', () => {
 		const oTables = OTable.init();
 		const tables = oTables.map(oTable => oTable.rootEl);
-		tables.forEach(table => {
-			proclaim.isTrue(table.hasAttribute('data-o-table--js'));
-		});
+		proclaim.equal(tables.length, 3);
 	});
 });
 
@@ -266,11 +260,11 @@ describe('Destroying an oTable instance', () => {
 
 		testOTable = new OTable(oTableEl);
 
-		const columnHead = document.querySelector('th');
-		proclaim.isTrue(addEventListenerSpy.calledOn(columnHead));
-		proclaim.isTrue(addEventListenerSpy.calledTwice);
+		const columnHeadButton = document.querySelector('th button');
+		proclaim.isTrue(addEventListenerSpy.calledOn(columnHeadButton));
+		proclaim.isTrue(addEventListenerSpy.calledOnce);
 
-		const columnHeadEventAndHandler = addEventListenerSpy.args[0];
+		const columnHeadButtonEventAndHandler = addEventListenerSpy.args[0];
 
 		const realRemoveEventListener = Element.prototype.removeEventListener;
 		const removeEventListenerSpy = sinon.spy();
@@ -278,10 +272,10 @@ describe('Destroying an oTable instance', () => {
 
 		testOTable.destroy();
 
-		proclaim.isTrue(removeEventListenerSpy.calledOn(columnHead));
-		proclaim.isTrue(removeEventListenerSpy.calledTwice);
+		proclaim.isTrue(removeEventListenerSpy.calledOn(columnHeadButton));
+		proclaim.isTrue(removeEventListenerSpy.calledOnce);
 
-		proclaim.isTrue(removeEventListenerSpy.calledWith(...columnHeadEventAndHandler));
+		proclaim.isTrue(removeEventListenerSpy.calledWith(...columnHeadButtonEventAndHandler));
 
 		Element.prototype.addEventListener = realAddEventListener;
 		Element.prototype.removeEventListener = realRemoveEventListener;
@@ -291,12 +285,6 @@ describe('Destroying an oTable instance', () => {
 		testOTable = new OTable(oTableEl);
 		testOTable.destroy();
 		proclaim.isUndefined(testOTable.rootEl);
-	});
-
-	it('when destroyed, removes the data attribute which was added during JS initialisation', () => {
-		testOTable = new OTable(oTableEl);
-		testOTable.destroy();
-		proclaim.isFalse(oTableEl.hasAttribute('data-o-table--js'));
 	});
 });
 
