@@ -23,8 +23,6 @@ function descendingSort(...args) {
 	return 0 - ascendingSort.apply(this, args);
 }
 
-const tables = [];
-
 class OTable {
 	/**
 	 * Initialises o-table component(s).
@@ -45,16 +43,13 @@ class OTable {
 		}
 
 		if (this.rootEl !== undefined) {
-			tables.push(this);
-			this.listeners = [];
+			this._sortListeners = [];
 
 			const thead = this.rootEl.querySelector('thead');
 			const tbody = this.rootEl.querySelector('tbody');
 
 			this.tableHeaders = thead ? Array.from(thead.querySelectorAll('th')) : [];
 			this.tableRows = tbody ? Array.from(tbody.getElementsByTagName('tr')) : [];
-
-			const typeScroll = this.rootEl.classList.contains('o-table--responsive-scroll');
 
 			this._addSortButtonsToHeaders();
 			this._addControls();
@@ -101,7 +96,7 @@ class OTable {
 			const listener = function(event) {
 				this._sortByColumn(columnIndex);
 			}.bind(this);
-			this.listeners.push(listener);
+			this._sortListeners.push(listener);
 			sortButton.addEventListener('click', listener);
 		});
 	}
@@ -113,6 +108,7 @@ class OTable {
 		if (this.controls || !this.wrapper || !this.container) {
 			return;
 		}
+
 		this.container.insertAdjacentHTML('beforeend', `
 			<div class="o-table-fade-overlay"></div>
 			<div class="o-table-control-overlay">
@@ -301,7 +297,7 @@ class OTable {
 	 */
 	removeEventListeners() {
 		this.tableHeaders.forEach((th, columnIndex) => {
-			th.querySelector('button').removeEventListener('click', this.listeners[columnIndex]);
+			th.querySelector('button').removeEventListener('click', this._sortListeners[columnIndex]);
 		});
 	}
 
@@ -510,35 +506,6 @@ class OTable {
 	 */
 	static setSortFormatterForType(type, formatFunction) {
 		tableSortFormatter.setFormatter(type, formatFunction);
-	}
-
-	static wrap() {
-		tables.forEach((table) => {
-			const element = table.rootEl;
-			const existingContainerElement = element.closest('.o-table-container');
-			const existingWrapperElement = element.closest('.o-table-wrapper');
-
-			if (existingContainerElement && existingWrapperElement) {
-				return;
-			}
-
-			if (existingContainerElement || existingWrapperElement) {
-				console.warn(`Could not wrap "o-table" element, it already has a ${existingContainerElement ? '"container"' : '"wrapper"'} element but no ${existingContainerElement ? '"wrapper"' : '"container"'} element. Refer to the README or registry demos to add the missing markup: https://github.com/Financial-Times/o-forms.`, element);
-				return;
-			}
-
-			const containerElement = document.createElement('div');
-			containerElement.setAttribute('class', 'o-table-container');
-
-			const wrapperElement = document.createElement('div');
-			wrapperElement.setAttribute('class', 'o-table-wrapper');
-			containerElement.appendChild(wrapperElement);
-
-			const parentEl = element.parentNode;
-			parentEl.insertBefore(containerElement, element);
-			wrapperElement.appendChild(element);
-			table._addControls();
-		});
 	}
 
 	/**

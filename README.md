@@ -440,6 +440,7 @@ Known issues:
 - To specify a custom sort order of table cells, `data-o-table-order` has been removed in favour of `data-o-table-sort-value`.
 - The ability to have custom classes which are not `o-table` has been removed -- please [contact us](#contact) if this is a problem for your team.
 - `OTable` instance property `isResponsive` has been removed.
+- `OTable.wrap` has been removed, for a style of responsive table add container classes manually.
 
 ### How to upgrade from v4.x.x to v5.x.x?
 

@@ -6,51 +6,6 @@ import sinon from 'sinon/pkg/sinon';
 import * as sandbox from './helpers/sandbox';
 import OTable from './../main';
 
-describe("wrap()", () => {
-
-	beforeEach(() => {
-		sandbox.init();
-	});
-
-	afterEach(() => {
-		sandbox.reset();
-	});
-
-	it("is defined", () => {
-		proclaim.isDefined(OTable.wrap);
-	});
-
-});
-
-describe("wrap()", () => {
-
-	beforeEach(() => {
-		sandbox.init();
-		sandbox.setContents('<p>Content before</p><table id="initiallyUnwrappedTable" class="o-table" data-o-component="o-table"></table><p>Content middle</p><div class="o-table-container"><div class="o-table-wrapper"><table id="initiallyWrappedTable" class="o-table" data-o-component="o-table"></table></div></div><p>Content after</p>');
-		OTable.init();
-		OTable.wrap();
-	});
-
-	afterEach(() => {
-		sandbox.reset();
-	});
-
-	it("preserves position in DOM", () => {
-		proclaim.isTrue(document.querySelector(".sandbox").childNodes[1].classList.contains("o-table-container"));
-		proclaim.equal(document.querySelector(".sandbox").childNodes[1].querySelector('.o-table'), document.getElementById("initiallyUnwrappedTable"));
-	});
-
-	it("doesn't wrap already-wrapped tables", () => {
-		proclaim.isFalse(document.getElementById("initiallyWrappedTable").parentNode.parentNode.classList.contains("o-table-wrapper"));
-	});
-
-	it("doesn't re-wrap tables", () => {
-		OTable.wrap();
-		proclaim.isFalse(document.getElementById("initiallyUnwrappedTable").parentNode.parentNode.classList.contains("o-table-wrapper"));
-	});
-
-});
-
 describe("oTable API", () => {
 
 	it("is defined", () => {
