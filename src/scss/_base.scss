@@ -23,7 +23,7 @@
 		background-color: _oTableGet('header-background');
 	}
 
-	thead th:not([data-o-table-heading-disable-sort]) {
+	th:not([data-o-table-heading-disable-sort]) {
 		button {
 			// sass-lint:disable no-vendor-prefixes
 			-webkit-font-smoothing: antialiased;

@@ -443,7 +443,10 @@ Known issues:
 - `OTable.wrap` has been removed, for a style of responsive table add container classes manually.
 - `OTable.sortRowsByColumn` arguments have been updated
 - `table[data-o-table-order]` was used to indicate that a table was sorted, this has been removed.
-- Event data `detail.sort` is now "ascending" rather than "ASC", and "descending" rather than "DES".
+- Event data `detail.oTable` is now `detail.instance`.
+- Event data `detail.sort` is now `detail.sortOrder`, the value is now "ascending" rather than "ASC", and "descending" rather than "DES".
+- The `dispatch` method is now private.
+- "sorting" event is no longer fired from "th"
 
 ### How to upgrade from v4.x.x to v5.x.x?
 

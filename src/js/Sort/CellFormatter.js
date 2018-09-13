@@ -229,7 +229,7 @@ function extractNumber(text) {
  * Methods to format table cells for sorting.
  * @access public
  */
-class SortFormatter {
+class CellFormatter {
 
 	constructor () {
 		// This object is used to keep the running order of filter methods
@@ -295,4 +295,4 @@ class SortFormatter {
 	}
 }
 
-export default SortFormatter;
+export default CellFormatter;

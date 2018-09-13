@@ -5,6 +5,8 @@ import sinon from 'sinon/pkg/sinon';
 
 import * as sandbox from './helpers/sandbox';
 import OTable from './../main';
+import BaseTable from './../src/js/BaseTable';
+import DefaultTable from './../src/js/DefaultTable';
 
 describe("oTable API", () => {
 
@@ -12,26 +14,7 @@ describe("oTable API", () => {
 		proclaim.isFunction(OTable);
 	});
 
-	it('has a static init method', () => {
-		proclaim.isFunction(OTable.init);
-	});
-
-	it('has a destroy instance method', () => {
-		proclaim.isFunction(OTable.prototype.destroy);
-	});
-
-	it('has a removeEventListeners instance method', () => {
-		proclaim.isFunction(OTable.prototype.removeEventListeners);
-	});
-
-	it('has a sortRowsByColumn instance method', () => {
-		proclaim.isFunction(OTable.prototype.sortRowsByColumn);
-	});
-
-	it('has a dispatch instance method', () => {
-		proclaim.isFunction(OTable.prototype.dispatch);
-	});
-
+	// @todo test for existence of final public api.
 });
 
 describe('An oTable instance', () => {
@@ -74,7 +57,9 @@ describe('An oTable instance', () => {
 
 	it('has the correct prototype', () => {
 		testOTable = new OTable(oTableEl);
-		proclaim.isInstanceOf(testOTable, OTable);
+		proclaim.isInstanceOf(testOTable, BaseTable);
+		proclaim.isInstanceOf(testOTable, DefaultTable);
+		// @todo check instance of other table types
 	});
 
 	describe('when the table has data-o-table-responsive="flat"', () => {
