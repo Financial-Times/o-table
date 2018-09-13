@@ -278,10 +278,10 @@ class OverflowTable extends BaseTable {
 		this.container.style.setProperty('--o-table-fade-from-start', `${Math.min(fromStart, 10)}px`);
 
 		// Show table dock if there are scroll buttons and a more button.
-		if ((fromEnd !== 0 && fromStart !== 0 ) && this._expanderIsEnabled() && this._rowsToHide.length !== 0) {
-			this.container.classList.add('o-table-control-overlay--dock');
+		if ((fromEnd !== 0 || fromStart !== 0 ) && this._expanderIsEnabled() && this._rowsToHide.length !== 0) {
+			this.container.classList.add('o-table-container--dock');
 		} else {
-			this.container.classList.remove('o-table-control-overlay--dock');
+			this.container.classList.remove('o-table-container--dock');
 		}
 
 		// Hide scroll buttons if the table fits within the viewport.
