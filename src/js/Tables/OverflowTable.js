@@ -59,6 +59,7 @@ class OverflowTable extends BaseTable {
 		window.requestAnimationFrame(() => {
 			this._updateRowVisibility();
 			this.wrapper.style.height = `${contractedHeight}px`;
+			this.container.classList.remove('o-table-container--expanded');
 			this.container.classList.add('o-table-container--contracted');
 			if (moreButton) {
 				moreButton.textContent = 'Show more';
@@ -75,6 +76,7 @@ class OverflowTable extends BaseTable {
 		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
 		window.requestAnimationFrame(() => {
 			this.container.classList.remove('o-table-container--contracted');
+			this.container.classList.add('o-table-container--expanded');
 			if (moreButton) {
 				moreButton.textContent = 'Show fewer';
 			}
@@ -232,7 +234,7 @@ class OverflowTable extends BaseTable {
 			});
 
 			// On resize enable/Disable forward/backward buttons at edge of table.
-			this.wrapper.addEventListener('scroll', updateControlsRateLimited.bind(this));
+			this.wrapper.addEventListener('resize', updateControlsRateLimited.bind(this));
 			this._listeners.push({
 				element: this.wrapper,
 				updateControlsRateLimited,
