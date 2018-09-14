@@ -118,9 +118,9 @@
 
 	.o-table-control--forward,
 	.o-table-control--back {
-		@supports (pointer-events: none) and (position: sticky) {
-			position: sticky;
-			top: calc(50vh - 20px);
+		@supports (pointer-events: none)  {
+			position: absolute;
+			top: calc(50% - 20px);
 			transition: opacity 0.3s $o-visual-effects-transition-fade;
 		}
 		z-index: 1;
@@ -143,17 +143,30 @@
 	}
 
 	.o-table-control--back {
-		float: left;
+		left: 0; //absolute
+		float: left; //sticky
 		margin: 0 10px;
 	}
 
 	.o-table-control--forward {
-		float: right;
+		right: 0; //absolute
+		float: right; //sticky
 		margin: 0 10px;
 	}
 
+	.o-table-control--sticky {
+		@supports (pointer-events: none) {
+			position: sticky;
+		}
+	}
 
-	@at-root .o-table-container--dock & {
+	.o-table-control--dock {
+		top: auto;
+		bottom: 0;
+	}
+
+	@at-root .o-table-container--arrow-dock & {
+
 		&:after,
 		&:before {
 			position: absolute;

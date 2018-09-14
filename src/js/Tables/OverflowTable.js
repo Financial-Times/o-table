@@ -10,9 +10,6 @@ class OverflowTable extends BaseTable {
 		if (this._expanderIsEnabled()) {
 			this._setupExpander();
 		}
-		if (!this.expanded) {
-			this.contractTable();
-		}
 		this._ready();
 		return this;
 	}
@@ -68,6 +65,7 @@ class OverflowTable extends BaseTable {
 					top: this.controls.moreButton.getBoundingClientRect().top - originalButtonTopOffset,
 				});
 			}
+			this._updateControls();
 		});
 	}
 
@@ -82,6 +80,7 @@ class OverflowTable extends BaseTable {
 			}
 			this.wrapper.style.height = '';
 			this.tableRows.forEach(row => row.setAttribute('aria-hidden', false));
+			this._updateControls();
 		});
 	}
 
@@ -269,45 +268,67 @@ class OverflowTable extends BaseTable {
 				}
 			});
 		}
+
+		if (!this.expanded) {
+			this.contractTable();
+		}
 	}
 
 	_updateControls() {
-		const fromEnd = this.wrapper.scrollWidth - this.wrapper.clientWidth - this.wrapper.scrollLeft;
-		const fromStart = this.wrapper.scrollLeft;
+		window.requestAnimationFrame(function() {
+			const fromEnd = this.wrapper.scrollWidth - this.wrapper.clientWidth - this.wrapper.scrollLeft;
+			const fromStart = this.wrapper.scrollLeft;
+			const canScrollTable = (fromEnd !== 0 || fromStart !== 0);
+			const containerRect = this.container.getBoundingClientRect();
+			const tableTallerThanViewport = containerRect.height > document.documentElement.clientHeight;
+			const canScrollPastTable = containerRect.bottom + (document.documentElement.clientHeight / 2) < document.documentElement.getBoundingClientRect().bottom;
 
-		// Update scroll fade.
-		this.container.style.setProperty('--o-table-fade-from-end', `${Math.min(fromEnd, 10)}px`);
-		this.container.style.setProperty('--o-table-fade-from-start', `${Math.min(fromStart, 10)}px`);
+			// Update scroll fade.
+			this.container.style.setProperty('--o-table-fade-from-end', `${Math.min(fromEnd, 10)}px`);
+			this.container.style.setProperty('--o-table-fade-from-start', `${Math.min(fromStart, 10)}px`);
 
-		// Show table dock if there are scroll buttons and a more button.
-		if ((fromEnd !== 0 || fromStart !== 0 ) && this._expanderIsEnabled() && this._rowsToHide.length !== 0) {
-			this.container.classList.add('o-table-container--dock');
-		} else {
-			this.container.classList.remove('o-table-container--dock');
-		}
+			// Show arrow doc if the table can be expanded, has a "more/less" button, and the table can be scrolled past.
+			const showArrowDock = canScrollTable && this._expanderIsEnabled() && this._rowsToHide.length !== 0 && canScrollPastTable;
+			this.container.classList.toggle('o-table-container--arrow-dock', showArrowDock);
 
-		// Hide scroll buttons if the table fits within the viewport.
-		if (fromEnd === 0 && fromStart === 0) {
-			this.controls.forwardButton.style.display = 'none';
-			this.controls.backButton.style.display = 'none';
-		} else {
-			this.controls.forwardButton.style.display = '';
-			this.controls.backButton.style.display = '';
-		}
+			// Make arrows sticky if table is tall and can be scrolled past.
+			const stickyArrows = tableTallerThanViewport;
+			this.controls.forwardButton.classList.toggle('o-table-control--sticky', tableTallerThanViewport);
+			this.controls.backButton.classList.toggle('o-table-control--sticky', tableTallerThanViewport);
 
-		// Disable forward button if the table is scrolled to the end.
-		if (fromEnd === 0) {
-			this.controls.forwardButton.querySelector('button').setAttribute('disabled', true);
-		} else {
-			this.controls.forwardButton.querySelector('button').removeAttribute('disabled');
-		}
+			// Place the arrows in the doc if they are not sticky.
+			this.controls.forwardButton.classList.toggle('o-table-control--dock', showArrowDock && !stickyArrows);
+			this.controls.backButton.classList.toggle('o-table-control--dock', showArrowDock && !stickyArrows);
 
-		// Disable back button if the table has not scrolled.
-		if (fromStart === 0) {
-			this.controls.backButton.querySelector('button').setAttribute('disabled', true);
-		} else {
-			this.controls.backButton.querySelector('button').removeAttribute('disabled');
-		}
+			// Hide scroll buttons if the table fits within the viewport.
+			if (canScrollTable) {
+				this.controls.forwardButton.style.display = '';
+				this.controls.backButton.style.display = '';
+			} else {
+				this.controls.forwardButton.style.display = 'none';
+				this.controls.backButton.style.display = 'none';
+			}
+
+			// Disable forward button if the table is scrolled to the end.
+			if (fromEnd === 0) {
+				this.controls.forwardButton.querySelector('button').setAttribute('disabled', true);
+				// Cannot scroll past table and no dock for sticky arrow, so arrow will obstruct table -- so hide disabled arrow.
+				this.controls.forwardButton.classList.toggle('o-table-control--hide', !showArrowDock && !canScrollPastTable);
+			} else {
+				this.controls.forwardButton.querySelector('button').removeAttribute('disabled');
+				this.controls.forwardButton.classList.remove('o-table-control--hide');
+			}
+
+			// Disable back button if the table has not scrolled.
+			if (fromStart === 0) {
+				this.controls.backButton.querySelector('button').setAttribute('disabled', true);
+				// Cannot scroll past table and no dock for sticky arrow, so arrow will obstruct table -- so hide disabled arrow.
+				this.controls.backButton.classList.toggle('o-table-control--hide', !showArrowDock && !canScrollPastTable);
+			} else {
+				this.controls.backButton.querySelector('button').removeAttribute('disabled');
+				this.controls.backButton.classList.remove('o-table-control--hide');
+			}
+		}.bind(this));
 	}
 }
 
