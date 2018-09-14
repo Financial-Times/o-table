@@ -88,9 +88,7 @@ class BaseTable {
 		}.bind(this));
 	}
 
-	_toggleColumnSort(th, columnIndex) {
-		const currentSort = th.getAttribute('aria-sort');
-		const sortOrder = [null, 'none', 'descending'].includes(currentSort) ? 'ascending' : 'descending';
+	sortRowsByColumn(columnIndex, sortOrder) {
 		/**
 		 * Fires an "oTable.sorting" event. The sorting event can be cancelled to
 		 * provide a totally custom method of sorting the table.
@@ -104,6 +102,12 @@ class BaseTable {
 		if (defaultSort) {
 			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder);
 		}
+	}
+
+	_toggleColumnSort(th, columnIndex) {
+		const currentSort = th.getAttribute('aria-sort');
+		const sortOrder = [null, 'none', 'descending'].includes(currentSort) ? 'ascending' : 'descending';
+		this.sortRowsByColumn(columnIndex, sortOrder);
 	}
 
 	/**

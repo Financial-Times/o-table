@@ -234,9 +234,9 @@ class OverflowTable extends BaseTable {
 			});
 
 			// On resize enable/Disable forward/backward buttons at edge of table.
-			this.wrapper.addEventListener('resize', updateControlsRateLimited.bind(this));
+			window.addEventListener('resize', updateControlsRateLimited.bind(this));
 			this._listeners.push({
-				element: this.wrapper,
+				element: window,
 				updateControlsRateLimited,
 				type: 'resize'
 			});

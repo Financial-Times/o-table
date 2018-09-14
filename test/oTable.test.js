@@ -5,8 +5,8 @@ import sinon from 'sinon/pkg/sinon';
 
 import * as sandbox from './helpers/sandbox';
 import OTable from './../main';
-import BaseTable from './../src/js/BaseTable';
-import DefaultTable from './../src/js/DefaultTable';
+import BaseTable from './../src/js/Tables/BaseTable';
+import OverflowTable from './../src/js/Tables/OverflowTable';
 
 describe("oTable API", () => {
 
@@ -58,7 +58,7 @@ describe('An oTable instance', () => {
 	it('has the correct prototype', () => {
 		testOTable = new OTable(oTableEl);
 		proclaim.isInstanceOf(testOTable, BaseTable);
-		proclaim.isInstanceOf(testOTable, DefaultTable);
+		proclaim.isInstanceOf(testOTable, OverflowTable);
 		// @todo check instance of other table types
 	});
 
@@ -83,10 +83,10 @@ describe('An oTable instance', () => {
 	});
 
 	it('fires an "oTable.ready" event when the JS for the component has executed', done => {
-		testOTable = new OTable(oTableEl);
 		oTableEl.addEventListener('oTable.ready', function() {
 			done();
 		});
+		testOTable = new OTable(oTableEl);
 	});
 
 });

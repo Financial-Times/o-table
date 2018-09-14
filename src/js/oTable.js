@@ -55,7 +55,7 @@ class OTable {
 	 * @see {@link CellFormatter#setFormatter} for `formatFunction` details.
 	 * @access public
 	 */
-	static setCellSortFormatterForType(type, formatFunction) {
+	static setSortFormatterForType(type, formatFunction) {
 		sorter.setCellFormatterForType(type, formatFunction);
 	}
 }

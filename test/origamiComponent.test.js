@@ -5,6 +5,7 @@ import sinon from 'sinon/pkg/sinon';
 import * as sandbox from './helpers/sandbox';
 
 import oTable from './../main';
+import BaseTable from './../src/js/Tables/BaseTable';
 
 describe("oTable", () => {
 	beforeEach(() => {
@@ -58,15 +59,15 @@ describe("oTable", () => {
 
 	describe("init", () => {
 
-		it("should create a single oTable when no element is passed in", () => {
+		it("should create a single BaseTable when no element is passed in", () => {
 			const otable = oTable.init();
 			proclaim.equal(otable instanceof Array, true);
-			proclaim.equal(otable[0] instanceof oTable, true);
+			proclaim.equal(otable[0] instanceof BaseTable, true);
 		});
 
-		it("should create an oTable for the element found within the passed in selector", () => {
+		it("should create an BaseTable for the element found within the passed in selector", () => {
 			const otable = oTable.init('.o-table');
-			proclaim.equal(otable instanceof oTable, true);
+			proclaim.equal(otable instanceof BaseTable, true);
 		});
 	});
 });

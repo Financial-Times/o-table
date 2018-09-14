@@ -30,14 +30,13 @@ class TableSorter {
 
 	sortRowsByColumn(table, columnIndex, sortOrder) {
 		const tableHeaderElement = table.getTableHeader(columnIndex);
-		const type = tableHeaderElement.getAttribute('data-o-table-data-type') || undefined;
 
 		if (!tableHeaderElement) {
 			throw new Error(`Could not find header for column index "${columnIndex}".`);
 		}
 
 		if (!['ascending', 'descending'].includes(sortOrder)) {
-			throw new Error(`"${sortOrder}" is not supported. Must be "ascending" or "descending".`);
+			throw new Error(`Sort order "${sortOrder}" is not supported. Must be "ascending" or "descending".`);
 		}
 
 		// Add class for immediate visual feedback (only update aria when table has sorted successfully).
@@ -47,6 +46,7 @@ class TableSorter {
 
 		const intlCollator = getIntlCollator();
 		const cellFormatter = this._cellFormatter;
+		const type = tableHeaderElement.getAttribute('data-o-table-data-type') || undefined;
 		table.tableRows.sort((a, b) => {
 			let aCol = a.children[columnIndex];
 			let bCol = b.children[columnIndex];

@@ -876,23 +876,20 @@ describe('oTable sorting', () => {
 		`);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		testOTable = new OTable(oTableEl);
-		sinon.spy(testOTable, "sortRowsByColumn");
 		oTableEl.addEventListener('oTable.sorting', (event) => {
 			event.preventDefault();
 			// Column index, sort order, and table instance provided by the event.
 			proclaim.equal(event.detail.columnIndex, 0);
 			proclaim.equal(event.detail.sort, 'ascending');
-			proclaim.equal(event.detail.oTable, testOTable);
+			proclaim.equal(event.detail.instance, testOTable);
 			// Sorted event can be fired.
-			event.detail.oTable.sorted(event.detail.columnIndex, event.detail.sort);
+			event.detail.instance.sorted({ columnIndex: event.detail.columnIndex, sort: event.detail.sort });
 		});
 
 		oTableEl.addEventListener('oTable.sorted', (event) => {
-			// Standard sort has been intercepted but aria labels are handled for us.
-			const sortedHeading = event.detail.oTable.getTableHeader(event.detail.columnIndex);
-			proclaim.equal(sortedHeading.getAttribute('aria-sort'), 'ascending');
-			proclaim.isTrue(testOTable.sortRowsByColumn.notCalled);
-			testOTable.sortRowsByColumn.restore();
+			const sortedHeading = event.detail.instance.getTableHeader(event.detail.columnIndex);
+			// Standard sort has been intercepted, and "ascending" sort never happened.
+			proclaim.equal(sortedHeading.getAttribute('aria-sort'), null);
 			done();
 		});
 		click('thead th button');
@@ -958,7 +955,7 @@ describe('oTable sorting', () => {
 					done();
 				});
 			});
-			testOTable.sorted(sortedHeaderIndex, sort);
+			testOTable.sortRowsByColumn(sortedHeaderIndex, sort);
 		});
 
 		it('by the second column, descending', (done) => {
@@ -971,33 +968,25 @@ describe('oTable sorting', () => {
 					done();
 				});
 			});
-			testOTable.sorted(sortedHeaderIndex, sort);
+			testOTable.sortRowsByColumn(sortedHeaderIndex, sort);
 		});
 
 		it('by the first column but with no sort specified', (done) => {
 			const sortedHeaderIndex = 0;
-			const otherHeaderIndex = 1;
 			const sort = null;
-			const expectedAriaValue = 'none';
-			oTableEl.addEventListener('oTable.sorted', () => {
-				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {
-					done();
-				});
-			});
-			testOTable.sorted(sortedHeaderIndex, sort);
+			proclaim.throws(() => {
+				testOTable.sortRowsByColumn(sortedHeaderIndex, sort);
+			}, /Must be "ascending" or "descending"/);
+			done();
 		});
 
 		it('by no column with no sort specified', (done) => {
 			const sortedHeaderIndex = null;
-			const otherHeaderIndex = 1;
-			const sort = null;
-			const expectedAriaValue = 'none';
-			oTableEl.addEventListener('oTable.sorted', () => {
-				checkHeaderExpectations(sortedHeaderIndex, otherHeaderIndex, expectedAriaValue).then(() => {
-					done();
-				});
-			});
-			testOTable.sorted(sortedHeaderIndex, sort);
+			const sort = 'ascending';
+			proclaim.throws(() => {
+				testOTable.sortRowsByColumn(sortedHeaderIndex, sort);
+			}, /Could not find header/);
+			done();
 		});
 	});
 
