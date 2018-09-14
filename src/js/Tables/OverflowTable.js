@@ -1,46 +1,41 @@
 import BaseTable from './BaseTable';
 
 class OverflowTable extends BaseTable {
+
+	/**
+	 * Initialises an `o-table` component.
+	 *
+	 * @param {HTMLElement} rootEl - The `o-table` element.
+	 * @param {TableSorter} sorter
+	 * @returns {OverflowTable}
+	 */
 	constructor(rootEl, sorter) {
 		super(rootEl, sorter);
 		this._addSortButtons();
-		if (this._overflowScrollEnabled()) {
+		if (this._hasScrollWrapper()) {
 			this._setupScroll();
 		}
-		if (this._expanderIsEnabled()) {
+		if (this._tableCanExpand()) {
 			this._setupExpander();
 		}
 		this._ready();
 		return this;
 	}
 
-	get expanded() {
-		const configuredValue = this.rootEl.getAttribute('data-o-table-expanded');
-		return Boolean(configuredValue !== 'false');
+	/**
+	 * Check if the table is expanded (true) or collapsed (false).
+	 * @returns {Bool}
+	 */
+	isExpanded() {
+		const value = this.rootEl.getAttribute('data-o-table-expanded');
+		return Boolean(value !== 'false');
 	}
 
-	set expanded(value) {
-		this.rootEl.setAttribute('aria-expanded', value);
-		this.rootEl.setAttribute('data-o-table-expanded', Boolean(value));
-	}
-
-	get _minimumRowCount() {
-		const minimumRowCount = this.rootEl.getAttribute('data-o-table-minimum-row-count');
-		return isNaN(parseInt(minimumRowCount, 10)) ? 20 : parseInt(minimumRowCount, 10);
-	}
-
-	get _hiddenRows() {
-		const visibleRowCount = Math.min(this.tableRows.length, this._minimumRowCount);
-		return this.expanded ? [] : this.tableRows.slice(visibleRowCount, this.tableRows.length);
-	}
-
-	get _rowsToHide() {
-		const visibleRowCount = Math.min(this.tableRows.length, this._minimumRowCount);
-		return this.tableRows.slice(visibleRowCount, this.tableRows.length);
-	}
-
+	/**
+	 * Hides table rows as configured by `data-o-table-minimum-row-count` and `data-o-table-expanded`.
+	 * @returns undefined
+	 */
 	contractTable() {
-		this.expanded = false;
 		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
 		const rowsToHide = this._rowsToHide;
 		const originalButtonTopOffset = this.controls.moreButton.getBoundingClientRect().top;
@@ -55,6 +50,8 @@ class OverflowTable extends BaseTable {
 		// Contract table.
 		window.requestAnimationFrame(() => {
 			this._updateRowVisibility();
+			this.rootEl.setAttribute('aria-expanded', false);
+			this.rootEl.setAttribute('data-o-table-expanded', false);
 			this.wrapper.style.height = `${contractedHeight}px`;
 			this.container.classList.remove('o-table-container--expanded');
 			this.container.classList.add('o-table-container--contracted');
@@ -69,8 +66,11 @@ class OverflowTable extends BaseTable {
 		});
 	}
 
+	/**
+	 * Shows all table rows if any have been hidden.
+	 * @returns undefined
+	 */
 	expandTable() {
-		this.expanded = true;
 		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
 		window.requestAnimationFrame(() => {
 			this.container.classList.remove('o-table-container--contracted');
@@ -80,14 +80,19 @@ class OverflowTable extends BaseTable {
 			}
 			this.wrapper.style.height = '';
 			this.tableRows.forEach(row => row.setAttribute('aria-hidden', false));
+			this.rootEl.setAttribute('aria-expanded', true);
+			this.rootEl.setAttribute('data-o-table-expanded', true);
 			this._updateControls();
 		});
 	}
 
 	/**
-	 * Sorts the table by a specific column
-	 * @param {number} columnIndex The index of the column to sort the table by
-	 * @param {bool} sortAscending Which direction to sort in, ascending or descending
+	 * Performs post-sort actions such as updating row visibility and firing a `oTable.sorted` event.
+	 * Required as the sort event can be intercepted for a custom implementation.
+	 *
+	 * @param {Object} sortDetail An object containing information about the sort.
+	 * @param {Number} sortDetail.columnIndex The index of the column which has been sorted.
+	 * @param {String} sortDetail.sortAscending The order of the sort i.e. ascending or descending.
 	 * @returns undefined
 	 */
 	sorted({columnIndex, sortOrder}) {
@@ -97,16 +102,29 @@ class OverflowTable extends BaseTable {
 		});
 	}
 
-	_expanderIsEnabled() {
+	/**
+	 * Check if the table supports the expand/contract feature.
+	 * @returns {Bool}
+	 */
+	_tableCanExpand() {
 		return this.rootEl.hasAttribute('data-o-table-expanded') && (this._minimumRowCount < this.tableRows.length);
 	}
 
-	_overflowScrollEnabled() {
-		// Is there is no wrapper assume the user intentionally omitted it,
-		// as they do not want a scrolling table.
+	/**
+	 * Check if the table has the wrapper element.
+	 * Is there is no wrapper assume the user intentionally omitted it,
+	 * as they do not want a scrolling table.
+	 * @returns {Bool}
+	 */
+	_hasScrollWrapper() {
 		return Boolean(this.wrapper);
 	}
 
+	/**
+	 * Update row aria attributes to show/hide them.
+	 * E.g. After performing a sort, rows which where hidden in the colapsed table may have become visible.
+	 * @returns {undefined}
+	 */
 	_updateRowVisibility() {
 		const hiddenRows = this._hiddenRows;
 		this.tableRows.forEach((row) => {
@@ -114,26 +132,32 @@ class OverflowTable extends BaseTable {
 		});
 	}
 
-	_addControls() {
+	/**
+	 * Add controls such as the back, forward, "show more" buttons to DOM,
+	 * plus wrappers needed for them to function.
+	 * @returns {undefined}
+	 */
+	_addControlsToDom() {
 		if (this.container && !this.controls) {
+
 			this.container.insertAdjacentHTML('beforeend', `
-				${this._overflowScrollEnabled() ? `
-					<div class="o-table-fade-overlay"></div>
+				${this._hasScrollWrapper() ? `
+					<div class="o-table-fade-overlay" style="display: none;"></div>
 				` : ''}
-				<div class="o-table-control-overlay">
-					${this._overflowScrollEnabled() ? `
+				<div class="o-table-control-overlay" style="display: none;">
+					${this._hasScrollWrapper() ? `
 						<div class="o-table-control o-table-control--back">
 							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
 						</div>
 					` : ''}
 
-					${this._overflowScrollEnabled() ? `
+					${this._hasScrollWrapper() ? `
 						<div class="o-table-control o-table-control--forward">
 							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
 						</div>
 					` : ''}
 
-					${this._expanderIsEnabled() ? `
+					${this._tableCanExpand() ? `
 						<div class="o-table-control o-table-control--more">
 							<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
 						</div>
@@ -142,14 +166,26 @@ class OverflowTable extends BaseTable {
 			`);
 
 			this.controls = {
-				overlay: this.container.querySelector('.o-table-control-overlay'),
+				controlsOverlay: this.container.querySelector('.o-table-control-overlay'),
+				fadeOverlay: this.container.querySelector('.o-table-fade-overlay'),
 				moreButton: this.container.querySelector('.o-table-control--more'),
 				forwardButton: this.container.querySelector('.o-table-control--forward'),
 				backButton: this.container.querySelector('.o-table-control--back')
 			};
+
+			this._updateControls();
+			window.requestAnimationFrame(function () {
+				this.controls.controlsOverlay.style.display = '';
+				this.controls.fadeOverlay.style.display = '';
+			}.bind(this));
 		}
 	}
 
+	/**
+	 * Add functionality to improve the experience when scrolling a table,
+	 * such as showing forward/back buttons to indicate that scroll is possible.
+	 * @returns {undefined}
+	 */
 	_setupScroll() {
 		// Can not add controls without a container.
 		// Does not add automatically for performace, but could.
@@ -164,7 +200,7 @@ class OverflowTable extends BaseTable {
 
 		// Add table controls (e.g. left/right button).
 		if (!this.controls) {
-			this._addControls();
+			this._addControlsToDom();
 		}
 
 		// Add forward button behaviour.
@@ -183,7 +219,7 @@ class OverflowTable extends BaseTable {
 			});
 		}
 
-		// Add backward button behaviour.
+		// Add back button behaviour.
 		if (this.controls.backButton) {
 			const scrollBackward = function () {
 				this.wrapper.scrollBy({
@@ -200,21 +236,22 @@ class OverflowTable extends BaseTable {
 		}
 
 
-		if (this.controls.overlay && window.IntersectionObserver) {
-			// Fade forward/backward buttons at start and end of table.
-			const controlFadeObserver = new IntersectionObserver((entries) => {
+		if (this.controls.controlsOverlay && window.IntersectionObserver) {
+			// Fade forward/back buttons at start and end of table.
+			const arrowFadeObserverConfig = {
+				root: this.controls.controlsOverlay,
+				threshold: 1.0,
+				rootMargin: `-50px 0px ${this.controls.moreButton ? '0px' : '-10px'} 0px`
+			};
+			const arrowFadeObserver = new IntersectionObserver(entries => {
 				entries.forEach(entry => {
 					entry.target.classList.toggle('o-table-control--hide', entry.intersectionRatio !== 1);
 				});
-			}, {
-				root: this.controls.overlay,
-				threshold: 1.0,
-				rootMargin: `-50px 0px ${this.controls.moreButton ? '0px' : '-10px'} 0px`
-			});
-			controlFadeObserver.observe(this.controls.backButton);
-			controlFadeObserver.observe(this.controls.forwardButton);
+			}, arrowFadeObserverConfig);
+			arrowFadeObserver.observe(this.controls.backButton);
+			arrowFadeObserver.observe(this.controls.forwardButton);
 
-			// On scroll enable/Disable forward/backward buttons at edge of table.
+
 			let updateControls = false;
 			const updateControlsRateLimited = function () {
 				if (!updateControls) {
@@ -225,25 +262,19 @@ class OverflowTable extends BaseTable {
 					}.bind(this), 33);
 				}
 			};
+			// On scroll enable/Disable forward/back buttons at edge of table.
 			this.wrapper.addEventListener('scroll', updateControlsRateLimited.bind(this));
-			this._listeners.push({
-				element: this.wrapper,
-				updateControlsRateLimited,
-				type: 'scroll'
-			});
-
-			// On resize enable/Disable forward/backward buttons at edge of table.
+			this._listeners.push({element: this.wrapper, updateControlsRateLimited, type: 'scroll'});
+			// On resize enable/Disable forward/back buttons at edge of table.
 			window.addEventListener('resize', updateControlsRateLimited.bind(this));
-			this._listeners.push({
-				element: window,
-				updateControlsRateLimited,
-				type: 'resize'
-			});
+			this._listeners.push({element: window, updateControlsRateLimited, type: 'resize'});
 		}
-		// Update controls according to scroll position, etc.
-		this._updateControls();
 	}
 
+	/**
+	 * Add hide/show functionality for long tables.
+	 * @returns {undefined}
+	 */
 	_setupExpander() {
 		if (!this.container) {
 			console.warn(
@@ -256,79 +287,170 @@ class OverflowTable extends BaseTable {
 
 		// Add table controls (e.g. "more" button).
 		if (!this.controls) {
-			this._addControls();
+			this._addControlsToDom();
 		}
 
 		if (this.controls.moreButton) {
-			this.controls.moreButton.addEventListener('click', () => {
-				if (this.expanded) {
+			const toggleExpanded = function () {
+				if (this.isExpanded()) {
 					this.contractTable();
 				} else {
 					this.expandTable();
 				}
-			});
+			}.bind(this);
+			this.controls.moreButton.addEventListener('click', toggleExpanded);
+			this._listeners.push({element: this.controls.moreButton, toggleExpanded, type: 'click'});
 		}
 
-		if (!this.expanded) {
+		if (!this.isExpanded()) {
 			this.contractTable();
 		}
 	}
 
+	/**
+	 * Update all controls and their overlays,
+	 * e.g. forward/back arrow visibility, visibility of arrow dock, overlay fade.
+	 * @returns {undefined}
+	 */
 	_updateControls() {
-		window.requestAnimationFrame(function() {
-			const fromEnd = this.wrapper.scrollWidth - this.wrapper.clientWidth - this.wrapper.scrollLeft;
-			const fromStart = this.wrapper.scrollLeft;
-			const canScrollTable = (fromEnd !== 0 || fromStart !== 0);
-			const containerRect = this.container.getBoundingClientRect();
-			const tableTallerThanViewport = containerRect.height > document.documentElement.clientHeight;
-			const canScrollPastTable = containerRect.bottom + (document.documentElement.clientHeight / 2) < document.documentElement.getBoundingClientRect().bottom;
-
-			// Update scroll fade.
-			this.container.style.setProperty('--o-table-fade-from-end', `${Math.min(fromEnd, 10)}px`);
-			this.container.style.setProperty('--o-table-fade-from-start', `${Math.min(fromStart, 10)}px`);
-
-			// Show arrow doc if the table can be expanded, has a "more/less" button, and the table can be scrolled past.
-			const showArrowDock = canScrollTable && this._expanderIsEnabled() && this._rowsToHide.length !== 0 && canScrollPastTable;
-			this.container.classList.toggle('o-table-container--arrow-dock', showArrowDock);
-
-			// Make arrows sticky if table is tall and can be scrolled past.
-			const stickyArrows = tableTallerThanViewport;
-			this.controls.forwardButton.classList.toggle('o-table-control--sticky', tableTallerThanViewport);
-			this.controls.backButton.classList.toggle('o-table-control--sticky', tableTallerThanViewport);
-
-			// Place the arrows in the doc if they are not sticky.
-			this.controls.forwardButton.classList.toggle('o-table-control--dock', showArrowDock && !stickyArrows);
-			this.controls.backButton.classList.toggle('o-table-control--dock', showArrowDock && !stickyArrows);
-
-			// Hide scroll buttons if the table fits within the viewport.
-			if (canScrollTable) {
-				this.controls.forwardButton.style.display = '';
-				this.controls.backButton.style.display = '';
-			} else {
-				this.controls.forwardButton.style.display = 'none';
-				this.controls.backButton.style.display = 'none';
-			}
-
-			// Disable forward button if the table is scrolled to the end.
-			if (fromEnd === 0) {
-				this.controls.forwardButton.querySelector('button').setAttribute('disabled', true);
-				// Cannot scroll past table and no dock for sticky arrow, so arrow will obstruct table -- so hide disabled arrow.
-				this.controls.forwardButton.classList.toggle('o-table-control--hide', !showArrowDock && !canScrollPastTable);
-			} else {
-				this.controls.forwardButton.querySelector('button').removeAttribute('disabled');
-				this.controls.forwardButton.classList.remove('o-table-control--hide');
-			}
-
-			// Disable back button if the table has not scrolled.
-			if (fromStart === 0) {
-				this.controls.backButton.querySelector('button').setAttribute('disabled', true);
-				// Cannot scroll past table and no dock for sticky arrow, so arrow will obstruct table -- so hide disabled arrow.
-				this.controls.backButton.classList.toggle('o-table-control--hide', !showArrowDock && !canScrollPastTable);
-			} else {
-				this.controls.backButton.querySelector('button').removeAttribute('disabled');
-				this.controls.backButton.classList.remove('o-table-control--hide');
-			}
+		window.requestAnimationFrame(function () {
+			this._toggleArrowDock(this.container);
+			this._updateFadeOverlay(this.controls.fadeOverlay);
+			this._updateScrollControl(this.controls.forwardButton, 'forward');
+			this._updateScrollControl(this.controls.backButton, 'back');
 		}.bind(this));
+	}
+
+	/**
+	 * Show arrow dock if the table can be expanded, has a "more/less" button, and the table can be scrolled past.
+	 * @param {HTMLElement} container - The table container.
+	 * @returns {undefined}
+	 */
+	_toggleArrowDock(container) {
+		container.classList.toggle('o-table-container--arrow-dock', this._showArrowDock);
+	}
+
+	/**
+	 * Updates CSS variables to change the fade overlay according to scroll position.
+	 * @param {HTMLElement} fadeOverlay - The table overlay.
+	 * @returns {undefined}
+	 */
+	_updateFadeOverlay(fadeOverlay) {
+		fadeOverlay.style.setProperty('--o-table-fade-from-end', `${Math.min(this._fromEnd, 10)}px`);
+		fadeOverlay.style.setProperty('--o-table-fade-from-start', `${Math.min(this._fromStart, 10)}px`);
+	}
+
+	/**
+	 * Update the visibility of a scroll forward/back button.
+	 * @param {HTMLElement} element - The button wrapper.
+	 * @param {String} direction - Either 'forward' or 'back'.
+	 * @returns {undefined}
+	 */
+	_updateScrollControl(element, direction) {
+		if (!['forward', 'back'].includes(direction)) {
+			throw new Error(`"${direction}" is not a recognised direction for a table scroll control.`);
+		}
+
+		// Make arrows sticky if table is tall and can be scrolled past.
+		const stickyArrows = this._tableTallerThanViewport;
+		element.classList.toggle('o-table-control--sticky', this._tableTallerThanViewport);
+
+		// Place the arrows in the doc if they are not sticky.
+		element.classList.toggle('o-table-control--dock', this._showArrowDock && !stickyArrows);
+
+		// Hide scroll buttons if the table fits within the viewport.
+		if (this._canScrollTable) {
+			element.style.display = '';
+		} else {
+			element.style.display = 'none';
+		}
+
+		// Disable forward button if the table is scrolled to the end.
+		if ((this._fromEnd === 0 && direction === 'forward') || (this._fromStart === 0 && direction === 'back')) {
+			element.querySelector('button').setAttribute('disabled', true);
+			// Cannot scroll past table and no dock for sticky arrow, so arrow will obstruct table -- so hide disabled arrow.
+			element.classList.toggle('o-table-control--hide', !this._showArrowDock && !this._canScrollPastTable);
+		} else {
+			element.querySelector('button').removeAttribute('disabled');
+			element.classList.remove('o-table-control--hide');
+		}
+	}
+
+	/**
+	 * The number of rows to display if the table is collapsed.
+	 * @returns {Number}
+	 */
+	get _minimumRowCount() {
+		const minimumRowCount = this.rootEl.getAttribute('data-o-table-minimum-row-count');
+		return isNaN(parseInt(minimumRowCount, 10)) ? 20 : parseInt(minimumRowCount, 10);
+	}
+
+	/**
+	 * The number rows which will be hidden if the table is collapsed.
+	 * @returns {Number}
+	 */
+	get _rowsToHide() {
+		const visibleRowCount = Math.min(this.tableRows.length, this._minimumRowCount);
+		return this.tableRows.slice(visibleRowCount, this.tableRows.length);
+	}
+
+	/**
+	 * The rows which are currently hidden.
+	 * @returns {Array[HTMLElement]}
+	 */
+	get _hiddenRows() {
+		const visibleRowCount = Math.min(this.tableRows.length, this._minimumRowCount);
+		return this.isExpanded() ? [] : this.tableRows.slice(visibleRowCount, this.tableRows.length);
+	}
+
+	/**
+	 * The number of pixels left to scroll to reach the end of the table.
+	 * @returns {Number}
+	 */
+	get _fromEnd() {
+		return this.wrapper.scrollWidth - this.wrapper.clientWidth - this.wrapper.scrollLeft;
+	}
+
+	/**
+	 * The number of pixels scrolled away from the start of the table.
+	 * @returns {Number}
+	 */
+	get _fromStart() {
+		return this.wrapper.scrollLeft;
+	}
+
+	/**
+	 * Check if the table can be scrolled.
+	 * @returns {Boolean}
+	 */
+	get _canScrollTable() {
+		return this.fromEnd !== 0 || this.fromStart !== 0;
+	}
+
+	/**
+	 * Check if the table can fit within the viewport vertically.
+	 * @returns {Boolean}
+	 */
+	get _tableTallerThanViewport() {
+		return this.container.getBoundingClientRect().height > document.documentElement.clientHeight;
+	}
+
+	/**
+	 * Check if the document is long enough to scroll beyond the table enough for sticky arrows to dock at the bottom.
+	 * I.e. Scroll past the table by at least 50% of the viewport.
+	 * @returns {Boolean}
+	 */
+	get _canScrollPastTable() {
+		return this.container.getBoundingClientRect().bottom + (document.documentElement.clientHeight / 2) < document.documentElement.getBoundingClientRect().bottom;
+	}
+
+	/**
+	 * Check if the "dock" at the bottom of the table should be shown.
+	 * After scrolling past the table, sticky arrows sit within the dock at the bottom of the table.
+	 * @returns {Boolean}
+	 */
+	get _showArrowDock() {
+		return this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0 && this._canScrollPastTable;
 	}
 }
 
