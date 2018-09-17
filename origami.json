@@ -97,6 +97,12 @@
 			"description": "This is a scrolling responsive version"
 		},
 		{
+			"title": "Sorting",
+			"name": "sorting",
+			"template": "demos/src/sorting.mustache",
+			"description": ""
+		},
+		{
 			"title": "Pa11y",
 			"name": "pa11y",
 			"template": "demos/src/pa11y.mustache",

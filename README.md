@@ -224,12 +224,51 @@ const OTable = require('o-table');
 oTable = new OTable(document.body);
 ```
 
-Sorting numbers works if the column has been declared as a numeric column via `data-o-table-data-type="numeric" class="o-table__cell--numeric"`.
+Sorting on non-string values such as numbers works if the column type has been declared. E.g. for a column of numbers add the following to `o-table`:
+`data-o-table-data-type="number"`.
 
-##### Sorting declaratively
+Other data types for `data-o-table-data-type` include:
+
+| type     | description                                                                                   | examples                                   |
+|----------|-----------------------------------------------------------------------------------------------|--------------------------------------------|
+| text     | The default, content is sorted as a stirng.                                                   | "Jane Doe", "John Smith"                   |
+| date     | Supports the FT style of date and time, including abbreviation.                               | "Aug 17", "1.30am", "April 20 2014 1.30pm" |
+| number   | Any number which may include number formatting and abbreviation.                              | "1,200", "100", "3.2", "1bn", "2tn"        |
+| percent  | Any percentage with or without the symbol "%".                                                | "3.3%", "200%", "50%"                      |
+| currency | Any currency, which may include number formatting, number abbreviation, and currency symbols. | "$84m", "£36bn", "HK$90bn", "Rp14.595"     |
+| numeric  | A column which may be treated as numeric which does not fit a more specific type.             | "101 dalmatians"                           |
+
+It is possible to add sort support for a custom `type`. Alternatively, the behaviour of an existing type may be modified.
+
+##### Custom sort (declarative)
+
 If you are wanting to sort by a custom pattern, you can apply the sorting values to each row as a data attribute:
-`data-o-table-order=${sort-position}`. These values can be strings or integers.
+`data-o-table-sort-value=${sort-value}`. These values can be strings or integers.
 
+For example to support a custom date format set `data-o-table-sort-value` to its UNIX Epoch.
+
+``` html
+<table class="o-table" data-o-component="o-table">
+	<thead>
+		<tr>
+			<th data-o-table-data-type="date">Custom Date Formats</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td data-o-table-sort-value="1533081600">Wednesday, 1 August 2018</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value="1483228800">Jan 2017</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value="723168000">1st December 1992</td>
+		</tr>
+	</tbody>
+</table>
+```
+
+Or to provide an arbitrary sort order:
 ``` html
 <table class="o-table" data-o-component="o-table">
 	<thead>
@@ -239,13 +278,92 @@ If you are wanting to sort by a custom pattern, you can apply the sorting values
 	</thead>
 	<tbody>
 		<tr>
-			<td data-o-table-order=2>snowman</td>
+			<td data-o-table-sort-value=2>snowman</td>
 		</tr>
 		<tr>
-			<td data-o-table-order=3>42</td>
+			<td data-o-table-sort-value=3>42</td>
 		</tr>
 		<tr>
-			<td data-o-table-order=1>pangea</td>
+			<td data-o-table-sort-value=1>pangea</td>
+		</tr>
+	</tbody>
+</table>
+```
+
+Note: `data-o-table-order` has been deprecated in favour of `data-o-table-sort-value` to specify a sort value.
+
+##### Custom sort (imperative)
+
+Rather than specify `data-o-table-sort-value` [declaratively](#custom-sort-declarative), a formatter function may be provided client-side to generate sort values for a given data type.
+
+For example we could add support for a custom data type `emoji-time`.
+
+``` html
+<table class="o-table" data-o-component="o-table">
+	<thead>
+		<tr>
+			<th data-o-table-data-type="emoji-time">Emoji Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>🌑</td>
+		</tr>
+		<tr>
+			<td>🌤️️</td>
+		</tr>
+		<tr>
+			<td>🌑</td>
+		</tr>
+		<tr>
+			<td>🌤️️</td>
+		</tr>
+	</tbody>
+</table>
+```
+
+To do that call `setSortFormatterForType` with the custom data type and a formatter function.
+The formatter accepts the table cell (HTMLElement) and returns a sort value (Number or String) for that cell.
+In this case we add support for our custom type `emoji-time` by assigning the emoji a numerical sort value.
+
+``` js
+const OTable = require('o-table');
+// Set a filter for custom data type "emoji-time".
+// The return value may be a string or number.
+OTable.setSortFormatterForType('emoji-time', (cell) => {
+	const text = cell.textContent.trim();
+	if (text === '🌑') {
+		return 1;
+	}
+	if (text === '🌤️️') {
+		return 2;
+	}
+	return 0;
+});
+OTable.init();
+```
+
+Which for an ascending sort, will result in:
+
+```html
+<table class="o-table" data-o-component="o-table" data-o-table-order="ASC">
+	<thead>
+		<tr>
+			<th data-o-table-data-type="emoji-time" aria-sort="ascending">Emoji Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td data-o-table-sort-value=1>🌑</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value=1>🌑</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value=2>🌤️️</td>
+		</tr>
+		<tr>
+			<td data-o-table-sort-value=2>🌤️️</td>
 		</tr>
 	</tbody>
 </table>
