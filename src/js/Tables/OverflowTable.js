@@ -58,9 +58,10 @@ class OverflowTable extends BaseTable {
 			if (moreButton) {
 				moreButton.textContent = 'Show more';
 				// Keep more/fewer button in viewport when contracting table.
-				window.scrollBy({
-					top: this.controls.moreButton.getBoundingClientRect().top - originalButtonTopOffset,
-				});
+				// Using `window.scroll(x-coord, y-coord)` as IE11 did not scroll
+				// correctly with `window.scroll(options)`.
+				const top = window.pageYOffset + this.controls.moreButton.getBoundingClientRect().top - originalButtonTopOffset;
+				window.scroll(null, top);
 			}
 			this._updateControls();
 		});
@@ -128,7 +129,7 @@ class OverflowTable extends BaseTable {
 	_updateRowVisibility() {
 		const hiddenRows = this._hiddenRows;
 		this.tableRows.forEach((row) => {
-			row.setAttribute('aria-hidden', hiddenRows && hiddenRows.includes(row) ? 'true' : 'false');
+			row.setAttribute('aria-hidden', hiddenRows && hiddenRows.indexOf(row) !== -1 ? 'true' : 'false');
 		});
 	}
 
@@ -145,13 +146,13 @@ class OverflowTable extends BaseTable {
 					<div class="o-table-fade-overlay" style="display: none;"></div>
 				` : ''}
 				<div class="o-table-control-overlay" style="display: none;">
-					${this._hasScrollWrapper() ? `
+					${this._hasScrollWrapper() && this._supportsArrows ? `
 						<div class="o-table-control o-table-control--back">
 							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
 						</div>
 					` : ''}
 
-					${this._hasScrollWrapper() ? `
+					${this._hasScrollWrapper() && this._supportsArrows ? `
 						<div class="o-table-control o-table-control--forward">
 							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
 						</div>
@@ -248,10 +249,15 @@ class OverflowTable extends BaseTable {
 					entry.target.classList.toggle('o-table-control--hide', entry.intersectionRatio !== 1);
 				});
 			}, arrowFadeObserverConfig);
-			arrowFadeObserver.observe(this.controls.backButton);
-			arrowFadeObserver.observe(this.controls.forwardButton);
+			if (this.controls.backButton) {
+				arrowFadeObserver.observe(this.controls.backButton);
+			}
+			if (this.controls.forwardButton) {
+				arrowFadeObserver.observe(this.controls.forwardButton);
+			}
+		}
 
-
+		if (this.wrapper) {
 			let updateControls = false;
 			const updateControlsRateLimited = function () {
 				if (!updateControls) {
@@ -314,10 +320,12 @@ class OverflowTable extends BaseTable {
 	 */
 	_updateControls() {
 		window.requestAnimationFrame(function () {
-			this._toggleArrowDock(this.container);
 			this._updateFadeOverlay(this.controls.fadeOverlay);
-			this._updateScrollControl(this.controls.forwardButton, 'forward');
-			this._updateScrollControl(this.controls.backButton, 'back');
+			if (this._supportsArrows) {
+				this._toggleArrowDock(this.container);
+				this._updateScrollControl(this.controls.forwardButton, 'forward');
+				this._updateScrollControl(this.controls.backButton, 'back');
+			}
 		}.bind(this));
 	}
 
@@ -347,24 +355,19 @@ class OverflowTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	_updateScrollControl(element, direction) {
-		if (!['forward', 'back'].includes(direction)) {
+		if (['forward', 'back'].indexOf(direction) === -1) {
 			throw new Error(`"${direction}" is not a recognised direction for a table scroll control.`);
 		}
-
 		// Make arrows sticky if table is tall and can be scrolled past.
-		const stickyArrows = this._tableTallerThanViewport;
-		element.classList.toggle('o-table-control--sticky', this._tableTallerThanViewport);
-
+		element.classList.toggle('o-table-control--sticky', this._showStickyArrows);
 		// Place the arrows in the doc if they are not sticky.
-		element.classList.toggle('o-table-control--dock', this._showArrowDock && !stickyArrows);
-
+		element.classList.toggle('o-table-control--dock', this._showArrowDock && !this._showStickyArrows);
 		// Hide scroll buttons if the table fits within the viewport.
 		if (this._canScrollTable) {
 			element.style.display = '';
 		} else {
 			element.style.display = 'none';
 		}
-
 		// Disable forward button if the table is scrolled to the end.
 		if ((this._fromEnd === 0 && direction === 'forward') || (this._fromStart === 0 && direction === 'back')) {
 			element.querySelector('button').setAttribute('disabled', true);
@@ -450,7 +453,23 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _showArrowDock() {
-		return this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0 && this._canScrollPastTable;
+		return this._supportsArrows && this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0 && this._canScrollPastTable;
+	}
+
+	/**
+	 * Check if left/right controls should be sticky.
+	 * @returns {Boolean}
+	 */
+	get _showStickyArrows() {
+		return this._supportsArrows && (this._canScrollPastTable || this._tableTallerThanViewport);
+	}
+
+	/**
+	 * Check if sticky buttons are supported.
+	 * @returns {Boolean}
+	 */
+	get _supportsArrows() {
+		return typeof CSS !== 'undefined' && CSS.supports("position", "sticky");
 	}
 }
 

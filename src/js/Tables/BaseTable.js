@@ -106,7 +106,7 @@ class BaseTable {
 
 	_toggleColumnSort(th, columnIndex) {
 		const currentSort = th.getAttribute('aria-sort');
-		const sortOrder = [null, 'none', 'descending'].includes(currentSort) ? 'ascending' : 'descending';
+		const sortOrder = [null, 'none', 'descending'].indexOf(currentSort) === -1 ? 'ascending' : 'descending';
 		this.sortRowsByColumn(columnIndex, sortOrder);
 	}
 
