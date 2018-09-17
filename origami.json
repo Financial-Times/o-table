@@ -28,7 +28,6 @@
 		"js": "demos/src/demo.js",
 		"sass": "demos/src/demo.scss",
 		"dependencies": [
-			"o-buttons",
 			"o-fonts@^3.0.0",
 			"o-normalise@^1.0.0",
 			"o-typography@v5.7.5"

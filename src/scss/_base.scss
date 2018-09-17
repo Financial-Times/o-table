@@ -100,8 +100,6 @@
 }
 
 @mixin oTableControlsContainer {
-	$bottom-margin: 10px;
-
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -114,6 +112,20 @@
 		background: _oTableGet('table-background');
 		pointer-events: all;
 		transition: 1s opacity ease-in-out;
+		button {
+			@include oButtons($size: 'big', $theme: 'primary');
+		}
+	}
+
+	.o-table-control--more {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		text-align: center;
+		button {
+			width: 100%;
+		}
 	}
 
 	.o-table-control--forward,
@@ -126,32 +138,36 @@
 		z-index: 1;
 	}
 
-	.o-table-control--more {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		text-align: center;
-	}
-
-	.o-table-control--hide {
-		opacity: 0;
-	}
-
-	.o-table-control--more button {
-		width: 100%;
-	}
-
 	.o-table-control--back {
 		left: 0; //absolute
 		float: left; //sticky
 		margin: 0 10px;
+		button {
+			@include oButtonsIconButton(
+				$icon-name: 'arrow-left',
+				$size: 'big',
+				$theme: 'primary',
+				$is-icon-only: true
+			);
+		}
 	}
 
 	.o-table-control--forward {
 		right: 0; //absolute
 		float: right; //sticky
 		margin: 0 10px;
+		button {
+			@include oButtonsIconButton(
+				$icon-name: 'arrow-right',
+				$size: 'big',
+				$theme: 'primary',
+				$is-icon-only: true
+			);
+		}
+	}
+
+	.o-table-control--hide {
+		opacity: 0;
 	}
 
 	.o-table-control--sticky {
@@ -166,7 +182,6 @@
 	}
 
 	@at-root .o-table-container--arrow-dock & {
-
 		&:after,
 		&:before {
 			position: absolute;

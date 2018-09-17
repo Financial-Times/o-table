@@ -447,6 +447,7 @@ Known issues:
 - Event data `detail.sort` is now `detail.sortOrder`, the value is now "ascending" rather than "ASC", and "descending" rather than "DES".
 - The `dispatch` method is now private.
 - "sorting" event is no longer fired from "th"
+- Removed deprecated color usecases.
 
 ### How to upgrade from v4.x.x to v5.x.x?
 

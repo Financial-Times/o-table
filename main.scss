@@ -25,8 +25,6 @@ $o-table-is-silent: true !default;
 @import "src/scss/borders";
 @import "src/scss/row-headings";
 
-@import "src/scss/deprecated";
-
 @if ($o-table-is-silent == false) {
 	@include oTableAll;
 
