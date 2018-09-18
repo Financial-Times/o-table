@@ -14,6 +14,7 @@
 
 	.o-table-container {
 		position: relative;
+		margin-bottom: 20px;
 	}
 
 	.o-table-container--contracted,
@@ -30,19 +31,9 @@
 	}
 	.#{$classname} {
 		@include oTableBase;
-		.#{$classname}__caption,
-		// Todo: remove these
-		.#{$classname}__caption--top,
-		.#{$classname}__caption--bottom {
+		.#{$classname}__caption {
 			@include oTableCaption;
 		}
-		.#{$classname}__caption--top {
-			@include oTableCaptionTop;
-		}
-		.#{$classname}__caption--bottom {
-			@include oTableCaptionBottom;
-		}
-
 		.#{$classname}__cell--numeric {
 			@include oTableCellNumeric;
 		}

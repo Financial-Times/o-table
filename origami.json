@@ -50,12 +50,6 @@
 			"description": ""
 		},
 		{
-			"title": "Captions",
-			"name": "captions",
-			"template": "demos/src/captions.mustache",
-			"description": ""
-		},
-		{
 			"title": "Row Stripes",
 			"name": "row-stripes",
 			"template": "demos/src/row-stripes.mustache",
@@ -106,6 +100,13 @@
 			"name": "sorting",
 			"template": "demos/src/sorting.mustache",
 			"description": "This demo shows sorting columns of various data types, including FT style dates, times, and abbreviated numbers. The demo also shows a column with sort disabled."
+		},
+		{
+			"title": "Caption",
+			"name": "captions",
+			"template": "demos/src/captions.mustache",
+			"documentClasses": "o-table-demo-constrain",
+			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2."
 		},
 		{
 			"title": "Pa11y",

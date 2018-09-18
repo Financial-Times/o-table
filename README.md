@@ -448,6 +448,7 @@ Known issues:
 - The `dispatch` method is now private.
 - "sorting" event is no longer fired from "th"
 - Removed deprecated color usecases.
+- `o-table__caption--top`/`oTableCaptionTop` and `o-table__caption--bottom`/`oTableCaptionBottom` have been removed. Use `o-table__caption` /`oTableCaption` with a nested header.
 
 ### How to upgrade from v4.x.x to v5.x.x?
 
