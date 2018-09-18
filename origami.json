@@ -102,7 +102,7 @@
 			"title": "Sorting",
 			"name": "sorting",
 			"template": "demos/src/sorting.mustache",
-			"description": ""
+			"description": "Sorting columns of various data types is supported by default, including FT style dates, times, and abbreviated numbers."
 		},
 		{
 			"title": "Pa11y",
