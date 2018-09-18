@@ -146,13 +146,13 @@ class OverflowTable extends BaseTable {
 					<div class="o-table-fade-overlay" style="display: none;"></div>
 				` : ''}
 				<div class="o-table-control-overlay" style="display: none;">
-					${this._hasScrollWrapper() && this._supportsArrows ? `
+					${this._hasScrollWrapper() && OverflowTable._supportsArrows() ? `
 						<div class="o-table-control o-table-control--back">
 							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
 						</div>
 					` : ''}
 
-					${this._hasScrollWrapper() && this._supportsArrows ? `
+					${this._hasScrollWrapper() && OverflowTable._supportsArrows() ? `
 						<div class="o-table-control o-table-control--forward">
 							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
 						</div>
@@ -321,7 +321,7 @@ class OverflowTable extends BaseTable {
 	_updateControls() {
 		window.requestAnimationFrame(function () {
 			this._updateFadeOverlay(this.controls.fadeOverlay);
-			if (this._supportsArrows) {
+			if (OverflowTable._supportsArrows()) {
 				this._toggleArrowDock(this.container);
 				this._updateScrollControl(this.controls.forwardButton, 'forward');
 				this._updateScrollControl(this.controls.backButton, 'back');
@@ -453,7 +453,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _showArrowDock() {
-		return this._supportsArrows && this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0 && this._canScrollPastTable;
+		return OverflowTable._supportsArrows() && this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0 && this._canScrollPastTable;
 	}
 
 	/**
@@ -461,14 +461,14 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _showStickyArrows() {
-		return this._supportsArrows && (this._canScrollPastTable || this._tableTallerThanViewport);
+		return OverflowTable._supportsArrows() && (this._canScrollPastTable || this._tableTallerThanViewport);
 	}
 
 	/**
 	 * Check if sticky buttons are supported.
 	 * @returns {Boolean}
 	 */
-	get _supportsArrows() {
+	static _supportsArrows() {
 		return typeof CSS !== 'undefined' && CSS.supports("position", "sticky");
 	}
 }

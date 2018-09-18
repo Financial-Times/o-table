@@ -99,7 +99,17 @@
 	scroll-snap-type: x proximity;
 }
 
-@mixin oTableControlsContainer {
+@mixin oTableContainer {
+	position: relative;
+	margin-bottom: 20px;
+
+	#{&}--contracted,
+	#{&}--expanded, {
+		padding-bottom: 40px;
+	}
+}
+
+@mixin oTableControlsOverflow {
 	position: absolute;
 	top: 0;
 	right: 0;

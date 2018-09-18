@@ -8,22 +8,16 @@
 ///
 /// @param {string} $classname
 @mixin oTableAll($classname: o-table) {
+	.#{$classname}-container {
+		@include oTableContainer;
+	}
+
 	.#{$classname}-wrapper {
 		@include oTableWrapper;
 	}
 
-	.o-table-container {
-		position: relative;
-		margin-bottom: 20px;
-	}
-
-	.o-table-container--contracted,
-	.o-table-container--expanded, {
-		padding-bottom: 40px;
-	}
-
 	.#{$classname}-control-overlay {
-		@include oTableControlsContainer;
+		@include oTableControlsOverflow;
 	}
 
 	.#{$classname}-fade-overlay {
@@ -31,21 +25,23 @@
 	}
 	.#{$classname} {
 		@include oTableBase;
-		.#{$classname}__caption {
-			@include oTableCaption;
-		}
-		.#{$classname}__cell--numeric {
-			@include oTableCellNumeric;
-		}
-
-		.#{$classname}__cell--content-secondary {
-			@include oTableCellContentSecondary;
-		}
-
-		.#{$classname}__cell--vertically-center {
-			@include oTableCellVerticallyCenter;
-		}
 	}
+
+	.#{$classname}__caption {
+		@include oTableCaption;
+	}
+	.#{$classname}__cell--numeric {
+		@include oTableCellNumeric;
+	}
+
+	.#{$classname}__cell--content-secondary {
+		@include oTableCellContentSecondary;
+	}
+
+	.#{$classname}__cell--vertically-center {
+		@include oTableCellVerticallyCenter;
+	}
+
 	.#{$classname}--horizontal-lines {
 		@include oTableHorizontalLines;
 	}
