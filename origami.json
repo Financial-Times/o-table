@@ -65,6 +65,7 @@
 			"title": "Row headings",
 			"name": "row-headings",
 			"brands": ["internal"],
+			"documentClasses": "o-table-demo-constrain",
 			"template": "demos/src/row-headings.mustache",
 			"description": ""
 		},
@@ -75,19 +76,14 @@
           "description": ""
         },
 		{
-			"title": "Responsive Flat",
-			"name": "responsive-flat",
-			"template": "demos/src/responsive-flat.mustache",
-			"description": "This is a flat responsive version"
-		},
-		{
 			"title": "Responsive Overflow",
 			"name": "responsive-overflow",
 			"template": "demos/src/responsive-overflow.mustache",
 			"data": {
 				"modifierClass": "o-table--responsive-overflow"
 			},
-			"description": "This is an overflow responsive version"
+			"documentClasses": "o-table-demo-constrain",
+			"description": "On small viewports this table overflows and may be scrolled left/right."
 		},
 		{
 			"title": "Responsive Scroll",
@@ -96,13 +92,20 @@
 			"data": {
 				"modifierClass": "o-table--responsive-scroll"
 			},
-			"description": "This is a scrolling responsive version"
+			"documentClasses": "o-table-demo-constrain",
+			"description": "This table moves headers into the first column on small viewports. The headers stick to the left edge as the table data is scrolled."
+		},
+		{
+			"title": "Responsive Flat",
+			"name": "responsive-flat",
+			"template": "demos/src/responsive-flat.mustache",
+			"description": "Each entry in the flat table is shown individually with headers on small viewports."
 		},
 		{
 			"title": "Sorting",
 			"name": "sorting",
 			"template": "demos/src/sorting.mustache",
-			"description": "Sorting columns of various data types is supported by default, including FT style dates, times, and abbreviated numbers."
+			"description": "This demo shows sorting columns of various data types, including FT style dates, times, and abbreviated numbers. The demo also shows a column with sort disabled."
 		},
 		{
 			"title": "Pa11y",

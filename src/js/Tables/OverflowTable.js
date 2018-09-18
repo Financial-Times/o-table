@@ -427,7 +427,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _canScrollTable() {
-		return this.fromEnd !== 0 || this.fromStart !== 0;
+		return this._fromEnd !== 0 || this._fromStart !== 0;
 	}
 
 	/**
