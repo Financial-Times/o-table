@@ -118,7 +118,10 @@
 		{
 			"title": "Caption",
 			"name": "captions",
-			"template": "demos/src/captions.mustache",
+			"template": "demos/src/basic.mustache",
+			"data": {
+				"showCaption": true
+			},
 			"documentClasses": "o-table-demo-constrain",
 			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2."
 		},
