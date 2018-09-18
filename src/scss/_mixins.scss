@@ -1,81 +1,37 @@
-////
-/// @group o-table
-/// @link http://registry.origami.ft.com/components/o-table
-////
+/// Outputs all features and styles available.
+@mixin oTableAll() {
+	// Basic styles and simple utilities.
+	@include oTableBase;
 
-/// Table styles boilerplate
-/// Generates all styles available, with a set of modifiers for alternative styles
-///
-/// @param {string} $classname
-@mixin oTableAll($classname: o-table) {
-	.#{$classname}-container {
-		@include oTableContainer;
-	}
+	// Sortable columns.
+	@include oTableSort;
 
-	.#{$classname}-wrapper {
-		@include oTableWrapper;
-	}
+	// Respnsive solutions.
+	@include oTableWrapper;
+	@include oTableContainer;
+	@include oTableControlsOverlay;
+	@include oTableFadeOverlay;
+	@include oTableResponsiveFlat;
+	@include oTableResponsiveScroll;
 
-	.#{$classname}-control-overlay {
-		@include oTableControlsOverflow;
-	}
+	// Lines.
+	@include oTableHorizontalLines;
+	@include oTableVerticalLines;
+	@include oTableHorizontalBorders;
+	@include oTableVerticalBorders;
 
-	.#{$classname}-fade-overlay {
-		@include oTableFadeOverlay;
-	}
-	.#{$classname} {
-		@include oTableBase;
-	}
-
-	.#{$classname}__caption {
-		@include oTableCaption;
-	}
-	.#{$classname}__cell--numeric {
-		@include oTableCellNumeric;
-	}
-
-	.#{$classname}__cell--content-secondary {
-		@include oTableCellContentSecondary;
-	}
-
-	.#{$classname}__cell--vertically-center {
-		@include oTableCellVerticallyCenter;
-	}
-
-	.#{$classname}--horizontal-lines {
-		@include oTableHorizontalLines;
-	}
-	.#{$classname}--vertical-lines {
-		@include oTableVerticalLines;
-	}
-	.#{$classname}--horizontal-borders {
-		@include oTableHorizontalBorders;
-	}
-	.#{$classname}--vertical-borders {
-		@include oTableVerticalBorders;
-	}
-	.#{$classname}--responsive-flat {
-		@include oTableResponsiveFlat;
-	}
-	.#{$classname}--responsive-scroll {
-		@include oTableResponsiveScroll;
-	}
-
-	@if _oTableSupports('row-headings') {
-		.#{$classname}--row-headings {
-			@include oTableRowHeadings;
-		}
-	}
-
+	// Compact.
 	@if _oTableSupports('compact') {
-		.#{$classname}--compact {
-			@include oTableCompact;
-		}
+		@include oTableCompact;
 	}
 
+	// Stripes.
 	@if _oTableSupports('stripe') {
-		.#{$classname}--row-stripes {
-			@include oTableRowStripes;
-		}
+		@include oTableRowStripes;
+	}
+
+	// Row headings.
+	@if _oTableSupports('row-headings') {
+		@include oTableRowHeadings;
 	}
 }

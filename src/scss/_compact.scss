@@ -1,15 +1,10 @@
-////
-/// @group o-table
-/// @link http://registry.origami.ft.com/components/o-table
-////
-
 /// Make a table 'compact'
 @mixin oTableCompact {
-
-	th,
-	td {
-		@include oTypographySize(0);
-		padding: 4px 10px;
+	.o-table--compact {
+		th,
+		td {
+			@include oTypographySize(0);
+			padding: 4px 10px;
+		}
 	}
-
 }

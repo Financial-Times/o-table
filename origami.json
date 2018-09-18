@@ -110,6 +110,25 @@
 			"description": "Open demo and shrink browser to preview. Each entry in the flat table is shown individually with headers on small viewports. This demo includes the optional row stripes from the previous demo."
 		},
 		{
+			"title": "Expanding Table",
+			"name": "expanding",
+			"template": "demos/src/expanding.mustache",
+			"data": {
+				"expanded": "false"
+			},
+			"description": "Open demo and shrink browser to preview. Responsive Overflow tables may be configured to expand/contract."
+		},
+		{
+			"title": "Expanding Table With Arrow Dock",
+			"name": "expanding-dock",
+			"template": "demos/src/expanding.mustache",
+			"data": {
+				"expanded": "true"
+			},
+			"documentClasses": "o-table-demo-pad",
+			"description": "Open demo and shrink browser to preview. When expanding Responsive Overflow tables are tall and can be scrolled past, the left/right arrows \"dock\" next to the \"show more\" expand button."
+		},
+		{
 			"title": "Sorting",
 			"name": "sorting",
 			"template": "demos/src/sorting.mustache",

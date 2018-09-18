@@ -322,7 +322,7 @@ class OverflowTable extends BaseTable {
 		window.requestAnimationFrame(function () {
 			this._updateFadeOverlay(this.controls.fadeOverlay);
 			if (OverflowTable._supportsArrows()) {
-				this._toggleArrowDock(this.container);
+				this._toggleArrowDock(this.controls.controlsOverlay);
 				this._updateScrollControl(this.controls.forwardButton, 'forward');
 				this._updateScrollControl(this.controls.backButton, 'back');
 			}
@@ -331,11 +331,11 @@ class OverflowTable extends BaseTable {
 
 	/**
 	 * Show arrow dock if the table can be expanded, has a "more/less" button, and the table can be scrolled past.
-	 * @param {HTMLElement} container - The table container.
+	 * @param {HTMLElement} controlsOverlay - The table overlay which contains controls.
 	 * @returns {undefined}
 	 */
-	_toggleArrowDock(container) {
-		container.classList.toggle('o-table-container--arrow-dock', this._showArrowDock);
+	_toggleArrowDock(controlsOverlay) {
+		controlsOverlay.classList.toggle('o-table-control-overlay--arrow-dock', this._showArrowDock);
 	}
 
 	/**
@@ -453,7 +453,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _showArrowDock() {
-		return OverflowTable._supportsArrows() && this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0 && this._canScrollPastTable;
+		return OverflowTable._supportsArrows() && this._canScrollTable && this._tableCanExpand() && this._rowsToHide.length !== 0;
 	}
 
 	/**
@@ -461,7 +461,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _showStickyArrows() {
-		return OverflowTable._supportsArrows() && (this._canScrollPastTable || this._tableTallerThanViewport);
+		return OverflowTable._supportsArrows() && this._canScrollPastTable && this._tableTallerThanViewport;
 	}
 
 	/**

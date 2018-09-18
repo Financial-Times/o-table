@@ -1,246 +1,58 @@
-////
-/// @group o-table
-/// @link http://registry.origami.ft.com/components/o-table
-////
-
-/// Base tables styles - add to <table>
+/// Base tables styles and simple utility classes.
 @mixin oTableBase() {
-	@include oTypographyBody;
-	border-collapse: collapse;
-	border-spacing: 0;
-	margin: 0;
-	width: 100%;
-
-	caption {
+	.o-table {
+		@include oTypographyBody;
+		border-collapse: collapse;
+		border-spacing: 0;
 		margin: 0;
-		padding: 0;
 		width: 100%;
-	}
 
-	th {
-		@include oTypographySansBold(1);
-		color: _oTableGet('table-header-color');
-		background-color: _oTableGet('header-background');
-	}
-
-	th:not([data-o-table-heading-disable-sort]) {
-		button {
-			// sass-lint:disable no-vendor-prefixes
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
-			-moz-appearance: none;
-			-webkit-appearance: none;
-			// sass-lint:enable no-vendor-prefixes
-			background: none;
-			color: inherit;
-			border: 0;
-			padding: 0;
-			font: inherit;
-			cursor: pointer;
-			user-select: none;
-			padding-right: 20px;
-			min-width: 60px;
+		th,
+		td {
+			padding: 10px;
 			text-align: left;
-			&:after {
-				@include oIconsGetIcon('arrows-up-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
+			vertical-align: top;
+		}
+
+		th {
+			@include oTypographySansBold(1);
+			color: _oTableGet('table-header-color');
+			background-color: _oTableGet('header-background');
+			&:not([scope=row]) {
+				vertical-align: bottom;
+			}
+		}
+
+		td {
+			@include oTypographySans(1);
+			color: _oTableGet('table-data-color');
+			scroll-snap-align: none center;
+			&:empty:before {
+				@include oIconsGetIcon('minus', $container-width: 15,  $container-height: 15, $iconset-version: 1);
 				content: '';
-				margin-right: -20px;
 				vertical-align: middle;
 			}
 		}
-		// Show descending icon with DSC sort applied.
-		&[aria-sort].o-table-sorting-descending button,
-		&[aria-sort='descending'] button {
-			&:after {
-				@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
-				vertical-align: middle;
-			}
-		}
-		// Show ascending icon with ascending sort applied or on hover with no sort.
-		&[aria-sort].o-table-sorting-ascending button,
-		&[aria-sort='none'] button:hover,
-		&:not([aria-sort]) button:hover,
-		&[aria-sort='ascending'] button {
-			&:after {
-				@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
-				vertical-align: middle;
-			}
-		}
-	}
 
-	td {
-		@include oTypographySans(1);
-		color: _oTableGet('table-data-color');
-		scroll-snap-align: none center;
-		&:empty:before {
-			@include oIconsGetIcon('minus', $container-width: 15,  $container-height: 15, $iconset-version: 1);
-			content: '';
-			vertical-align: middle;
-		}
-	}
-
-	th,
-	td {
-		padding: 10px;
-		text-align: left;
-		vertical-align: top;
-	}
-
-	th:not([scope=row]) {
-		vertical-align: bottom;
-	}
-}
-
-/// Add to table's wrapper element (if there is one)
-@mixin oTableWrapper {
-	overflow-y: hidden;
-	overflow-x: auto;
-	width: 100%;
-	scroll-snap-type: x proximity;
-}
-
-@mixin oTableContainer {
-	position: relative;
-	margin-bottom: 20px;
-
-	#{&}--contracted,
-	#{&}--expanded, {
-		padding-bottom: 40px;
-	}
-}
-
-@mixin oTableControlsOverflow {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	pointer-events: none;
-
-	.o-table-control {
-		display: inline-block;
-		background: _oTableGet('table-background');
-		pointer-events: all;
-		transition: 1s opacity ease-in-out;
-		button {
-			@include oButtons($size: 'big', $theme: 'primary');
-		}
-	}
-
-	.o-table-control--more {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		text-align: center;
-		button {
+		.o-table__caption {
+			text-align: left;
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0 10px;
 			width: 100%;
 		}
-	}
 
-	.o-table-control--forward,
-	.o-table-control--back {
-		@supports (pointer-events: none)  {
-			position: absolute;
-			top: calc(50% - 20px);
-			transition: opacity 0.3s $o-visual-effects-transition-fade;
-		}
-		z-index: 1;
-	}
-
-	.o-table-control--back {
-		left: 0; //absolute
-		float: left; //sticky
-		margin: 0 10px;
-		button {
-			@include oButtonsIconButton(
-				$icon-name: 'arrow-left',
-				$size: 'big',
-				$theme: 'primary',
-				$is-icon-only: true
-			);
-		}
-	}
-
-	.o-table-control--forward {
-		right: 0; //absolute
-		float: right; //sticky
-		margin: 0 10px;
-		button {
-			@include oButtonsIconButton(
-				$icon-name: 'arrow-right',
-				$size: 'big',
-				$theme: 'primary',
-				$is-icon-only: true
-			);
-		}
-	}
-
-	.o-table-control--hide {
-		opacity: 0;
-	}
-
-	.o-table-control--sticky {
-		@supports (pointer-events: none) {
-			position: sticky;
-		}
-	}
-
-	.o-table-control--dock {
-		top: auto;
-		bottom: 0;
-	}
-
-	@at-root .o-table-container--arrow-dock & {
-		&:after,
-		&:before {
-			position: absolute;
-			content: '';
-			bottom: 0;
-			height: 40px;
-			pointer-events: none;
-			border-color: oButtonsGetColor('default', 'background', $theme: 'primary');
-			border-style: solid;
-			width: 1px;
+		.o-table__cell--numeric {
+			text-align: right;
 		}
 
-		&:before {
-			left: 0;
-			border-width: 0 40px 0 9px;
+		.o-table__cell--content-secondary {
+			@include oTypographySans(0);
+			font-weight: normal;
 		}
 
-		&:after {
-			right: 0;
-			border-width: 0 9px 0 40px;
+		.o-table__cell--vertically-center {
+			vertical-align: middle;
 		}
-
-		.o-table-control--more {
-			left: 51px;
-			right: 51px;
-		}
-	}
-}
-
-@mixin oTableFadeOverlay {
-	@supports (pointer-events: none) {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		pointer-events: none;
-		background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-start)),
-		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
-	}
-
-	@at-root .o-table-container--contracted &:after {
-		content: '';
-		position: absolute;
-		height: 80px;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background: linear-gradient(to top, _oTableGet('table-background') 30px, rgba(_oTableGet('table-background'), 0) 80px);
-		pointer-events: none;
 	}
 }

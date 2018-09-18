@@ -74,6 +74,7 @@ class BaseTable {
 			sortButton.textContent = heading;
 			// In VoiceOver, button `aria-label` is repeated when moving from one column of tds to the next.
 			// Using `title` avoids this, but risks not being announced by other screen readers.
+			sortButton.classList.add('o-table__sort');
 			sortButton.setAttribute('title', `sort table by ${heading}`);
 			th.innerHTML = '';
 			th.appendChild(sortButton);

@@ -449,6 +449,7 @@ Known issues:
 - "sorting" event is no longer fired from "th"
 - Removed deprecated color usecases.
 - `o-table__caption--top`/`oTableCaptionTop` and `o-table__caption--bottom`/`oTableCaptionBottom` have been removed. Use `o-table__caption` /`oTableCaption` with a nested header.
+- Consolidated mixins. Utilities including `oTableCellNumeric`, `oTableCellContentSecondary`, `oTableCellVerticallyCenter`, `oTableCaption` have been removed. There styles are now included as part of `oTableBase`
 
 ### How to upgrade from v4.x.x to v5.x.x?
 

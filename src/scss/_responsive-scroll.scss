@@ -1,32 +1,28 @@
-////
-/// @group o-table
-/// @link http://registry.origami.ft.com/components/o-table
-////
-
 /// Make a table 'ResponsiveScroll'
-
 @mixin oTableResponsiveScroll {
-	.o-table__duplicate-row {
-		display: none;
-	}
-
-	@include oGridRespondTo($until: S) {
-		tr:not(.o-table__duplicate-row) {
+	.o-table--responsive-scroll {
+		.o-table__duplicate-row {
 			display: none;
 		}
 
-		.o-table__duplicate-row {
-			display: table-row;
-		}
+		@include oGridRespondTo($until: S) {
+			tr:not(.o-table__duplicate-row) {
+				display: none;
+			}
 
-		th {
-			position: sticky;
-			left: 0;
-			background-color: _oTableGet('table-background');
-		}
+			.o-table__duplicate-row {
+				display: table-row;
+			}
 
-		.o-table__cell--numeric {
-			text-align: left;
+			th {
+				position: sticky;
+				left: 0;
+				background-color: _oTableGet('table-background');
+			}
+
+			.o-table__cell--numeric {
+				text-align: left;
+			}
 		}
 	}
 }
