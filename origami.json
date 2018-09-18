@@ -38,6 +38,7 @@
 			"title": "Basic",
 			"name": "basic",
 			"template": "demos/src/basic.mustache",
+			"documentClasses": "o-table-demo-constrain",
 			"description": ""
 		},
 		{
@@ -47,13 +48,18 @@
 			"data": {
 				"modifierClass": "o-table--compact"
 			},
+			"documentClasses": "o-table-demo-constrain",
 			"description": ""
 		},
 		{
 			"title": "Row Stripes",
 			"name": "row-stripes",
-			"template": "demos/src/row-stripes.mustache",
-			"description": ""
+			"template": "demos/src/basic.mustache",
+			"data": {
+				"modifierClass": "o-table--row-stripes"
+			},
+			"documentClasses": "o-table-demo-constrain",
+			"description": "Adds a modifier class to make alternate table rows striped."
 		},
 		{
 			"title": "Row headings",
@@ -64,36 +70,44 @@
 			"description": ""
 		},
         {
-          "title": "Cell styles",
-          "name": "cell-styles",
-          "template": "demos/src/cell-styles.mustache",
-          "description": ""
+			"title": "Cell styles",
+			"name": "cell-styles",
+			"template": "demos/src/cell-styles.mustache",
+			"documentClasses": "o-table-demo-constrain",
+			"description": ""
         },
 		{
 			"title": "Responsive Overflow",
 			"name": "responsive-overflow",
-			"template": "demos/src/responsive-overflow.mustache",
+			"template": "demos/src/base.mustache",
 			"data": {
-				"modifierClass": "o-table--responsive-overflow"
+				"tableType": "overflow",
+				"modifierClass": "o-table--row-stripes"
 			},
 			"documentClasses": "o-table-demo-constrain",
-			"description": "On small viewports this table overflows and may be scrolled left/right."
+			"description": "Open demo and shrink browser to preview. On small viewports this table overflows and may be scrolled left/right. This demo includes the optional row stripes from the previous demo."
 		},
 		{
 			"title": "Responsive Scroll",
 			"name": "responsive-scroll",
-			"template": "demos/src/responsive-scroll.mustache",
+			"template": "demos/src/base.mustache",
 			"data": {
-				"modifierClass": "o-table--responsive-scroll"
+				"tableType": "scroll",
+				"modifierClass": "o-table--row-stripes"
 			},
 			"documentClasses": "o-table-demo-constrain",
-			"description": "This table moves headers into the first column on small viewports. The headers stick to the left edge as the table data is scrolled."
+			"description": "Open demo and shrink browser to preview. This table moves headers into the first column on small viewports. The headers stick to the left edge as the table data is scrolled. This demo includes the optional row stripes from the previous demo."
 		},
 		{
 			"title": "Responsive Flat",
 			"name": "responsive-flat",
-			"template": "demos/src/responsive-flat.mustache",
-			"description": "Each entry in the flat table is shown individually with headers on small viewports."
+			"template": "demos/src/base.mustache",
+			"data": {
+				"tableType": "flat",
+				"modifierClass": "o-table--row-stripes"
+			},
+			"documentClasses": "o-table-demo-constrain",
+			"description": "Open demo and shrink browser to preview. Each entry in the flat table is shown individually with headers on small viewports. This demo includes the optional row stripes from the previous demo."
 		},
 		{
 			"title": "Sorting",

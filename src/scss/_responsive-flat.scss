@@ -29,7 +29,6 @@
 		width: 50%;
 
 		@include oGridRespondTo(S) {
-			border-right: 1px solid _oTableGet('table-border-color');
 			display: table-cell;
 		}
 	} // td
@@ -39,7 +38,6 @@
 		padding: 10px;
 
 		@include oGridRespondTo(S) {
-			border-right: 1px solid _oTableGet('table-border-color');
 			display: table-cell;
 		}
 	} // thead th

@@ -13,5 +13,9 @@
 
 	tbody tr:nth-child(even) {
 		background-color: _oTableGet('table-alternate-background');
+		th {
+			// For sticky "responsive-scroll" headers.
+			background-color: _oTableGet('table-alternate-background');
+		}
 	}
 }
