@@ -7,10 +7,14 @@ class OverflowTable extends BaseTable {
 	 *
 	 * @param {HTMLElement} rootEl - The `o-table` element.
 	 * @param {TableSorter} sorter
+	 * @param {Object} opts
 	 * @returns {OverflowTable}
 	 */
-	constructor(rootEl, sorter) {
-		super(rootEl, sorter);
+	constructor(rootEl, sorter, opts = {}) {
+		super(rootEl, sorter, opts);
+		this._opts = Object.assign({
+			expanded: this.rootEl.hasAttribute('data-o-table-expanded') ? this.rootEl.getAttribute('data-o-table-expanded') !== 'false' : null
+		}, opts);
 		this._addSortButtons();
 		if (this._hasScrollWrapper()) {
 			this._setupScroll();
@@ -108,7 +112,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Bool}
 	 */
 	_tableCanExpand() {
-		return this.rootEl.hasAttribute('data-o-table-expanded') && (this._minimumRowCount < this.tableRows.length);
+		return typeof this._opts.expanded === 'boolean' && (this._minimumRowCount < this.tableRows.length);
 	}
 
 	/**
@@ -308,7 +312,7 @@ class OverflowTable extends BaseTable {
 			this._listeners.push({element: this.controls.moreButton, toggleExpanded, type: 'click'});
 		}
 
-		if (!this.isExpanded()) {
+		if (!this._opts.expanded) {
 			this.contractTable();
 		}
 	}

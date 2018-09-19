@@ -5,11 +5,13 @@ class FlatTable extends BaseTable {
 	/**
 	 * Initialises a "flat" o-table component.
 	 *
-	 * @param {HTMLElement} - o-table element
-	 * @returns {FlatTable} - A single OTable instance
+	 * @param {HTMLElement} rootEl - The `o-table` element.
+	 * @param {TableSorter} sorter
+	 * @param {Object} opts
+	 * @returns {FlatTable} - A FlatTable instance
 	 */
-	constructor(rootEl, sorter) {
-		super(rootEl, sorter);
+	constructor(rootEl, sorter, opts = {}) {
+		super(rootEl, sorter, opts);
 		// Flat table can only work given headers.
 		if (this.tableHeaders.length > 0) {
 			this._duplicateHeaders(rootEl);

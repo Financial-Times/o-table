@@ -5,10 +5,13 @@ class BaseTable {
 	 * @param {(HTMLElement|string)} [el=document.body] - o-table element, or element where to search for an o-table element to initialise. You can pass an HTMLElement or a selector string
 	 * @returns {OTable} - A single OTable instance
 	 */
-	constructor(rootEl, sorter) {
+	constructor(rootEl, sorter, opts = {}) {
 		this._listeners = [];
 		this._sorter = sorter;
 		this.rootEl = rootEl;
+		this._opts = Object.assign({
+			sortable: this.rootEl.getAttribute('data-o-table-sortable') !== 'false'
+		}, opts);
 		this.thead = this.rootEl.querySelector('thead');
 		this.tbody = this.rootEl.querySelector('tbody');
 		this.tableHeaders = this.thead ? Array.from(this.thead.querySelectorAll('th')) : [];
@@ -25,6 +28,22 @@ class BaseTable {
 	 */
 	getTableHeader(columnIndex) {
 		return this.tableHeaders[columnIndex] || null;
+	}
+
+	sortRowsByColumn(columnIndex, sortOrder) {
+		/**
+		 * Fires an "oTable.sorting" event. The sorting event can be cancelled to
+		 * provide a totally custom method of sorting the table.
+		 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
+		 */
+		const defaultSort = this._dispatchEvent('sorting', {
+			sort: sortOrder,
+			columnIndex
+		}, { cancelable: true });
+
+		if (defaultSort) {
+			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder);
+		}
 	}
 
 	/**
@@ -63,6 +82,9 @@ class BaseTable {
 	}
 
 	_addSortButtons() {
+		if(!this._opts.sortable) {
+			return;
+		}
 		this.tableHeaders.forEach(function (th, columnIndex) {
 			// Don't add sort buttons to unsortable columns.
 			if (th.hasAttribute('data-o-table-heading-disable-sort')) {
@@ -87,22 +109,6 @@ class BaseTable {
 				type: 'click'
 			});
 		}.bind(this));
-	}
-
-	sortRowsByColumn(columnIndex, sortOrder) {
-		/**
-		 * Fires an "oTable.sorting" event. The sorting event can be cancelled to
-		 * provide a totally custom method of sorting the table.
-		 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
-		 */
-		const defaultSort = this._dispatchEvent('sorting', {
-			sort: sortOrder,
-			columnIndex
-		}, { cancelable: true });
-
-		if (defaultSort) {
-			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder);
-		}
 	}
 
 	_toggleColumnSort(th, columnIndex) {

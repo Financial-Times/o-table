@@ -11,9 +11,10 @@ class OTable {
 	 * Initialises o-table component(s).
 	 *
 	 * @param {HTMLElement} - o-table element
+	 * @param {Object} opts
 	 * @returns {FlatTable | ScrollTable | OverflowTable} - A BaseTable instance
 	 */
-	constructor(rootEl) {
+	constructor(rootEl, opts = {}) {
 		const tableType = rootEl.getAttribute('data-o-table-responsive');
 		let Table;
 		switch (tableType) {
@@ -27,7 +28,7 @@ class OTable {
 				Table = OverflowTable;
 				break;
 		}
-		return new Table(rootEl, sorter);
+		return new Table(rootEl, sorter, opts);
 	}
 
 	/**
@@ -35,18 +36,19 @@ class OTable {
 	 *
 	 * @access public
 	 * @param {(HTMLElement|string)} [el=document.body] - Element where to search for o-table components. You can pass an HTMLElement or a selector string
+	 * @param {Object} opts
 	 * @returns {Array|OverflowTable|OTable|FlatTable} - An array of OTable instances or a single OTable instance
 	 */
-	static init(el = document.body) {
+	static init(el = document.body, opts = {}) {
 		if (!(el instanceof HTMLElement)) {
 			el = document.querySelector(el);
 		}
 		if (/\bo-table\b/.test(el.getAttribute('data-o-component'))) {
-			return new OTable(el);
+			return new OTable(el, opts);
 		}
 		const tableEls = Array.from(el.querySelectorAll('[data-o-component~="o-table"]'));
 		return tableEls.map(el => {
-			return new OTable(el);
+			return new OTable(el, opts);
 		});
 	}
 

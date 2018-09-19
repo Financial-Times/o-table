@@ -5,11 +5,13 @@ class ScrollTable extends BaseTable {
 	/**
 	 * Initialises a "scroll" o-table component.
 	 *
-	 * @param {HTMLElement} - o-table element
-	 * @returns {ScrollTable} - A single OTable instance
+	 * @param {HTMLElement} rootEl - The `o-table` element.
+	 * @param {TableSorter} sorter
+	 * @param {Object} opts
+	 * @returns {ScrollTable}
 	 */
-	constructor(rootEl, sorter) {
-		super(rootEl, sorter);
+	constructor(rootEl, sorter, opts = {}) {
+		super(rootEl, sorter, opts);
 		this._duplicateRowsWithAddedHeader();
 		this._addSortButtons();
 		this._ready();

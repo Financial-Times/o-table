@@ -27,8 +27,8 @@
 	}
 
 	// Show descending icon in sort button with DSC sort applied.
-	th[aria-sort].o-table-sorting-descending .o-table__sort,
-	th[aria-sort='descending'] .o-table__sort {
+	[aria-sort].o-table-sorting-descending .o-table__sort,
+	[aria-sort='descending'] .o-table__sort {
 		&:after {
 			@include oIconsGetIcon('arrow-down', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 			vertical-align: middle;
@@ -36,10 +36,10 @@
 	}
 
 	// Show ascending icon in sort button with ascending sort applied or on hover with no sort.
-	th[aria-sort].o-table-sorting-ascending .o-table__sort,
-	th[aria-sort='none'] .o-table__sort:hover,
-	th:not([aria-sort]) .o-table__sort:hover,
-	th[aria-sort='ascending'] .o-table__sort {
+	[aria-sort].o-table-sorting-ascending .o-table__sort,
+	[aria-sort='none'] .o-table__sort:hover,
+	:not([aria-sort]) .o-table__sort:hover,
+	[aria-sort='ascending'] .o-table__sort {
 		&:after {
 			@include oIconsGetIcon('arrow-up', $container-width: 20,  $container-height: 20, $iconset-version: 1);
 			vertical-align: middle;
