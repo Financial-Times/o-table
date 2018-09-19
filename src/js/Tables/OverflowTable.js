@@ -14,7 +14,7 @@ class OverflowTable extends BaseTable {
 		super(rootEl, sorter, opts);
 		this._opts = Object.assign({
 			expanded: this.rootEl.hasAttribute('data-o-table-expanded') ? this.rootEl.getAttribute('data-o-table-expanded') !== 'false' : null
-		}, opts);
+		}, this._opts);
 		this._addSortButtons();
 		if (this._hasScrollWrapper()) {
 			this._setupScroll();
