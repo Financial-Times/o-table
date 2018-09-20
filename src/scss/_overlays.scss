@@ -130,9 +130,12 @@
 			bottom: 0;
 			left: 0;
 			pointer-events: none;
-			background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-start)),
-			linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
 		}
+	}
+
+	.o-table-fade-overlay--scroll {
+		background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-start)),
+		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
 	}
 
 	// Show a bottom fade when the table is contracted.
