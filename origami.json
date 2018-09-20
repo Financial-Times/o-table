@@ -21,7 +21,8 @@
 		"required": [
 			"Element.prototype.matches",
 			"IntersectionObserver",
-			"IntersectionObserverEntry"
+			"IntersectionObserverEntry",
+			"Array.prototype.findIndex"
 		]
 	},
 	"demosDefaults": {
