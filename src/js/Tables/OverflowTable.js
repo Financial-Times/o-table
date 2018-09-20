@@ -13,8 +13,10 @@ class OverflowTable extends BaseTable {
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
 		this._opts = Object.assign({
-			expanded: this.rootEl.hasAttribute('data-o-table-expanded') ? this.rootEl.getAttribute('data-o-table-expanded') !== 'false' : null
+			expanded: this.rootEl.hasAttribute('data-o-table-expanded') ? this.rootEl.getAttribute('data-o-table-expanded') !== 'false' : null,
+			minimumRowCount: this.rootEl.getAttribute('data-o-table-minimum-row-count')
 		}, this._opts);
+		console.log(this._opts);
 		this._addSortButtons();
 		if (this._hasScrollWrapper()) {
 			this._setupScroll();
@@ -398,7 +400,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Number}
 	 */
 	get _minimumRowCount() {
-		const minimumRowCount = this.rootEl.getAttribute('data-o-table-minimum-row-count');
+		const minimumRowCount = this._opts.minimumRowCount;
 		return isNaN(parseInt(minimumRowCount, 10)) ? 20 : parseInt(minimumRowCount, 10);
 	}
 
