@@ -157,13 +157,13 @@ class OverflowTable extends BaseTable {
 				<div class="o-table-control-overlay" style="display: none;">
 					${this.wrapper && supportsArrows ? `
 						<div class="o-table-control o-table-control--back o-table-control--hide">
-							<button disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
+							<button aria-label="visually scroll table back" disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
 						</div>
 					` : ''}
 
 					${this.wrapper && supportsArrows ? `
 						<div class="o-table-control o-table-control--forward o-table-control--hide">
-							<button disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
+							<button aria-label="visually scroll table forward" disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
 						</div>
 					` : ''}
 
