@@ -24,7 +24,10 @@ function canScrollTable() {
 
 function scrollTable(oTableEl, { toEnd }) {
 	const wrapper = oTableEl.closest('.o-table-wrapper');
-	wrapper.scrollLeft = toEnd ? oTableEl.getBoundingClientRect().width : 0;
+	const scrollTo = toEnd ? oTableEl.getBoundingClientRect().width : 0;
+	setTimeout(() => {
+		wrapper.scrollLeft = scrollTo;
+	}, 50);
 }
 
 function canScrollPastTable() {
@@ -96,12 +99,16 @@ describe("OverflowTable", () => {
 
 	describe("expandable feature", () => {
 
-		it("errors if there is not a container element and expander enabled", () => {
+		it("errors if there is not a container element and expander enabled", (done) => {
 			oTableEl = noTableWrapperOrContainer(oTableEl);
 			expandable(oTableEl, { expanded: false });
-			proclaim.throws(() => {
-				new OverflowTable(oTableEl, sorter);
-			}, /container/, 'Expected an error when a table is configured to be expandable but has no container element.');
+			window.onerror = function (message, file, line, col, error) {
+				proclaim.include(error.message, 'container', 'Expected an error when a table is configured to be expandable but has no container element.');
+				window.onerror = null;
+				done();
+				return true;
+			};
+			new OverflowTable(oTableEl, sorter);
 		});
 
 		it("is not enabled by default", () => {
@@ -137,8 +144,8 @@ describe("OverflowTable", () => {
 				setTimeout(() => {
 					assertExpanded(table, { expanded: true });
 					done();
-				}, 100);
-			}, 100);
+				}, 500);
+			}, 500);
 		});
 
 		it("can configure the number of rows to contract to", (done) => {

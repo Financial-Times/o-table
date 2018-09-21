@@ -22,9 +22,12 @@ describe('oTable sorting', () => {
 	};
 
 	const click = element => {
-		const click = document.createEvent('MouseEvent');
-		click.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-		oTableEl.querySelector(element).dispatchEvent(click);
+		// Timeout allows for dom to update (window.requestAnimationFrame)
+		setTimeout(() => {
+			const click = document.createEvent('MouseEvent');
+			click.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			oTableEl.querySelector(element).dispatchEvent(click);
+		}, 50);
 	};
 
 	beforeEach(() => {
@@ -127,7 +130,7 @@ describe('oTable sorting', () => {
 				});
 			});
 			click('thead th button');
-		}, 50);
+		}, 100);
 	});
 
 	it('sorts strings alphabetically', done => {

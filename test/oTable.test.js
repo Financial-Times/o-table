@@ -4,6 +4,7 @@ import proclaim from 'proclaim';
 import sinon from 'sinon/pkg/sinon';
 
 import * as sandbox from './helpers/sandbox';
+import * as fixtures from './helpers/fixtures';
 import OTable from './../main';
 import BaseTable from './../src/js/Tables/BaseTable';
 import OverflowTable from './../src/js/Tables/OverflowTable';
@@ -23,24 +24,7 @@ describe('An oTable instance', () => {
 
 	beforeEach(() => {
 		sandbox.init();
-		sandbox.setContents(`
-			<table class="o-table" data-o-component="o-table">
-				<thead>
-					<th>Cheese</th>
-				</thead>
-				<tbody>
-					<tr>
-						<td>cheddar</td>
-					</tr>
-					<tr>
-						<td>stilton</td>
-					</tr>
-					<tr>
-						<td>red leicester</td>
-					</tr>
-				</tbody>
-			</table>
-		`);
+		sandbox.setContents(fixtures.shortTableWithContainer);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 	});
 
@@ -68,15 +52,17 @@ describe('An oTable instance', () => {
 			oTableEl.setAttribute('data-o-table-responsive','flat');
 		});
 
-		it('should clone any `<th>` elements into all of the rows in the `<tbody>`', () => {
+		it('should clone any `<th>` elements into all of the rows in the `<tbody>`', (done) => {
 			testOTable = new OTable(oTableEl);
+			setTimeout(() => {
+				const allBodyTableHeads = oTableEl.querySelectorAll('tbody th');
+				proclaim.lengthEquals(allBodyTableHeads, 25);
 
-			const allBodyTableHeads = oTableEl.querySelectorAll('tbody th');
-			proclaim.lengthEquals(allBodyTableHeads, 3);
-
-			const firstRow = oTableEl.querySelectorAll('tbody tr')[0];
-			const firstRowTableHeads = firstRow.querySelectorAll('th');
-			proclaim.lengthEquals(firstRowTableHeads, 1);
+				const firstRow = oTableEl.querySelectorAll('tbody tr')[0];
+				const firstRowTableHeads = firstRow.querySelectorAll('th');
+				proclaim.lengthEquals(firstRowTableHeads, 5);
+				done();
+			}, 100);
 
 		});
 
@@ -96,56 +82,9 @@ describe('Init', () => {
 	beforeEach(() => {
 		sandbox.init();
 		sandbox.setContents(`
-			<table class="o-table" data-o-component="o-table">
-				<thead>
-					<th>Cheese</th>
-				</thead>
-				<tbody>
-					<tr>
-						<td>cheddar</td>
-					</tr>
-					<tr>
-						<td>stilton</td>
-					</tr>
-					<tr>
-						<td>red leicester</td>
-					</tr>
-				</tbody>
-			</table>
-
-			<table class="o-table" data-o-component="o-table">
-				<thead>
-					<th>Cheese</th>
-				</thead>
-				<tbody>
-					<tr>
-						<td>cheddar</td>
-					</tr>
-					<tr>
-						<td>stilton</td>
-					</tr>
-					<tr>
-						<td>red leicester</td>
-					</tr>
-				</tbody>
-			</table>
-
-			<table class="o-table" data-o-component="o-table">
-				<thead>
-					<th>Cheese</th>
-				</thead>
-				<tbody>
-					<tr>
-						<td>cheddar</td>
-					</tr>
-					<tr>
-						<td>stilton</td>
-					</tr>
-					<tr>
-						<td>red leicester</td>
-					</tr>
-				</tbody>
-			</table>
+			${fixtures.shortTableWithContainer}
+			${fixtures.shortTableWithContainer}
+			${fixtures.shortTableWithContainer}
 		`);
 	});
 
@@ -153,10 +92,13 @@ describe('Init', () => {
 		sandbox.reset();
 	});
 
-	it('instantiates every o-table piece of markup within the element given', () => {
+	it('instantiates every o-table piece of markup within the element given', (done) => {
 		const oTables = OTable.init();
-		const tables = oTables.map(oTable => oTable.rootEl);
-		proclaim.equal(tables.length, 3);
+		setTimeout(() => {
+			const tables = oTables.map(oTable => oTable.rootEl);
+			proclaim.equal(tables.length, 3);
+			done();
+		}, 100);
 	});
 });
 
@@ -193,32 +135,34 @@ describe('Destroying an oTable instance', () => {
 		oTableEl = undefined;
 	});
 
-	it('when destroyed, removes all event listeners which were added by the component', () => {
+	it('when destroyed, removes all event listeners which were added by the component', (done) => {
 		const realAddEventListener = Element.prototype.addEventListener;
 		const addEventListenerSpy = sinon.spy();
 		Element.prototype.addEventListener = addEventListenerSpy;
-
-		testOTable = new OTable(oTableEl);
-
-		const columnHeadButton = document.querySelector('th button');
-		proclaim.isTrue(addEventListenerSpy.calledOn(columnHeadButton));
-		proclaim.isTrue(addEventListenerSpy.calledOnce);
-
-		const columnHeadButtonEventAndHandler = addEventListenerSpy.args[0];
 
 		const realRemoveEventListener = Element.prototype.removeEventListener;
 		const removeEventListenerSpy = sinon.spy();
 		Element.prototype.removeEventListener = removeEventListenerSpy;
 
-		testOTable.destroy();
-
-		proclaim.isTrue(removeEventListenerSpy.calledOn(columnHeadButton));
-		proclaim.isTrue(removeEventListenerSpy.calledOnce);
-
-		proclaim.isTrue(removeEventListenerSpy.calledWith(...columnHeadButtonEventAndHandler));
-
-		Element.prototype.addEventListener = realAddEventListener;
-		Element.prototype.removeEventListener = realRemoveEventListener;
+		testOTable = new OTable(oTableEl);
+		setTimeout(() => {
+			testOTable.destroy();
+			const columnHeadButtonEventAndHandler = addEventListenerSpy.args[0];
+			const columnHeadButton = document.querySelector('th button');
+			let error;
+			try	{
+				proclaim.isTrue(addEventListenerSpy.called);
+				proclaim.isTrue(removeEventListenerSpy.calledOn(columnHeadButton), 'Remove event listener was not called on the column sort button.');
+				proclaim.isTrue(removeEventListenerSpy.called, 'Remove event listener was not called on the column sort button.');
+				proclaim.isTrue(removeEventListenerSpy.calledWith(...columnHeadButtonEventAndHandler), 'Remove event listener was not called with the event handler.');
+			} catch(err) {
+				error = err;
+			} finally {
+				Element.prototype.addEventListener = realAddEventListener;
+				Element.prototype.removeEventListener = realRemoveEventListener;
+				done(error);
+			}
+		}, 100);
 	});
 
 	it('when destroyed, removes the rootEl property from the object', () => {

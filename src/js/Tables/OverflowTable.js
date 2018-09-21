@@ -16,14 +16,9 @@ class OverflowTable extends BaseTable {
 			expanded: this.rootEl.hasAttribute('data-o-table-expanded') ? this.rootEl.getAttribute('data-o-table-expanded') !== 'false' : null,
 			minimumRowCount: this.rootEl.getAttribute('data-o-table-minimum-row-count')
 		}, this._opts);
-		console.log(this._opts);
-		this._addSortButtons();
-		if (this._hasScrollWrapper()) {
-			this._setupScroll();
-		}
-		if (this.canExpand()) {
-			this._setupExpander();
-		}
+		window.requestAnimationFrame(this._addSortButtons.bind(this));
+		window.requestAnimationFrame(this._setupScroll.bind(this));
+		window.requestAnimationFrame(this._setupExpander.bind(this));
 		this._ready();
 		return this;
 	}
@@ -51,6 +46,11 @@ class OverflowTable extends BaseTable {
 	 */
 	contractTable() {
 		if (!this.canExpand()) {
+			return;
+		}
+		// Expander not setup until next frame. Update options.
+		if (!this.controls) {
+			this._opts.expanded = false;
 			return;
 		}
 		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
@@ -92,6 +92,11 @@ class OverflowTable extends BaseTable {
 		if (!this.canExpand()) {
 			return;
 		}
+		// Expander not setup until next frame. Update options.
+		if (!this.controls) {
+			this._opts.expanded = true;
+			return;
+		}
 		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
 		window.requestAnimationFrame(() => {
 			this.container.classList.remove('o-table-container--contracted');
@@ -124,16 +129,6 @@ class OverflowTable extends BaseTable {
 	}
 
 	/**
-	 * Check if the table has the wrapper element.
-	 * Is there is no wrapper assume the user intentionally omitted it,
-	 * as they do not want a scrolling table.
-	 * @returns {Bool}
-	 */
-	_hasScrollWrapper() {
-		return Boolean(this.wrapper);
-	}
-
-	/**
 	 * Update row aria attributes to show/hide them.
 	 * E.g. After performing a sort, rows which where hidden in the colapsed table may have become visible.
 	 * @param {boolean} expanded - Update row visibility for an expanded or contracted table.
@@ -154,21 +149,21 @@ class OverflowTable extends BaseTable {
 	 */
 	_addControlsToDom() {
 		if (this.container && !this.controls) {
-
+			const supportsArrows = OverflowTable._supportsArrows();
 			this.container.insertAdjacentHTML('beforeend', `
-				${this._hasScrollWrapper() ? `
+				${this.wrapper ? `
 					<div class="o-table-fade-overlay" style="display: none;"></div>
 				` : ''}
 				<div class="o-table-control-overlay" style="display: none;">
-					${this._hasScrollWrapper() && OverflowTable._supportsArrows() ? `
-						<div class="o-table-control o-table-control--back">
-							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
+					${this.wrapper && supportsArrows ? `
+						<div class="o-table-control o-table-control--back o-table-control--hide">
+							<button disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
 						</div>
 					` : ''}
 
-					${this._hasScrollWrapper() && OverflowTable._supportsArrows() ? `
-						<div class="o-table-control o-table-control--forward">
-							<button class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
+					${this.wrapper && supportsArrows ? `
+						<div class="o-table-control o-table-control--forward o-table-control--hide">
+							<button disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-right"></button>
 						</div>
 					` : ''}
 
@@ -197,13 +192,16 @@ class OverflowTable extends BaseTable {
 	 */
 	_setupScroll() {
 		// Can not add controls without a container.
-		// Does not add automatically for performace, but could.
-		if (!this.container || !this.wrapper) {
+		if (this.container && !this.wrapper) {
 			console.warn(
-				'Controls to scroll table left/right could not be added to "o-table" as it is missing markup.' +
+				'Controls to scroll table left/right could not be added to "o-table" as it is missing markup. ' +
 				'Please add the container and wrapper elements according to the documentation https://registry.origami.ft.com/components/o-table.',
 				{ table: this.rootEl }
 			);
+		}
+
+		// Does not warn of a missing wrapper: assumes no overflow is desired.
+		if (!this.container || !this.wrapper) {
 			return;
 		}
 
@@ -287,6 +285,10 @@ class OverflowTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	_setupExpander() {
+		if (!this.canExpand()) {
+			return;
+		}
+
 		if (!this.container || !this.wrapper) {
 			throw new Error(
 				'Controls to expand/contract the table could not be added to "o-table" as it is missing markup.' +
