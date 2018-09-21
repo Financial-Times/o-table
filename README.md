@@ -450,7 +450,7 @@ Known issues:
 	- Table properties removed or made private: `isResponsive`, `listeners`.
 	- Table methods removed or made private:
 		- `wrap`: for a responsive table manually wrap the table in a container and wrapper class (as above).
-		- `sortRowsByColumn`: arguments are simplified (as above).
+		- `sortRowsByColumn`: arguments are simplified `sortRowsByColumn(columnIndex, sortOrder)` over `sortRowsByColumn(index, sortAscending, isNumericValue, type)`, where `columnIndex` replaces `index` and `sortOrder` is "ascending" or "descending".
 		- `removeEventListeners`
 		- `dispatch`
 - Events:
