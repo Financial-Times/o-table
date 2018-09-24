@@ -18,7 +18,7 @@ $o-table-is-silent: true !default;
 @import "src/scss/container";
 @import "src/scss/lines";
 @import "src/scss/mixins";
-@import "src/scss/overlays";
+@import "src/scss/responsive-overflow";
 @import "src/scss/responsive-flat";
 @import "src/scss/responsive-scroll";
 @import "src/scss/row-headings";

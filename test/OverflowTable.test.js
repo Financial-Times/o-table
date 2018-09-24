@@ -288,8 +288,8 @@ describe("OverflowTable", () => {
 
 	describe("control dock", () => {
 		function assertDock(hasDock) {
-			const controlOverlay = document.querySelector('.o-table-control-overlay');
-			proclaim.equal(controlOverlay.classList.contains('o-table-control-overlay--arrow-dock'), hasDock, `Table control overlay does ${hasDock ? 'not have a control dock' : 'has a control dock'}.`);
+			const controlOverlay = document.querySelector('.o-table-overflow-control-overlay');
+			proclaim.equal(controlOverlay.classList.contains('o-table-overflow-control-overlay--arrow-dock'), hasDock, `Table control overlay does ${hasDock ? 'not have a control dock' : 'has a control dock'}.`);
 		}
 		it("is added given the table is scrollable, expandable, and can be scrolled past", (done) => {
 			canScrollTable();

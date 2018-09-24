@@ -153,8 +153,7 @@ Optional:
 // Respnsive solutions.
 @include oTableWrapper;
 @include oTableContainer;
-@include oTableControlsOverlay;
-@include oTableFadeOverlay;
+@include oTableResponsiveOverflow;
 @include oTableResponsiveFlat;
 @include oTableResponsiveScroll;
 

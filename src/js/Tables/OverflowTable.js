@@ -161,9 +161,9 @@ class OverflowTable extends BaseTable {
 			const supportsArrows = OverflowTable._supportsArrows();
 			this.container.insertAdjacentHTML('beforeend', `
 				${this.wrapper ? `
-					<div class="o-table-fade-overlay" style="display: none;"></div>
+					<div class="o-table-overflow-fade-overlay" style="display: none;"></div>
 				` : ''}
-				<div class="o-table-control-overlay" style="display: none;">
+				<div class="o-table-overflow-control-overlay" style="display: none;">
 					${this.wrapper && supportsArrows ? `
 						<div class="o-table-control o-table-control--back o-table-control--hide">
 							<button aria-label="visually scroll table back" disabled="true" class="o-buttons o-buttons--primary o-buttons--big o-buttons-icon o-buttons-icon--icon-only o-buttons-icon--arrow-left"></button>
@@ -185,8 +185,8 @@ class OverflowTable extends BaseTable {
 			`);
 
 			this.controls = {
-				controlsOverlay: this.container.querySelector('.o-table-control-overlay'),
-				fadeOverlay: this.container.querySelector('.o-table-fade-overlay'),
+				controlsOverlay: this.container.querySelector('.o-table-overflow-control-overlay'),
+				fadeOverlay: this.container.querySelector('.o-table-overflow-fade-overlay'),
 				moreButton: this.container.querySelector('.o-table-control--more'),
 				forwardButton: this.container.querySelector('.o-table-control--forward'),
 				backButton: this.container.querySelector('.o-table-control--back')
@@ -348,12 +348,12 @@ class OverflowTable extends BaseTable {
 			this._controlUpdateScheduled = true;
 			setTimeout(function () {
 				// Toggle fade.
-				this.controls.fadeOverlay.classList.toggle('o-table-fade-overlay--scroll', this._canScrollTable);
+				this.controls.fadeOverlay.classList.toggle('o-table-overflow-fade-overlay--scroll', this._canScrollTable);
 				this.controls.fadeOverlay.style.setProperty('--o-table-fade-from-end', `${Math.min(this._fromEnd, 10)}px`);
 				this.controls.fadeOverlay.style.setProperty('--o-table-fade-from-start', `${Math.min(this._fromStart, 10)}px`);
 
 				// Toggle arrow dock.
-				this.controls.controlsOverlay.classList.toggle('o-table-control-overlay--arrow-dock', this._showArrowDock);
+				this.controls.controlsOverlay.classList.toggle('o-table-overflow-control-overlay--arrow-dock', this._showArrowDock);
 
 				// Update forward/back scroll controls.
 				if (OverflowTable._supportsArrows()) {
