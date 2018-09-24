@@ -422,33 +422,57 @@ Known issues:
 - Data attribute `data-o-table-order` has been removed. To specify a custom sort order on `td` cells use `data-o-table-sort-value` instead.
 - Markup updates:
 	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup is correct and includes `thead` and `tbody`.
-	- `o-table__caption--top` and `o-table__caption--bottom` have been removed. Update use of table captions as described above.
-	- Responsive tables are now wrapped in a container class and the type of responsive table should be specified (as above).
-	```diff
-	+ <div class="o-table-container">
-		<div class="o-table-wrapper">
-	-		<table data-o-component="o-table" data-o-table-responsive>
-	+ 		<table data-o-component="o-table" data-o-table-responsive="overflow">
-	-           <caption class="o-table__caption o-table__caption--bottom">
-	-               My Table Caption
-	+           <caption class="o-table__caption">
-	+               <h2>My Table Caption</h2>
-				</caption>
-				<!-- thead, tbody -->
-			</table>
-		</div>
-	+ </div>
-	```
+	- `o-table__caption--top` and `o-table__caption--bottom` have been removed. Remove these classes and add a heading within the caption (e.g. a `<h2>`) with appropriate styling.
+	- Responsive tables are now wrapped in a container class and the type of responsive table should be specified.
+```diff
++<div class="o-table-container">
+     <div class="o-table-wrapper">
+-        <table data-o-component="o-table" class="o-table--responsive-overflow">
++        <table data-o-component="o-table" class="o-table--responsive-overflow" data-o-table-responsive="overflow">
+-            <caption class="o-table__caption o-table__caption--bottom">
++            <caption class="o-table__caption">
+-                My Table Caption
++                <h2>My Table Caption</h2>
+             </caption>
+             <!-- thead, tbody -->
+        </table>
+    </div>
++</div>
+```
 - Mixin updates:
-	- `oTableAll`: does not accept a class name `$classname`. Instead use the default `o-table` class name -- please [contact us](#contact) if this is a problem for your team.
 	- `oTableCaptionTop`, `oTableCaptionBottom` have been removed. Use only `oTableCaption` instead.
 	- `oTableCellNumeric`, `oTableCellContentSecondary`, `oTableCellVerticallyCenter`, `oTableCaption` have been removed. Their styles are now included as part of `oTableBase`.
+	- `oTableAll`: does not accept a class name `$classname`. Instead use the default `o-table` class name -- please [contact us](#contact) if this is a problem for your team.
 	- All mixins now output classes directly, so must not be wrapped in an `.o-table` class manually.
+```diff
+-.o-table {
+-    @include oTableBase;
+-    @include oTableResponsiveFlat;
+-}
+-.o-table-wrapper {
+-    @include oTableWrapper;
+-}
+-.o-table-container {
+-    @include oTableContainer;
+-}
+
++ @include oTableBase;
++ @include oTableWrapper;
++ @include oTableContainer;
++ @include oTableResponsiveFlat;
+```
 - JS updates:
 	- `OTable` returns an instance of `FlatTable`, `ScrollTable`, `OverflowTable` on construction, according to the type of table. All extend from `BaseTable`.
 	- Table properties removed or made private: `isResponsive`, `listeners`.
 	- Table methods removed or made private:
-		- `wrap`: for a responsive table manually wrap the table in a container and wrapper class (as above).
+		- `wrap`: for a responsive table manually wrap the table in a container and wrapper class.
+		```html
+		<div class="o-table-container">
+			<div class="o-table-wrapper">
+				<!-- table -->
+			</div>
+		</div>
+		```
 		- `sortRowsByColumn`: arguments are simplified `sortRowsByColumn(columnIndex, sortOrder)` over `sortRowsByColumn(index, sortAscending, isNumericValue, type)`, where `columnIndex` replaces `index` and `sortOrder` is "ascending" or "descending".
 		- `removeEventListeners`
 		- `dispatch`

@@ -28,7 +28,7 @@
 			}
 		}
 
-		.o-table-control--more {
+		.o-table-control--expander {
 			position: absolute;
 			left: 0;
 			right: 0;
@@ -111,7 +111,7 @@
 		}
 
 		// Make more control leave space for arrows to dock left/right.
-		.o-table-control--more {
+		.o-table-control--expander {
 			left: 51px;
 			right: 51px;
 		}

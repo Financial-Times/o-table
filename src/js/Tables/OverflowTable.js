@@ -60,9 +60,9 @@ class OverflowTable extends BaseTable {
 			this._opts.expanded = false;
 			return;
 		}
-		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
+		const expanderButton = this.controls ? this.controls.expanderButton.querySelector('button') : null;
 		const rowsToHide = this._rowsToHide;
-		const originalButtonTopOffset = this.controls.moreButton.getBoundingClientRect().top;
+		const originalButtonTopOffset = this.controls.expanderButton.getBoundingClientRect().top;
 		// Calculate contracted table height.
 		// Extra height to tease half of the first hidden row.
 		const tableHeight = this.rootEl.getBoundingClientRect().height;
@@ -79,12 +79,12 @@ class OverflowTable extends BaseTable {
 			this.wrapper.style.height = `${contractedHeight}px`;
 			this.container.classList.remove('o-table-container--expanded');
 			this.container.classList.add('o-table-container--contracted');
-			if (moreButton) {
-				moreButton.textContent = 'Show more';
+			if (expanderButton) {
+				expanderButton.textContent = 'Show more';
 				// Keep more/fewer button in viewport when contracting table.
 				// Using `window.scroll(x-coord, y-coord)` as IE11 did not scroll
 				// correctly with `window.scroll(options)`.
-				const top = window.pageYOffset + this.controls.moreButton.getBoundingClientRect().top - originalButtonTopOffset;
+				const top = window.pageYOffset + this.controls.expanderButton.getBoundingClientRect().top - originalButtonTopOffset;
 				window.scroll(null, top);
 			}
 			this._updateControls();
@@ -105,12 +105,12 @@ class OverflowTable extends BaseTable {
 			this._opts.expanded = true;
 			return;
 		}
-		const moreButton = this.controls ? this.controls.moreButton.querySelector('button') : null;
+		const expanderButton = this.controls ? this.controls.expanderButton.querySelector('button') : null;
 		window.requestAnimationFrame(() => {
 			this.container.classList.remove('o-table-container--contracted');
 			this.container.classList.add('o-table-container--expanded');
-			if (moreButton) {
-				moreButton.textContent = 'Show fewer';
+			if (expanderButton) {
+				expanderButton.textContent = 'Show fewer';
 			}
 			this.wrapper.style.height = '';
 			this._updateRowVisibility(true);
@@ -177,7 +177,7 @@ class OverflowTable extends BaseTable {
 					` : ''}
 
 					${this.canExpand() ? `
-						<div class="o-table-control o-table-control--more">
+						<div class="o-table-control o-table-control--expander">
 							<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
 						</div>
 					` : ''}
@@ -187,7 +187,7 @@ class OverflowTable extends BaseTable {
 			this.controls = {
 				controlsOverlay: this.container.querySelector('.o-table-overflow-control-overlay'),
 				fadeOverlay: this.container.querySelector('.o-table-overflow-fade-overlay'),
-				moreButton: this.container.querySelector('.o-table-control--more'),
+				expanderButton: this.container.querySelector('.o-table-control--expander'),
 				forwardButton: this.container.querySelector('.o-table-control--forward'),
 				backButton: this.container.querySelector('.o-table-control--back')
 			};
@@ -252,11 +252,11 @@ class OverflowTable extends BaseTable {
 		}
 
 		// Set scroll position and update controls.
-		const updateScoll = function () {
+		const updateScroll = function () {
 			this._setScrollPosition();
 			this._updateControls();
 		}.bind(this);
-		updateScoll();
+		updateScroll();
 
 		// Observe controls scrolling beyond table and update.
 		if (this.controls.controlsOverlay && window.IntersectionObserver) {
@@ -264,12 +264,12 @@ class OverflowTable extends BaseTable {
 			const arrowFadeObserverConfig = {
 				root: this.controls.controlsOverlay,
 				threshold: 1.0,
-				rootMargin: `-50px 0px ${this.controls.moreButton ? '0px' : '-10px'} 0px`
+				rootMargin: `-50px 0px ${this.controls.expanderButton ? '0px' : '-10px'} 0px`
 			};
 			const arrowFadeObserver = new IntersectionObserver(function(entries) {
 				entries.forEach(function(entry) {
 					entry.target.setAttribute('data-o-table-intersection', entry.intersectionRatio !== 1);
-					updateScoll();
+					updateScroll();
 				});
 			}, arrowFadeObserverConfig);
 			if (this.controls.backButton) {
@@ -281,12 +281,12 @@ class OverflowTable extends BaseTable {
 		}
 
 		// Add other event listeners to update controls.
-		this.wrapper.addEventListener('scroll', updateScoll);
-		window.addEventListener('resize', updateScoll);
-		window.addEventListener('load', updateScoll);
-		this._listeners.push({ element: this.wrapper, updateScoll, type: 'scroll' });
-		this._listeners.push({element: window, updateScoll, type: 'resize'});
-		this._listeners.push({element: window, updateScoll, type: 'load'});
+		this.wrapper.addEventListener('scroll', updateScroll);
+		window.addEventListener('resize', updateScroll);
+		window.addEventListener('load', updateScroll);
+		this._listeners.push({ element: this.wrapper, updateScroll, type: 'scroll' });
+		this._listeners.push({element: window, updateScroll, type: 'resize'});
+		this._listeners.push({element: window, updateScroll, type: 'load'});
 	}
 
 	/**
@@ -310,7 +310,7 @@ class OverflowTable extends BaseTable {
 			this._addControlsToDom();
 		}
 
-		if (this.controls.moreButton) {
+		if (this.controls.expanderButton) {
 			const toggleExpanded = function () {
 				if (this.isExpanded()) {
 					this.contractTable();
@@ -318,8 +318,8 @@ class OverflowTable extends BaseTable {
 					this.expandTable();
 				}
 			}.bind(this);
-			this.controls.moreButton.addEventListener('click', toggleExpanded);
-			this._listeners.push({element: this.controls.moreButton, toggleExpanded, type: 'click'});
+			this.controls.expanderButton.addEventListener('click', toggleExpanded);
+			this._listeners.push({element: this.controls.expanderButton, toggleExpanded, type: 'click'});
 		}
 
 		if (this._opts.expanded){

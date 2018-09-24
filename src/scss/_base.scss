@@ -1,7 +1,6 @@
 /// Base tables styles and simple utility classes.
 @mixin oTableBase() {
 	.o-table {
-		@include oTypographyBody;
 		border-collapse: collapse;
 		border-spacing: 0;
 		margin: 0;
@@ -47,7 +46,7 @@
 		}
 
 		.o-table__cell--content-secondary {
-			@include oTypographySans(0);
+			@include oTypographySize(0);
 			font-weight: normal;
 		}
 
