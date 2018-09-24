@@ -1,13 +1,14 @@
 import BaseTable from './BaseTable';
 
 class ScrollTable extends BaseTable {
-
 	/**
-	 * Initialises a "scroll" o-table component.
+	 * Initialises an `o-table` component with "scroll" responsive behaviour.
 	 *
+	 * @access public
 	 * @param {HTMLElement} rootEl - The `o-table` element.
 	 * @param {TableSorter} sorter
-	 * @param {Object} opts
+	 * @param {Object} opts [{}]
+	 * @param {Bool} opts.sortable [true]
 	 * @returns {ScrollTable}
 	 */
 	constructor(rootEl, sorter, opts = {}) {
@@ -19,10 +20,8 @@ class ScrollTable extends BaseTable {
 	}
 
 	/**
-	 * Duplicate the table headers into each row
-	 * For use with responsive tables
-	 *
-	 * @private
+	 * Duplicate the table headers into a one tbody row.
+	 * @returns {undefined}
 	 */
 	_duplicateRowsWithAddedHeader() {
 		this.tableHeaders.forEach((header, index) => {

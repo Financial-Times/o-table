@@ -3,12 +3,14 @@ import BaseTable from './BaseTable';
 class FlatTable extends BaseTable {
 
 	/**
-	 * Initialises a "flat" o-table component.
+	 * Initialises an `o-table` component with "overflow" responsive behaviour.
 	 *
+	 * @access public
 	 * @param {HTMLElement} rootEl - The `o-table` element.
 	 * @param {TableSorter} sorter
-	 * @param {Object} opts
-	 * @returns {FlatTable} - A FlatTable instance
+	 * @param {Object} opts [{}]
+	 * @param {Bool} opts.sortable [true]
+	 * @returns {FlatTable}
 	 */
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
@@ -25,10 +27,7 @@ class FlatTable extends BaseTable {
 	}
 
 	/**
-	 * Duplicate the table headers into each row
-	 * For use with responsive tables
-	 *
-	 * @private
+	 * Duplicate table headers for each tabel row.
 	 */
 	_duplicateHeaders() {
 		this.tableRows.forEach((row) => {
