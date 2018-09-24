@@ -3,7 +3,7 @@ import BaseTable from './BaseTable';
 class FlatTable extends BaseTable {
 
 	/**
-	 * Initialises an `o-table` component with "overflow" responsive behaviour.
+	 * Initialises an `o-table` component with "flat" responsive behaviour.
 	 *
 	 * @access public
 	 * @param {HTMLElement} rootEl - The `o-table` element.

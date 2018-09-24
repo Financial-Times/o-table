@@ -1,9 +1,14 @@
 class BaseTable {
+
 	/**
-	 * Initialises o-table component(s).
+	 * The shared functionality of all `o-table` variants.
 	 *
-	 * @param {(HTMLElement|string)} [el=document.body] - o-table element, or element where to search for an o-table element to initialise. You can pass an HTMLElement or a selector string
-	 * @returns {OTable} - A single OTable instance
+	 * @access public
+	 * @param {HTMLElement} rootEl - The `o-table` element.
+	 * @param {TableSorter} sorter
+	 * @param {Object} opts [{}]
+	 * @param {Bool} opts.sortable [true]
+	 * @returns {BaseTable}
 	 */
 	constructor(rootEl, sorter, opts = {}) {
 		this._listeners = [];
@@ -23,13 +28,22 @@ class BaseTable {
 	/**
 	 * Gets a table header for a given column index.
 	 *
-	 * @public
-	 * @returns {element|null} - The header element for the requested column index.
+	 * @access public
+	 * @param {Number} columnIndex - The index of the table column to get the header for.
+	 * @returns {HTMLElement|null}
 	 */
 	getTableHeader(columnIndex) {
 		return this.tableHeaders[columnIndex] || null;
 	}
 
+	/**
+	 * Sort the table.
+	 *
+	 * @access public
+	 * @param {Number} columnIndex - The index of the table column to sort.
+	 * @param {Number} sortOrder - How to sort the column, "ascending" or "descending"
+	 * @returns {undefined}
+	 */
 	sortRowsByColumn(columnIndex, sortOrder) {
 		/**
 		 * Fires an "oTable.sorting" event. The sorting event can be cancelled to
@@ -47,11 +61,12 @@ class BaseTable {
 	}
 
 	/**
-	 * Indicates that the table has been sorted.
+	 * Indicate that the table has been sorted after intercepting the sorting event.
 	 *
-	 * @public
-	 * @param {number|null} columnIndex - The index of the currently sorted column, if any.
-	 * @param {string|null} sortOrder - The type of sort i.e. ascending or descending, if any.
+	 * @access public
+	 * @param {Object} sortDetails - Details of the current sort state.
+	 * @param {Number|Null} sortDetails.columnIndex - The index of the currently sorted column.
+	 * @param {String|Null} sortDetails.sortOrder - The type of sort, "ascending" or "descending"
 	 */
 	sorted({ columnIndex, sortOrder }) {
 		this._dispatchEvent('sorted', {
@@ -61,8 +76,9 @@ class BaseTable {
 	}
 
 	/**
-	 * Destroys the instance, removing any event listeners that were added during instatiation of the component
-	 * @returns undefined
+	 * Destroys the instance, removing any event listeners that were added during instatiation of the component.
+	 * @access public
+	 * @returns {undefined}
 	 */
 	destroy() {
 		this._listeners.forEach(({ type, listener, element }) => {
@@ -77,10 +93,18 @@ class BaseTable {
 		}
 	}
 
+	/**
+	 * Indicate that the table has been constructed successfully.
+	 * @returns {undefined}
+	 */
 	_ready() {
 		this._dispatchEvent('ready');
 	}
 
+	/**
+	 * Add sort buttons to the DOM within the table header.
+	 * @returns {undefined}
+	 */
 	_addSortButtons() {
 		if(!this._opts.sortable) {
 			return;
@@ -111,6 +135,11 @@ class BaseTable {
 		}.bind(this));
 	}
 
+	/**
+	 * @param {HTMLElement} th - The table header element for the column to sort by.
+	 * @param {Number} columnIndex - The index of the column to sort by.
+	 * @returns {undefined}
+	 */
 	_toggleColumnSort(th, columnIndex) {
 		const currentSort = th.getAttribute('aria-sort');
 		const sortOrder = [null, 'none', 'descending'].indexOf(currentSort) !== -1 ? 'ascending' : 'descending';
@@ -118,10 +147,11 @@ class BaseTable {
 	}
 
 	/**
-	 * Helper function to dispatch namespaced events, namespace defaults to oTable
-	 * @param  {String} event
-	 * @param  {Object} data={}
-	 * @param  {Object} opts={}
+	 * Helper function to dispatch namespaced events.
+	 *
+	 * @param {String} event - The event name within `oTable` e.g. "sorted".
+	 * @param {Object} data={} - Event data. `insatnce` is added automatically.
+	 * @param {Object} opts={} - [Event options]{@link https://developer.mozilla.org/en-US/docs/Web/API/Event/Event#Values} (o-table events bubble by default).
 	 */
 	_dispatchEvent(event, data = {}, opts = {}) {
 		Object.assign(data , {
