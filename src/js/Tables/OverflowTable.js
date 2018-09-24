@@ -378,7 +378,7 @@ class OverflowTable extends BaseTable {
 			element.style.display = 'none';
 		}
 		// Disable forward button if the table is scrolled to the end.
-		const scrolledToBoundary = (this._fromEnd === 0 && element === this.controls.forwardButton) || (this._fromStart === 0 && element === this.controls.backButton);
+		const scrolledToBoundary = (this._fromEnd <= 0 && element === this.controls.forwardButton) || (this._fromStart <= 0 && element === this.controls.backButton);
 		const outsideTable = element.getAttribute('data-o-table-intersection') === 'true';
 		if (outsideTable) {
 			element.querySelector('button').setAttribute('disabled', true);
@@ -420,7 +420,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	get _canScrollTable() {
-		return this._fromEnd !== 0 || this._fromStart !== 0;
+		return this._fromEnd > 0 || this._fromStart > 0;
 	}
 
 	/**
@@ -462,7 +462,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Boolean}
 	 */
 	static _supportsArrows() {
-		return typeof CSS !== 'undefined' && CSS.supports("position", "sticky");
+		return typeof CSS !== 'undefined' && (CSS.supports("position", "sticky") || CSS.supports('position', '-webkit-sticky'));
 	}
 }
 
