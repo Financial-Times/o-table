@@ -61,14 +61,19 @@ class OTable {
 		});
 	}
 
+
 	/**
-	 * Set a custom sort formatter for a given data type.
 	 * The custom formatter accepts a table cell and returns a sort value for that cell.
 	 * This could be used to define a custom sort order for an unsupported format, such as emoji's, or a new date format.
 	 *
-	 * @see {@link CellFormatter#setFormatter} for `formatFunction` details.
-	 * @param {String} type - The data type to apply the filter function to.
-	 * @example
+	 * @callback formatFunction
+	 * @param {HTMLElement} cell
+	 */
+
+	/**
+	 * Set a custom sort formatter for a given data type.
+	 *
+	 * @example <caption>Mapping table cells which contain emojis to a numerical sort value.</caption>
 	 *	const OTable = require('o-table');
 	 *	// Set a filter for custom data type "emoji-time".
 	 *	// The return value may be a string or number.
@@ -84,7 +89,8 @@ class OTable {
 	 *	});
 	 *	OTable.init();
 	 *
-	 * @param {...CellFormatter~formatFunction} formatFunction
+	 * @param {String} type - The data type to apply the filter function to.
+	 * @param {formatFunction} formatFunction
 	 * @access public
 	 */
 	static setSortFormatterForType(type, formatFunction) {
