@@ -422,7 +422,7 @@ Known issues:
 - To prevent errors in IE11, add support for `Array.prototype.findIndex`, `IntersectionObserverEntry`, and `IntersectionObserver` with the [polyfill service](https://polyfill.io/).
 - Data attribute `data-o-table-order` has been removed. To specify a custom sort order on `td` cells use `data-o-table-sort-value` instead.
 - Markup updates:
-	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup is correct an includes `thead` and `tbody`.
+	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup is correct and includes `thead` and `tbody`.
 	- `o-table__caption--top` and `o-table__caption--bottom` have been removed. Update use of table captions as described above.
 	- Responsive tables are now wrapped in a container class and the type of responsive table should be specified (as above).
 	```diff
