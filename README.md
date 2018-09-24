@@ -137,7 +137,7 @@ See more styles in the registry: [o-table demos](https://registry.origami.ft.com
 
 #### Silent mode
 
-If using `o-table` in silent mode, `@include oTableAll` includes every feature. Alternatively features may be includes granularly:
+If using `o-table` in silent mode, `@include oTableAll` includes every feature. Alternatively features may be included granularly:
 
 Required:
 ```scss
@@ -176,7 +176,7 @@ Optional:
 
 ### JavaScript
 
-Instantiate `o-table` using Bower:
+To manually instantiate `o-table`:
 
 ``` js
 const OTable = require('o-table');
@@ -190,7 +190,7 @@ oTable = new OTable(document.body);
 
 This will return an instance of `OverflowTable` (default), `FlatTable`, or `ScrollTable` depending on the value of `data-o-table-responsive`. All three table types extend `BaseTable`.
 
-Instantiation will add column sorting to all tables. It will also add scroll controls and, if configured, an [expander](#expander) to any `OverflowTable`. These can be configured with [data attributes](#disable-sort) or imperitively with an options object:
+Instantiation will add column sorting to all tables. It will also add scroll controls and, if configured, an [expander](#expander) to any `OverflowTable`. These can be configured with [data attributes](#disable-sort) or imperatively with an options object:
 
 ``` js
 const OTable = require('o-table');
@@ -422,7 +422,7 @@ Known issues:
 - To prevent errors in IE11, add support for `Array.prototype.findIndex`, `IntersectionObserverEntry`, and `IntersectionObserver` with the [polyfill service](https://polyfill.io/).
 - Data attribute `data-o-table-order` has been removed. To specify a custom sort order on `td` cells use `data-o-table-sort-value` instead.
 - Markup updates:
-	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup includes these.
+	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup is correct an includes `thead` and `tbody`.
 	- `o-table__caption--top` and `o-table__caption--bottom` have been removed. Update use of table captions as described above.
 	- Responsive tables are now wrapped in a container class and the type of responsive table should be specified (as above).
 	```diff

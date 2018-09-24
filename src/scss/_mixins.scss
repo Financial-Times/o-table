@@ -26,7 +26,7 @@
 	}
 
 	// Stripes.
-	@if _oTableSupports('stripe') {
+	@if _oTableSupports('stripes') {
 		@include oTableRowStripes;
 	}
 
