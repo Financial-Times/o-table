@@ -3,11 +3,15 @@ import BaseTable from './BaseTable';
 class OverflowTable extends BaseTable {
 
 	/**
-	 * Initialises an `o-table` component.
+	 * Initialises an `o-table` component with "overflow" responsive behaviour.
 	 *
 	 * @param {HTMLElement} rootEl - The `o-table` element.
 	 * @param {TableSorter} sorter
-	 * @param {Object} opts
+	 * @param {Object} opts [{}]
+	 * @param {Bool} opts.sortable [true]
+	 * @param {Undefined | Bool} opts.expanded
+	 * @param {Number} opts.minimumRowCount [20]
+	 * @access public
 	 * @returns {OverflowTable}
 	 */
 	constructor(rootEl, sorter, opts = {}) {
@@ -25,6 +29,7 @@ class OverflowTable extends BaseTable {
 
 	/**
 	 * Check if the table is expanded (true) or collapsed (false).
+	 * @access public
 	 * @returns {Bool}
 	 */
 	isExpanded() {
@@ -34,6 +39,7 @@ class OverflowTable extends BaseTable {
 
 	/**
 	 * Check if the table supports the expand/contract feature.
+	 * @access public
 	 * @returns {Bool}
 	 */
 	canExpand() {
@@ -41,7 +47,8 @@ class OverflowTable extends BaseTable {
 	}
 
 	/**
-	 * Hides table rows as configured by `data-o-table-minimum-row-count` and `data-o-table-expanded`.
+	 * Hides table rows if the table can be expanded.
+	 * @access public
 	 * @returns undefined
 	 */
 	contractTable() {
@@ -85,7 +92,8 @@ class OverflowTable extends BaseTable {
 	}
 
 	/**
-	 * Shows all table rows if any have been hidden.
+	 * Expands the table, revealing hidden table rows, if it can be expanded and has been contracted.
+	 * @access public
 	 * @returns undefined
 	 */
 	expandTable() {
@@ -116,6 +124,7 @@ class OverflowTable extends BaseTable {
 	 * Performs post-sort actions such as updating row visibility and firing a `oTable.sorted` event.
 	 * Required as the sort event can be intercepted for a custom implementation.
 	 *
+	 * @access public
 	 * @param {Object} sortDetail An object containing information about the sort.
 	 * @param {Number} sortDetail.columnIndex The index of the column which has been sorted.
 	 * @param {String} sortDetail.sortAscending The order of the sort i.e. ascending or descending.
@@ -191,7 +200,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	_setupScroll() {
-		// Can not add controls without a container.
+		// Does not warn of a missing wrapper: assumes no overflow is desired.
 		if (this.container && !this.wrapper) {
 			console.warn(
 				'Controls to scroll table left/right could not be added to "o-table" as it is missing markup. ' +
@@ -200,7 +209,7 @@ class OverflowTable extends BaseTable {
 			);
 		}
 
-		// Does not warn of a missing wrapper: assumes no overflow is desired.
+		// Can not add controls without a container or wrapper.
 		if (!this.container || !this.wrapper) {
 			return;
 		}
