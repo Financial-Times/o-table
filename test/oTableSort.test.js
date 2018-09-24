@@ -78,6 +78,58 @@ describe('oTable sorting', () => {
 		click('thead th button');
 	});
 
+	it('sorts by ascending order ignoring any duplicate headings of the responsive flat table', done => {
+		sandbox.setContents(`
+			<div class="o-table-container">
+				<div class="o-table-wrapper">
+					<table class="o-table o-table--row-stripes o-table--responsive-flat" data-o-component="o-table" data-o-table-responsive="flat">
+						<thead>
+							<tr>
+								<th scope="col" role="columnheader" data-o-table-data-type="numeric">
+									Cost&nbsp;(GBP)
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>3</td>
+							</tr>
+							<tr>
+								<td>1.75</td>
+							</tr>
+							<tr>
+								<td>2</td>
+							</tr>
+							<tr>
+								<td>1.5</td>
+							</tr>
+							<tr>
+								<td>0.5</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		`);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		testOTable = new OTable(oTableEl);
+		oTableEl.addEventListener('oTable.sorted', () => {
+			const rows = oTableEl.querySelectorAll('tbody tr td');
+			try {
+				proclaim.equal(rows[0].textContent, '0.5');
+				proclaim.equal(rows[1].textContent, '1.5');
+				proclaim.equal(rows[2].textContent, '1.75');
+				proclaim.equal(rows[3].textContent, '2');
+				proclaim.equal(rows[4].textContent, '3');
+			} catch (error) {
+				done(error);
+			} finally {
+				done();
+			}
+		});
+		click('thead th button');
+	});
+
 	it('does not sort if the heading has an attribute specifying not to', done => {
 		sandbox.reset();
 		sandbox.init();

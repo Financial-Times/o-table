@@ -84,8 +84,8 @@ class TableSorter {
 		const cellFormatter = this._cellFormatter;
 		const type = tableHeaderElement.getAttribute('data-o-table-data-type') || undefined;
 		table.tableRows.sort((a, b) => {
-			let aCol = a.children[columnIndex];
-			let bCol = b.children[columnIndex];
+			let aCol = a.querySelectorAll('td,th:not(.o-table__duplicate-heading)')[columnIndex];
+			let bCol = b.querySelectorAll('td,th:not(.o-table__duplicate-heading)')[columnIndex];
 			aCol = cellFormatter.formatCell({ cell: aCol, type });
 			bCol = cellFormatter.formatCell({ cell: bCol, type });
 			if (sortOrder === 'ascending') {

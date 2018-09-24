@@ -34,6 +34,7 @@ class FlatTable extends BaseTable {
 			const data = Array.from(row.getElementsByTagName('td'));
 			data.forEach((td, dataIndex) => {
 				const clonedHeader = this.tableHeaders[dataIndex].cloneNode(true);
+				clonedHeader.classList.add('o-table__duplicate-heading');
 				td.parentNode.insertBefore(clonedHeader, td);
 			});
 		});
