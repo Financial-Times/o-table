@@ -8,31 +8,31 @@ import TableSorter from './../src/js/Sort/TableSorter';
 const sorter = new TableSorter();
 
 describe("ScrollTable", () => {
-    let oTableEl;
+	let oTableEl;
 
-    beforeEach(() => {
-        sandbox.init();
-        sandbox.setContents(fixtures.shortTableWithContainer);
-        oTableEl = document.querySelector('[data-o-component=o-table]');
-        oTableEl.classList.add('o-table--responsive-scroll');
-    });
+	beforeEach(() => {
+		sandbox.init();
+		sandbox.setContents(fixtures.shortTableWithContainer);
+		oTableEl = document.querySelector('[data-o-component=o-table]');
+		oTableEl.classList.add('o-table--responsive-scroll');
+	});
 
-    it('clones column data into a new row with row header', (done) => {
-        const table = new ScrollTable(oTableEl, sorter);
-        setTimeout(() => {
-            try {
-                const duplicateRowClass = '.o-table__duplicate-row';
-                const duplicateRows = document.querySelectorAll(duplicateRowClass);
-                proclaim.equal(duplicateRows.length, 5, `Expected to find 5 rows with duplicate data and class "${duplicateRowClass}".`);
-                duplicateRows.forEach(row => {
-                    const duplicateHeadings = row.querySelectorAll('th[scope="row"][role="rowheader"]');
-                    proclaim.equal(duplicateHeadings.length, 1, `Expected to find a row heading within the rows of duplicate data, with scope="row" and role="rowheader".`);
-                });
-            } catch (error) {
-                done(error);
-            }
-            done();
-        }, 2); // wait for window.requestAnimationFrame
-    });
+	it('clones column data into a new row with row header', (done) => {
+		new ScrollTable(oTableEl, sorter);
+		setTimeout(() => {
+			try {
+				const duplicateRowClass = '.o-table__duplicate-row';
+				const duplicateRows = document.querySelectorAll(duplicateRowClass);
+				proclaim.equal(duplicateRows.length, 5, `Expected to find 5 rows with duplicate data and class "${duplicateRowClass}".`);
+				duplicateRows.forEach(row => {
+					const duplicateHeadings = row.querySelectorAll('th[scope="row"][role="rowheader"]');
+					proclaim.equal(duplicateHeadings.length, 1, `Expected to find a row heading within the rows of duplicate data, with scope="row" and role="rowheader".`);
+				});
+			} catch (error) {
+				done(error);
+			}
+			done();
+		}, 2); // wait for window.requestAnimationFrame
+	});
 
 });
