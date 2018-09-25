@@ -27,8 +27,12 @@ class ScrollTable extends BaseTable {
 		this.tableHeaders.forEach((header, index) => {
 			const headerRow = document.createElement('tr');
 			headerRow.classList.add('o-table__duplicate-row');
-			header.setAttribute('scope', 'row');
-			headerRow.appendChild(header.cloneNode(true));
+			// Clone column heading and turn into a row heading.
+			const clonedHeader = header.cloneNode(true);
+			clonedHeader.setAttribute('scope', 'row');
+			clonedHeader.setAttribute('role', 'rowheader');
+			headerRow.appendChild(clonedHeader);
+			// Clone data for the column into the new row.
 			this.tableRows.forEach(row => {
 				const data = row.querySelectorAll('td')[index];
 				headerRow.appendChild(data.cloneNode(true));
