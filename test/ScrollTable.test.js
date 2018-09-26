@@ -4,6 +4,7 @@ import proclaim from 'proclaim';
 import * as sandbox from './helpers/sandbox';
 import * as fixtures from './helpers/fixtures';
 import ScrollTable from './../src/js/Tables/ScrollTable';
+import BaseTable from './../src/js/Tables/BaseTable';
 import TableSorter from './../src/js/Sort/TableSorter';
 const sorter = new TableSorter();
 
@@ -15,6 +16,18 @@ describe("ScrollTable", () => {
 		sandbox.setContents(fixtures.shortTableWithContainer);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
 		oTableEl.classList.add('o-table--responsive-scroll');
+	});
+
+	it('it fires an "oTable.ready" event when constructed', done => {
+		window.addEventListener('oTable.ready', function () {
+			done();
+		});
+		new ScrollTable(oTableEl, sorter);
+	});
+
+	it('it extends BaseTable', () => {
+		const table = new ScrollTable(oTableEl, sorter);
+		proclaim.isInstanceOf(table, BaseTable);
 	});
 
 	it('clones column data into a new row with row header', (done) => {

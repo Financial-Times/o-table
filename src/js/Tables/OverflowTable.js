@@ -20,7 +20,7 @@ class OverflowTable extends BaseTable {
 			expanded: this.rootEl.hasAttribute('data-o-table-expanded') ? this.rootEl.getAttribute('data-o-table-expanded') !== 'false' : null,
 			minimumRowCount: this.rootEl.getAttribute('data-o-table-minimum-row-count')
 		}, this._opts);
-		window.requestAnimationFrame(this._addSortButtons.bind(this));
+		window.requestAnimationFrame(this.addSortButtons.bind(this));
 		window.requestAnimationFrame(this._setupScroll.bind(this));
 		window.requestAnimationFrame(this._setupExpander.bind(this));
 		this._ready();

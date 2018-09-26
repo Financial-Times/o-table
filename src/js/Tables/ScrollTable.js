@@ -14,7 +14,7 @@ class ScrollTable extends BaseTable {
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
 		this._duplicateRowsWithAddedHeader();
-		window.requestAnimationFrame(this._addSortButtons.bind(this));
+		window.requestAnimationFrame(this.addSortButtons.bind(this));
 		this._ready();
 		return this;
 	}

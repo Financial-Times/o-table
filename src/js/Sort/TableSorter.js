@@ -67,10 +67,6 @@ class TableSorter {
 	sortRowsByColumn(table, columnIndex, sortOrder) {
 		const tableHeaderElement = table.getTableHeader(columnIndex);
 
-		if (!tableHeaderElement) {
-			throw new Error(`Could not find header for column index "${columnIndex}".`);
-		}
-
 		if (['ascending', 'descending'].indexOf(sortOrder) === -1) {
 			throw new Error(`Sort order "${sortOrder}" is not supported. Must be "ascending" or "descending".`);
 		}

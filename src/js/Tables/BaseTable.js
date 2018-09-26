@@ -30,10 +30,15 @@ class BaseTable {
 	 *
 	 * @access public
 	 * @param {Number} columnIndex - The index of the table column to get the header for.
-	 * @returns {HTMLElement|null}
+	 * @throws When no header is not found.
+	 * @returns {HTMLElement}
 	 */
 	getTableHeader(columnIndex) {
-		return this.tableHeaders[columnIndex] || null;
+		const th = this.tableHeaders[columnIndex];
+		if (!th) {
+			throw new Error(`Could not find header for column index "${columnIndex}".`);
+		}
+		return th;
 	}
 
 	/**
@@ -61,52 +66,11 @@ class BaseTable {
 	}
 
 	/**
-	 * Indicate that the table has been sorted after intercepting the sorting event.
-	 *
-	 * @access public
-	 * @param {Object} sortDetails - Details of the current sort state.
-	 * @param {Number|Null} sortDetails.columnIndex - The index of the currently sorted column.
-	 * @param {String|Null} sortDetails.sortOrder - The type of sort, "ascending" or "descending"
-	 */
-	sorted({ columnIndex, sortOrder }) {
-		this._dispatchEvent('sorted', {
-			sortOrder,
-			columnIndex
-		});
-	}
-
-	/**
-	 * Destroys the instance, removing any event listeners that were added during instatiation of the component.
-	 * @access public
-	 * @returns {undefined}
-	 */
-	destroy() {
-		this._listeners.forEach(({ type, listener, element }) => {
-			element.removeEventListener(type, listener);
-		});
-		try {
-			delete this.rootEl;
-			delete this.wrapper;
-			delete this.container;
-		} catch (error) {
-			// Elements never existed or are already deleted.
-		}
-	}
-
-	/**
-	 * Indicate that the table has been constructed successfully.
-	 * @returns {undefined}
-	 */
-	_ready() {
-		this._dispatchEvent('ready');
-	}
-
-	/**
 	 * Add sort buttons to the DOM within the table header.
 	 * @returns {undefined}
 	 */
-	_addSortButtons() {
-		if(!this._opts.sortable) {
+	addSortButtons() {
+		if (!this._opts.sortable) {
 			return;
 		}
 		this.tableHeaders.forEach(function (th, columnIndex) {
@@ -133,6 +97,47 @@ class BaseTable {
 				type: 'click'
 			});
 		}.bind(this));
+	}
+
+	/**
+	 * Indicate that the table has been sorted after intercepting the sorting event.
+	 *
+	 * @access public
+	 * @param {Object} sortDetails - Details of the current sort state.
+	 * @param {Number|Null} sortDetails.columnIndex - The index of the currently sorted column.
+	 * @param {String|Null} sortDetails.sortOrder - The type of sort, "ascending" or "descending"
+	 */
+	sorted({ columnIndex, sortOrder }) {
+		if (isNaN(columnIndex)) {
+			throw new Error(`Expected a numerical column index but received "${columnIndex}".`);
+		}
+		if (!sortOrder) {
+			throw new Error(`Expected a sort order e.g. "ascending" or "descending".`);
+		}
+		this._dispatchEvent('sorted', {
+			sortOrder,
+			columnIndex
+		});
+	}
+
+	/**
+	 * Gets the instance ready for deletion.
+	 * Removes event listeners that were added during instatiation of the component.
+	 * @access public
+	 * @returns {undefined}
+	 */
+	destroy() {
+		this._listeners.forEach(({ type, listener, element }) => {
+			element.removeEventListener(type, listener);
+		});
+	}
+
+	/**
+	 * Indicate that the table has been constructed successfully.
+	 * @returns {undefined}
+	 */
+	_ready() {
+		this._dispatchEvent('ready');
 	}
 
 	/**

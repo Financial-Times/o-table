@@ -5,6 +5,7 @@ import proclaim from 'proclaim';
 import * as sandbox from './helpers/sandbox';
 import * as fixtures from './helpers/fixtures';
 import OverflowTable from './../src/js/Tables/OverflowTable';
+import BaseTable from './../src/js/Tables/BaseTable';
 import TableSorter from './../src/js/Sort/TableSorter';
 const sorter = new TableSorter();
 
@@ -95,6 +96,18 @@ describe("OverflowTable", () => {
 		document.documentElement.style.width = '';
 		sandbox.setContents(fixtures.longTableWithContainer);
 		oTableEl = document.querySelector('[data-o-component=o-table]');
+	});
+
+	it('it fires an "oTable.ready" event when constructed', done => {
+		window.addEventListener('oTable.ready', function () {
+			done();
+		});
+		new OverflowTable(oTableEl, sorter);
+	});
+
+	it('it extends BaseTable', () => {
+		const table = new OverflowTable(oTableEl, sorter);
+		proclaim.isInstanceOf(table, BaseTable);
 	});
 
 	describe("expandable feature", () => {
