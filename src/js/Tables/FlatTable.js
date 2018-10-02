@@ -18,7 +18,7 @@ class FlatTable extends BaseTable {
 		if (this.tableHeaders.length > 0) {
 			this._duplicateHeaders(rootEl);
 		} else {
-			console.warn('Could create a "flat" table as no headers were found. Ensure table headers are placed within "<thead>". Removing class "o-table--responsive-flat".', rootEl);
+			console.warn('Could not create a "flat" table as no headers were found. Ensure table headers are placed within "<thead>". Removing class "o-table--responsive-flat".', rootEl);
 			rootEl.classList.remove('o-table--responsive-flat');
 		}
 		window.requestAnimationFrame(this.addSortButtons.bind(this));
