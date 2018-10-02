@@ -149,7 +149,7 @@ function ftDateTimeToNumber(text) {
 	const time = text.match(/(?:\s|^)(\d{1,2}(?:[.](\d{2}))?)(pm|am)$/);
 	// Get date.
 	const month = date && date[1] ? date[1] : null;
-	const monthIndex = month ? months.findIndex((name) => name.includes(month)) : null;
+	const monthIndex = month ? months.findIndex((name) => name.indexOf(month) !== -1) : null;
 	const day = date && date[2] ? parseInt(date[2], 10) : null;
 	let year = date && date[3] ? parseInt(date[3], 10) : null;
 	if (month && !year) {
@@ -229,7 +229,7 @@ function extractNumber(text) {
  * Methods to format table cells for sorting.
  * @access public
  */
-class SortFormatter {
+class CellFormatter {
 
 	constructor () {
 		// This object is used to keep the running order of filter methods
@@ -295,4 +295,4 @@ class SortFormatter {
 	}
 }
 
-export default SortFormatter;
+export default CellFormatter;

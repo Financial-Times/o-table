@@ -1,367 +1,100 @@
-const SortFormatter = require('./sort-formatter');
-const tableSortFormatter = new SortFormatter();
+import FlatTable from './Tables/FlatTable';
+import ScrollTable from './Tables/ScrollTable';
+import OverflowTable from './Tables/OverflowTable';
 
-function getIntlCollator() {
-	if (typeof Intl !== 'undefined' && {}.hasOwnProperty.call(Intl, 'Collator')) {
-		return new Intl.Collator();
-	}
-}
+import TableSorter from './Sort/TableSorter';
+const sorter = new TableSorter();
 
-function ascendingSort(a, b, intlCollator) {
-	if ((typeof a === 'string' || a instanceof String) && (typeof b === 'string' || b instanceof String)) {
-		return intlCollator ? intlCollator.compare(a, b) : a.localeCompare(b);
-	} else if ((!isNaN(b) && isNaN(a)) || a < b) {
-		return -1;
-	} else if ((!isNaN(a) && isNaN(b)) || b < a) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-function descendingSort(...args) {
-	return 0 - ascendingSort.apply(this, args);
-}
-
-function wrapElement(targetEl, wrapEl) {
-	const parentEl = targetEl.parentNode;
-	parentEl.insertBefore(wrapEl, targetEl);
-	wrapEl.appendChild(targetEl);
-}
 
 class OTable {
+
 	/**
-	 * Initialises o-table component(s).
+	 * Table options.
+	 * @typedef {Object} OTable~opts - Table options.
+	 * @property {Bool} sortable [true] - Disable the table's sort feature.
+	 * @property {Undefined | Bool} expanded [Undefined] - Allow the "OverflowTable" to hide results behind a "show more" button. The table is expanded by default when "true", contracted when "false", or not expandable if not set.
+	 * @property {Number} minimumRowCount [20] - When the `expanded` option is set, the number of rows to show when the table is not expanded.
+	 */
+
+	/**
+	 * Constructs an o-table component.
 	 *
-	 * @param {(HTMLElement|string)} [el=document.body] - o-table element, or element where to search for an o-table element to initialise. You can pass an HTMLElement or a selector string
-	 * @returns {OTable} - A single OTable instance
+	 * @param {HTMLElement} - An o-table element.
+	 * @param {...OTable~opts} opts - A table options object.
+	 * @returns {FlatTable | ScrollTable | OverflowTable} - A table instance.
 	 */
-	constructor(rootEl) {
-		if (!rootEl) {
-			rootEl = document.body;
-		} else if (!(rootEl instanceof HTMLElement)) {
-			rootEl = document.querySelector(rootEl);
-		}
-		if (rootEl.getAttribute('data-o-component') === "o-table") {
-			this.rootEl = rootEl;
-		} else {
-			this.rootEl = rootEl.querySelector('[data-o-component~="o-table"]');
-		}
-
-		if (this.rootEl !== undefined) {
-			this.listeners = [];
-			this.isResponsive = false;
-			this.rootEl.setAttribute('data-o-table--js', '');
-
-			// Map "data-o-table-order" to "data-o-table-sort-value".
-			const cellsWithOrder = this.rootEl.querySelectorAll('td[data-o-table-order], th[data-o-table-order]');
-			if (cellsWithOrder.length > 0) {
-				console.warn('o-table: "data-o-table-order" is deprecated, to provide a custom sort value for a table cell use "data-o-table-sort-value" instead.');
-				cellsWithOrder.forEach(cell => {
-					if (cell.getAttribute('data-o-table-order') !== null) {
-						cell.setAttribute('data-o-table-sort-value', cell.getAttribute('data-o-table-order'));
-					}
-				});
-			}
-
-			const thead = this.rootEl.querySelector('thead');
-			this.tableHeaders = Array.from(thead.querySelectorAll('th'));
-			const tableRows = Array.from(this.rootEl.getElementsByTagName('tr'));
-
-			this.tableHeaders.forEach((th, columnIndex) => {
-				// Do not sort headers with attribute.
-				if (th.hasAttribute('data-o-table-heading-disable-sort')) {
-					return false;
-				}
-
-				th.setAttribute('tabindex', "0");
-
-				const listener = this._sortByColumn(columnIndex);
-				this.listeners.push(listener);
-				th.addEventListener('click', listener);
-				th.addEventListener('keydown', (event) => {
-					const ENTER = 13;
-					const SPACE = 32;
-					if ('code' in event) {
-						// event.code is not fully supported in the browsers we care about but
-						// use it if it exists
-						if (event.code === "Space" || event.code === "Enter") {
-							listener(event);
-						}
-					} else if (event.keyCode === ENTER || event.keyCode === SPACE) {
-						// event.keyCode has been deprecated but there is no alternative
-						listener(event);
-					}
-				});
-			});
-
-			// "o-table--responsive-flat" configuration only works when there is a
-			// `<thead>` block containing the table headers. If there are no headers
-			// available, the `responsive-flat` class needs to be removed to prevent
-			// headings being hidden.
-			if (this.rootEl.getAttribute('data-o-table-responsive') === 'flat' && this.tableHeaders.length > 0) {
-				this.isResponsive = true;
-			} else {
-				this.rootEl.classList.remove('o-table--responsive-flat');
-			}
-
-			if (this.isResponsive) {
-				OTable._duplicateHeaders(tableRows, this.tableHeaders);
-			}
-
-			this.dispatch('ready', {
-				oTable: this
-			});
-		}
-	}
-
-	/**
-	 * Helper function to dispatch namespaced events, namespace defaults to oTable
-	 * @param  {String} event
-	 * @param  {Object} data={}
-	 * @param  {String} namespace='oTable'
-	 */
-	dispatch(event, data = {}, namespace = 'oTable') {
-		this._timeoutID = setTimeout(() => {
-			this.rootEl.dispatchEvent(new CustomEvent(namespace + '.' + event, {
-				detail: data,
-				bubbles: true
-			}));
-		}, 0);
-	}
-
-	/**
-	 * Gets a table header for a given column index.
-	 *
-	 * @public
-	 * @returns {element|null} - The header element for the requested column index.
-	 */
-	getTableHeader(columnIndex) {
-		return this.tableHeaders[columnIndex] || null;
-	}
-
-	/**
-	 * Helper function to remove all event handlers which were added during instantiation of the component
-	 * @returns {undefined}
-	 */
-	removeEventListeners() {
-		this.tableHeaders.forEach((th, columnIndex) => {
-			th.removeEventListener('click', this.listeners[columnIndex]);
-			th.removeEventListener('keydown', this.listeners[columnIndex]);
-		});
-	}
-
-	/**
-	 * Sorts the table by a specific column
-	 * @param {number} index The index of the column to sort the table by
-	 * @param {bool} sortAscending Which direction to sort in, ascending or descending
-	 * @param {bool} isNumericValue Deprecated: Set `type` instead.
-	 * @param {string} type What type of data the column holds to enable sorting of numeric values, dates, etc.
-	 * @returns undefined
-	 */
-	sortRowsByColumn(index, sortAscending, isNumericValue = null, type = null) {
-		if (isNumericValue !== null) {
-			console.warn(`"sortRowsByColumn" argument "isNumericValue" is deprecated. Set "type" to a valid type such as "numeric" or "text". More specific types are listed in the README https://github.com/Financial-Times/o-table#sorting.`);
-		}
-		// If type is not set but deprecated "isNumericValue" is, set the type to numeric.
-		if (isNumericValue) {
-			type = type || 'numeric';
-		}
-		const tbody = this.rootEl.querySelector('tbody');
-		const rows = Array.from(tbody.querySelectorAll('tr'));
-		const intlCollator = getIntlCollator();
-		rows.sort(function (a, b) {
-			let aCol = a.children[index];
-			let bCol = b.children[index];
-			aCol = tableSortFormatter.formatCell({ cell: aCol, type });
-			bCol = tableSortFormatter.formatCell({ cell: bCol, type });
-			if (sortAscending) {
-				return ascendingSort(aCol, bCol, intlCollator);
-			} else {
-				return descendingSort(aCol, bCol, intlCollator);
-			}
-		});
-
-		window.requestAnimationFrame(() => {
-			rows.forEach(function (row) {
-				tbody.appendChild(row);
-			});
-			this.sorted(index, (sortAscending ? 'ASC' : 'DES'));
-		});
-	}
-
-	/**
-	 * Indicated that the table has been sorted by firing by a custom sort implementation.
-	 * Fires the `oTable.sorted` event.
-	 *
-	 * @public
-	 * @param {number|null} columnIndex - The index of the currently sorted column, if any.
-	 * @param {string|null} sort - The type of sort i.e. ASC or DES, if any.
-	 */
-	sorted(columnIndex, sort) {
-		this._updateSortAttributes(columnIndex, sort);
-		this.dispatch('sorted', {
-			sort,
-			columnIndex,
-			oTable: this
-		});
-	}
-
-	/**
-	 * Destroys the instance, removing any event listeners that were added during instatiation of the component
-	 * @returns undefined
-	 */
-	destroy() {
-		if (this._timeoutID !== undefined) {
-			clearTimeout(this._timeoutID);
-			this._timeoutID = undefined;
-		}
-		this.rootEl.removeAttribute('data-o-table--js');
-		this.removeEventListeners();
-		delete this.rootEl;
-	}
-
-	/**
-	 * @private
-	 * @param {Number} columnIndex
-	 */
-	_sortByColumn(columnIndex) {
-		return function (event) {
-			const currentSort = event.currentTarget.getAttribute('aria-sort');
-			const sort = this.rootEl.getAttribute('data-o-table-order') === null || currentSort === "none" || currentSort === "descending" ? 'ASC' : 'DES';
-
-			/**
-			 * Check if sorting has been cancelled on this table in favour of a custom implementation.
-			 *
-			 * The return value is false if event is cancelable and at least one of the event handlers
-			 * which handled this event called Event.preventDefault(). Otherwise it returns true.
-			 * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
-			 */
-			const customSort = !event.currentTarget.dispatchEvent(new CustomEvent('oTable.sorting', {
-				detail: {
-					sort,
-					columnIndex,
-					oTable: this
-				},
-				bubbles: true,
-				cancelable: true
-			}));
-
-			if (!customSort) {
-				const columnDataType = event.currentTarget.getAttribute('data-o-table-data-type');
-				this.sortRowsByColumn(columnIndex, sort === "ASC", null, columnDataType);
-			}
-
-			/**
-			 * Update aria attributes to provide immediate feedback.
-			 *
-			 * This is called again by the `sorted` method to assure accuracy.
-			 * I.e. if a sort fails previous sort attributes can be restored via the `sorted` method.
-			 */
-			this._updateSortAttributes(columnIndex, sort);
-
-		}.bind(this);
-	}
-
-	/**
-	 * Update the aria sort attributes on a sorted table.
-	 * Useful to reset sort attributes in the case of a custom sort implementation failing.
-	 * E.g. One which relies on the network.
-	 *
-	 * @private
-	 * @param {number|null} columnIndex - The index of the currently sorted column, if any.
-	 * @param {string|null} sort - The type of sort i.e. ASC or DES, if any.
-	 */
-	_updateSortAttributes(columnIndex, sort) {
-		let ariaSort;
-		switch (sort) {
-			case 'ASC':
-				ariaSort = 'ascending';
+	constructor(rootEl, opts = {}) {
+		const tableType = rootEl.getAttribute('data-o-table-responsive');
+		let Table;
+		switch (tableType) {
+			case 'flat':
+				Table = FlatTable;
 				break;
-			case 'DES':
-				ariaSort = 'descending';
+			case 'scroll':
+				Table = ScrollTable;
 				break;
 			default:
-				ariaSort = 'none';
+				Table = OverflowTable;
 				break;
 		}
-		// Set aria attributes.
-		window.requestAnimationFrame(() => {
-			const sortedHeader = this.getTableHeader(columnIndex);
-			if (!sortedHeader || sortedHeader.getAttribute('aria-sort') !== ariaSort) {
-				this.tableHeaders.forEach((header) => {
-					const headerSort = (header === sortedHeader ? ariaSort : 'none');
-					header.setAttribute('aria-sort', headerSort);
-				});
-				this.rootEl.setAttribute('data-o-table-order', sort);
-			}
-		});
+		return new Table(rootEl, sorter, opts);
 	}
 
 	/**
-	 * Initialises all o-table components inside the element passed as the first parameter
+	 * Constructs all o-table components inside the element passed as the first parameter.
 	 *
 	 * @access public
-	 * @param {(HTMLElement|string)} [el=document.body] - Element where to search for o-table components. You can pass an HTMLElement or a selector string
-	 * @returns {Array|OTable} - An array of OTable instances or a single OTable instance
+	 * @param {(HTMLElement|string)} [el=document.body] - Element where to search for o-table components. You can pass an HTMLElement or a selector string.
+	 * @param {...OTable~opts} opts - A table options object.
+	 * @returns {Array<FlatTable | ScrollTable | OverflowTable> | FlatTable | ScrollTable | OverflowTable} - A table instance or array of table instances.
 	 */
-	static init(el = document.body) {
+	static init(el = document.body, opts = {}) {
 		if (!(el instanceof HTMLElement)) {
 			el = document.querySelector(el);
 		}
 		if (/\bo-table\b/.test(el.getAttribute('data-o-component'))) {
-			return new OTable(el);
+			return new OTable(el, opts);
 		}
 		const tableEls = Array.from(el.querySelectorAll('[data-o-component~="o-table"]'));
 		return tableEls.map(el => {
-			return new OTable(el);
+			return new OTable(el, opts);
 		});
 	}
 
+
 	/**
-	 * Set a custom sort filter for a given table cell data type.
-	 * @see {@link SortFormatter#setFormatter} for `formatFunction` details.
+	 * The custom formatter accepts a table cell and returns a sort value for that cell.
+	 * This could be used to define a custom sort order for an unsupported format, such as emoji's, or a new date format.
+	 *
+	 * @callback formatFunction
+	 * @param {HTMLElement} cell
+	 */
+
+	/**
+	 * Set a custom sort formatter for a given data type.
+	 *
+	 * @example <caption>Mapping table cells which contain emojis to a numerical sort value.</caption>
+	 *	const OTable = require('o-table');
+	 *	// Set a filter for custom data type "emoji-time".
+	 *	// The return value may be a string or number.
+	 *	OTable.setSortFormatterForType('emoji-time', (cell) => {
+	 *		const text = cell.textContent.trim();
+	 *		if (text === '🌑') {
+	 *			return 1;
+	 *		}
+	 *		if (text === '🌤️️') {
+	 *			return 2;
+	 *		}
+	 *		return 0;
+	 *	});
+	 *	OTable.init();
+	 *
+	 * @param {String} type - The data type to apply the filter function to.
+	 * @param {formatFunction} formatFunction
 	 * @access public
 	 */
 	static setSortFormatterForType(type, formatFunction) {
-		tableSortFormatter.setFormatter(type, formatFunction);
-	}
-
-	static wrap(tableSelector, wrapClass) {
-		tableSelector = typeof tableSelector === "string" ? tableSelector : ".o-table";
-		wrapClass = typeof wrapClass === "string" ? wrapClass : "o-table-wrapper";
-
-		const matchingEls = document.querySelectorAll(tableSelector);
-		let wrapEl;
-
-		if (matchingEls.length > 0) {
-			wrapEl = document.createElement('div');
-			wrapEl.setAttribute("class", wrapClass);
-
-			for (let c = 0, l = matchingEls.length; c < l; c++) {
-				const tableEl = matchingEls[c];
-
-				if (!tableEl.parentNode.matches("." + wrapClass)) {
-					wrapElement(tableEl, wrapEl.cloneNode(false));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Duplicate the table headers into each row
-	 * For use with responsive tables
-	 *
-	 * @private
-	 * @param  {array} rows Table rows
-	 */
-	static _duplicateHeaders(rows, headers) {
-		rows.forEach((row) => {
-			const data = Array.from(row.getElementsByTagName('td'));
-			data.forEach((td, dataIndex) => {
-				td.parentNode.insertBefore(headers[dataIndex].cloneNode(true), td);
-			});
-		});
+		sorter.setCellFormatterForType(type, formatFunction);
 	}
 }
 

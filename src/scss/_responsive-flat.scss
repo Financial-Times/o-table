@@ -1,67 +1,62 @@
-////
-/// @group o-table
-/// @link http://registry.origami.ft.com/components/o-table
-////
-
-/// Make a table 'ResponsiveFlat'
+/// Styles for a 'FlatTable'
 @mixin oTableResponsiveFlat {
-	float: left;
-	width: 100%;
-
-	*,
-	*:before,
-	*:after {
-		box-sizing: border-box;
-	}
-
-	@include oGridRespondTo(S) {
-		display: table;
-	}
-
-	@include oGridRespondTo($until: S) {
-		.o-table__cell--numeric {
-			text-align: left;
-		}
-	}
-
-	td {
-		padding: 8px;
-		width: 50%;
-
-		@include oGridRespondTo(S) {
-			border-right: 1px solid _oTableGet('table-border-color');
-			display: table-cell;
-		}
-	} // td
-
-	thead th {
-		display: none;
-		padding: 8px;
-
-		@include oGridRespondTo(S) {
-			border-right: 1px solid _oTableGet('table-border-color');
-			display: table-cell;
-		}
-	} // thead th
-
-	tr {
-		display: flex;
-		flex-flow: row wrap;
+	.o-table--responsive-flat {
+		float: left;
 		width: 100%;
 
-		@include oGridRespondTo(S) {
-			display: table-row;
+		*,
+		*:before,
+		*:after {
+			box-sizing: border-box;
 		}
-	} // tr
-
-	tbody tr th {
-		border-right: 1px solid _oTableGet('table-border-color');
-		float: left;
-		padding: 8px;
-		width: 50%;
 
 		@include oGridRespondTo(S) {
+			display: table;
+		}
+
+		@include oGridRespondTo($until: S) {
+			.o-table__cell--numeric {
+				text-align: left;
+			}
+		}
+
+		td {
+			padding: 10px;
+			width: 50%;
+
+			@include oGridRespondTo(S) {
+				display: table-cell;
+			}
+		} // td
+
+		thead th {
 			display: none;
-		}
-	} // td th
+			padding: 10px;
+
+			@include oGridRespondTo(S) {
+				display: table-cell;
+			}
+		} // thead th
+
+		tr {
+			display: flex;
+			flex-flow: row wrap;
+			width: 100%;
+
+			@include oGridRespondTo(S) {
+				display: table-row;
+			}
+		} // tr
+
+		tbody tr th {
+			border-right: 1px solid _oTableGet('table-border-color');
+			float: left;
+			padding: 10px;
+			width: 50%;
+
+			@include oGridRespondTo(S) {
+				display: none;
+			}
+		} // td th
+	}
 } // mixin

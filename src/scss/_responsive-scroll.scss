@@ -1,64 +1,28 @@
-////
-/// @group o-table
-/// @link http://registry.origami.ft.com/components/o-table
-////
-
-/// Make a table 'ResponsiveScroll'
+/// Styles for a 'ScrollTable'
 @mixin oTableResponsiveScroll {
-	display: flex;
-	overflow: hidden;
+	.o-table--responsive-scroll {
+		.o-table__duplicate-row {
+			display: none;
+		}
 
-	// Ensure collapsed table border is not hidden.
-	border-right-width: 2px;
-	border-bottom-width: 2px;
+		@include oGridRespondTo($until: S) {
+			tr:not(.o-table__duplicate-row) {
+				display: none;
+			}
 
-	@include oGridRespondTo(S) {
-		display: table;
-	}
+			.o-table__duplicate-row {
+				display: table-row;
+			}
 
-	@include oGridRespondTo($until: S) {
-		.o-table__cell--numeric {
-			text-align: left;
+			th {
+				position: sticky;
+				left: 0;
+				background-color: _oTableGet('table-background');
+			}
+
+			.o-table__cell--numeric {
+				text-align: left;
+			}
 		}
 	}
-
-	thead {
-		display: flex;
-		flex-shrink: 0;
-
-		@include oGridRespondTo(S) {
-			display: table-header-group;
-		}
-	}
-
-	tbody {
-		display: flex;
-		overflow-x: auto;
-		overflow-y: hidden;
-		position: relative;
-
-		@include oGridRespondTo(S) {
-			display: table-row-group;
-		}
-	}
-
-	tr {
-		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-
-		@include oGridRespondTo(S) {
-			display: table-row;
-		}
-	}
-
-	th,
-	td {
-		display: block;
-
-
-		@include oGridRespondTo(S) {
-			display: table-cell;
-		}
-		}
-} // mixin
+}
