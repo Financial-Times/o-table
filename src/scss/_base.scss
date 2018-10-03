@@ -53,5 +53,10 @@
 		.o-table__cell--vertically-center {
 			vertical-align: middle;
 		}
+
+		.o-table__footnote {
+			@include oTypographySize(-1);
+			color: _oTableGet('table-footnote-color');
+		}
 	}
 }

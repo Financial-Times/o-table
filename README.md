@@ -129,6 +129,7 @@ The "overflow" style of responsive table ([see above](#responsive-options)) supp
 
 #### Table Utility Styles
 - `o-table--row-stripes` - Apply to the table for alternating stripes on the table rows.
+- `o-table__footnote` - Style a `tfoot` element subtily for sources, disclaimers, etc.
 - `o-table__cell--numeric` - Apply to numeric cells to align content to the right.
 - `o-table__cell--vertically-center` - Apply to cells which should center vertically.
 

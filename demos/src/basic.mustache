@@ -4,6 +4,15 @@
             <h2 class="o-typography-heading-level-2">Table Caption</h2>
         </caption>
     {{/showCaption}}
+    {{#showFootnote}}
+        <tfoot>
+            <tr>
+                <td colspan=5 class="o-table__footnote">
+                    Source: The Origami team's love of fruit.
+                </td>
+            </tr>
+        </tfoot>
+    {{/showFootnote}}
     <thead>
         <tr>
             <th scope="col" role="columnheader">Fruit</th>

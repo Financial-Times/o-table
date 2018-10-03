@@ -136,14 +136,15 @@
 			"description": "This demo shows sorting columns of various data types, including FT style dates, times, and abbreviated numbers. The demo also shows a column with sort disabled."
 		},
 		{
-			"title": "Caption",
+			"title": "Caption and footnote",
 			"name": "captions",
 			"template": "demos/src/basic.mustache",
 			"data": {
-				"showCaption": true
+				"showCaption": true,
+				"showFootnote": true
 			},
 			"documentClasses": "o-table-demo-constrain",
-			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2."
+			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2. The footer may also include any flow content, but in this case uses the footnote class to style a source."
 		},
 		{
 			"title": "Borders",
