@@ -45,13 +45,34 @@ Where table headings (`th`) are used as row headings, `scope="row"` attributes m
 </table>
 ```
 
-Table `caption` elements should include a header of the appropriate level and style for the table's context.
+The table's `caption` element should include a header of the appropriate level and style for the table's context.
 
 ```html
 <table class="o-table" data-o-component="o-table">
 	<caption class="o-table__caption">
 		<h2>My Table Caption</h2>
 	</caption>
+	<thead>
+		...
+	</thead>
+	<tbody>
+		...
+	</tbody>
+	...
+</table>
+```
+
+The table's footer `tfoot` element may use the helper class `o-table-footnote` to display sources, disclaimers, etc.
+
+```html
+<table class="o-table" data-o-component="o-table">
+	<tfoot>
+		<tr>
+			<td colspan=2 class="o-table-footnote">
+				Source: The Origami team.
+			</td>
+		</tr>
+	</tfoot>
 	<thead>
 		...
 	</thead>
@@ -97,14 +118,16 @@ There are three options for small viewports where the table does not fit.
 2. [scroll](https://www.ft.com/__origami/service/build/v2/demos/o-table/responsive-scroll) - Flip the table so headings are in the first column and sticky, data is scrollable horizontally.
 3. [flat](https://www.ft.com/__origami/service/build/v2/demos/o-table/responsive-flat) - Split each row into an individual item and repeat headings.
 
-To enable these set `data-o-table-responsive` to the type of responsive table desired and add the classes for that type of table. Then wrap the table in `o-table-container` and `o-table-wrapper`. E.g for an "overflow" table:
+To enable these set `data-o-table-responsive` to the type of responsive table desired and add the classes for that type of table. Then wrap the table in `o-table-container`, `o-table-overlay-wrapper`, `o-table-scroll-wrapper`. E.g for an "overflow" table:
 
 ```html
 <div class="o-table-container">
-	<div class="o-table-wrapper">
-		<table class="o-table o-table--row-stripes o-table--responsive-overflow o-table--responsive-flat" data-o-component="o-table" data-o-table-responsive="overflow">
-			...
-		</table>
+	<div class="o-table-overlay-wrapper">
+		<div class="o-table-scroll-wrapper">
+			<table class="o-table o-table--row-stripes o-table--responsive-overflow o-table--responsive-flat" data-o-component="o-table" data-o-table-responsive="overflow">
+				...
+			</table>
+		</div>
 	</div>
 </div>
 ```
@@ -117,11 +140,33 @@ The "overflow" style of responsive table ([see above](#responsive-options)) supp
 
 ```html
 <div class="o-table-container">
-	<div class="o-table-wrapper">
-		<table class="o-table o-table--row-stripes o-table--responsive-overflow o-table--responsive-flat" data-o-component="o-table" data-o-table-responsive="overflow" data-o-table-expanded="false" data-o-table-minimum-row-count="10">
-			...
-		</table>
+	<div class="o-table-overlay-wrapper">
+		<div class="o-table-scroll--wrapper">
+			<table class="o-table o-table--row-stripes o-table--responsive-overflow o-table--responsive-flat"
+			data-o-component="o-table"
+			data-o-table-responsive="overflow"
+			data-o-table-expanded="false"
+			data-o-table-minimum-row-count="10">
+				...
+			</table>
+		</div>
 	</div>
+</div>
+```
+
+To add a footnote to an expandable table, for example with disclaimers or sources, add the footnote within the container and link to the table with an id and the `aria-describedby` attribute. If not working on an expandable table, [use the `tfoot` element instead](#basic-table).
+```diff
+<div class="o-table-container">
+	<div class="o-table-overlay-wrapper">
+		<div class="o-table-scroll--wrapper">
++			<table aria-describedby="demo-footnote">
+				...
+			</table>
+		</div>
+	</div>
++	<div id="demo-footnode" class="o-table-footnote">
++		Source: The Origami team's love of fruit.
++	</div>
 </div>
 ```
 
@@ -414,7 +459,7 @@ document.addEventListener('oTable.sorting', (event) => {
 ## Troubleshooting
 
 Known issues:
-* IE11 or below need the [polyfill service](https://polyfill.io/)
+* IE11 and below need the [polyfill service](https://polyfill.io/)
 
 ## Migration guide
 
@@ -424,20 +469,25 @@ Known issues:
 - Markup updates:
 	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup is correct and includes `thead` and `tbody`.
 	- `o-table__caption--top` and `o-table__caption--bottom` have been removed. Remove these classes and add a heading within the caption (e.g. a `<h2>`) with appropriate styling.
-	- Responsive tables are now wrapped in a container class and the type of responsive table should be specified.
+	- `o-table-wrapper` is now `o-table-scroll-wrapper`
+	- Responsive tables are now wrapped in a container div `o-table-container` and overlay div `o-table-overlay-wrapper`.
+	- Responsive tables should now have their type specified via a data attribute e.g. `data-o-table-responsive="overflow"`.
 ```diff
 +<div class="o-table-container">
-     <div class="o-table-wrapper">
--        <table data-o-component="o-table" class="o-table--responsive-overflow">
-+        <table data-o-component="o-table" class="o-table--responsive-overflow" data-o-table-responsive="overflow">
--            <caption class="o-table__caption o-table__caption--bottom">
-+            <caption class="o-table__caption">
--                My Table Caption
-+                <h2>My Table Caption</h2>
-             </caption>
-             <!-- thead, tbody -->
-        </table>
-    </div>
++    <div class="o-table-overlay-wrapper">
++     	<div class="o-table-scroll-wrapper">
+-    	<div class="o-table-wrapper">
+-        	<table data-o-component="o-table" class="o-table--responsive-overflow">
++        	<table data-o-component="o-table" class="o-table--responsive-overflow" data-o-table-responsive="overflow">
+-            	<caption class="o-table__caption o-table__caption--bottom">
++            	<caption class="o-table__caption">
+-                	My Table Caption
++                	<h2>My Table Caption</h2>
+             	</caption>
+             	<!-- thead, tbody -->
+        	</table>
+    	</div>
++   </div>
 +</div>
 ```
 - Mixin updates:

@@ -53,10 +53,13 @@
 		.o-table__cell--vertically-center {
 			vertical-align: middle;
 		}
+	}
 
-		.o-table__footnote {
-			@include oTypographySize(-1);
-			color: _oTableGet('table-footnote-color');
-		}
+	.o-table-footnote {
+		@include oTypographyCaption();
+	}
+
+	.o-table-container > .o-table-footnote {
+		margin-left: 10px;
 	}
 }

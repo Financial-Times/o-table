@@ -1,7 +1,8 @@
 
 const longTableWithContainer = `
 <div class="o-table-container">
-		<div class="o-table-wrapper">
+	<div class="o-table-overlay-wrapper">
+		<div class="o-table-scroll-wrapper">
 			<table class="o-table" data-o-component="o-table">
 				<thead>
 					<tr>
@@ -192,11 +193,13 @@ const longTableWithContainer = `
 			</table>
 		</div>
 	</div>
+</div>
 `;
 
 const shortTableWithContainer = `
 <div class="o-table-container">
-		<div class="o-table-wrapper">
+	<div class="o-table-overlay-wrapper">
+		<div class="o-table-scroll-wrapper">
 			<table class="o-table" data-o-component="o-table">
 				<thead>
 					<tr>
@@ -247,6 +250,7 @@ const shortTableWithContainer = `
 			</table>
 		</div>
 	</div>
+</div>
 `;
 
 export {

@@ -56,7 +56,7 @@ describe("BaseTable", () => {
 		function getTableElementWithData(type, dataArray) {
 			const markup = `
 				<div class="o-table-container">
-					<div class="o-table-wrapper">
+					<div class="o-table-scroll-wrapper">
 						<table class="o-table" data-o-component="o-table">
 							<thead>
 								<tr>
@@ -295,7 +295,7 @@ describe("BaseTable", () => {
 		it('sorts by attribute "data-o-table-sort-value" value if set', done => {
 			sandbox.setContents(`
 				<div class="o-table-container">
-					<div class="o-table-wrapper">
+					<div class="o-table-scroll-wrapper">
 						<table class="o-table" data-o-component="o-table">
 							<thead>
 								<tr>
@@ -329,7 +329,7 @@ describe("BaseTable", () => {
 		it('sorts row headers', done => {
 			sandbox.setContents(`
 				<div class="o-table-container">
-					<div class="o-table-wrapper">
+					<div class="o-table-scroll-wrapper">
 						<table class="o-table" data-o-component="o-table">
 							<thead>
 								<tr>

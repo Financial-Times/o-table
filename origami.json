@@ -141,7 +141,7 @@
 			"template": "demos/src/basic.mustache",
 			"data": {
 				"showCaption": true,
-				"showFootnote": true
+				"showFooter": true
 			},
 			"documentClasses": "o-table-demo-constrain",
 			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2. The footer may also include any flow content, but in this case uses the footnote class to style a source."

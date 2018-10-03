@@ -21,8 +21,9 @@ class BaseTable {
 		this.tbody = this.rootEl.querySelector('tbody');
 		this.tableHeaders = this.thead ? Array.from(this.thead.querySelectorAll('th')) : [];
 		this.tableRows = this.tbody ? Array.from(this.tbody.getElementsByTagName('tr')) : [];
-		this.wrapper = this.rootEl.closest('.o-table-wrapper');
+		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
+		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
 	}
 
 	/**
