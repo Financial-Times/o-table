@@ -24,7 +24,7 @@ function canScrollTable() {
 }
 
 function scrollTable(oTableEl, { toEnd }) {
-	const wrapper = oTableEl.closest('.o-table-wrapper');
+	const wrapper = oTableEl.closest('.o-table-scroll-wrapper');
 	const scrollTo = toEnd ? oTableEl.getBoundingClientRect().width : 0;
 	setTimeout(() => {
 		wrapper.scrollLeft = scrollTo;

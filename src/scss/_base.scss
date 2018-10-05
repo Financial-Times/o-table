@@ -54,4 +54,12 @@
 			vertical-align: middle;
 		}
 	}
+
+	.o-table-footnote {
+		@include oTypographyCaption();
+	}
+
+	.o-table-container > .o-table-footnote {
+		margin-left: 10px;
+	}
 }

@@ -157,9 +157,9 @@ class OverflowTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	_addControlsToDom() {
-		if (this.container && !this.controls) {
+		if (this.overlayWrapper && !this.controls) {
 			const supportsArrows = OverflowTable._supportsArrows();
-			this.container.insertAdjacentHTML('beforeend', `
+			this.overlayWrapper.insertAdjacentHTML('beforeend', `
 				${this.wrapper ? `
 					<div class="o-table-overflow-fade-overlay" style="display: none;"></div>
 				` : ''}
@@ -185,11 +185,11 @@ class OverflowTable extends BaseTable {
 			`);
 
 			this.controls = {
-				controlsOverlay: this.container.querySelector('.o-table-overflow-control-overlay'),
-				fadeOverlay: this.container.querySelector('.o-table-overflow-fade-overlay'),
-				expanderButton: this.container.querySelector('.o-table-control--expander'),
-				forwardButton: this.container.querySelector('.o-table-control--forward'),
-				backButton: this.container.querySelector('.o-table-control--back')
+				controlsOverlay: this.overlayWrapper.querySelector('.o-table-overflow-control-overlay'),
+				fadeOverlay: this.overlayWrapper.querySelector('.o-table-overflow-fade-overlay'),
+				expanderButton: this.overlayWrapper.querySelector('.o-table-control--expander'),
+				forwardButton: this.overlayWrapper.querySelector('.o-table-control--forward'),
+				backButton: this.overlayWrapper.querySelector('.o-table-control--back')
 			};
 		}
 	}
@@ -201,7 +201,7 @@ class OverflowTable extends BaseTable {
 	 */
 	_setupScroll() {
 		// Does not warn of a missing wrapper: assumes no overflow is desired.
-		if (this.container && !this.wrapper) {
+		if (this.container && this.overlayWrapper && !this.wrapper) {
 			console.warn(
 				'Controls to scroll table left/right could not be added to "o-table" as it is missing markup. ' +
 				'Please add the container and wrapper elements according to the documentation https://registry.origami.ft.com/components/o-table.',
@@ -210,7 +210,7 @@ class OverflowTable extends BaseTable {
 		}
 
 		// Can not add controls without a container or wrapper.
-		if (!this.container || !this.wrapper) {
+		if (!this.container || !this.overlayWrapper || !this.wrapper) {
 			return;
 		}
 
@@ -298,7 +298,7 @@ class OverflowTable extends BaseTable {
 			return;
 		}
 
-		if (!this.container || !this.wrapper) {
+		if (!this.container || !this.overlayWrapper || !this.wrapper) {
 			throw new Error(
 				'Controls to expand/contract the table could not be added to "o-table" as it is missing markup.' +
 				'Please add the container and wrapper element according to the documentation https://registry.origami.ft.com/components/o-table.'
