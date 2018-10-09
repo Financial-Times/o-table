@@ -9,7 +9,7 @@ import BaseTable from './../src/js/Tables/BaseTable';
 import TableSorter from './../src/js/Sort/TableSorter';
 const sorter = new TableSorter();
 
-describe.only("BasicTable", () => {
+describe("BasicTable", () => {
 	let oTableEl;
 
 	beforeEach(() => {
@@ -39,6 +39,7 @@ describe.only("BasicTable", () => {
 			} catch (error) {
 				done(error);
 			}
+			addSortSpy.restore();
 			done();
 		}, 2); // wait for window.requestAnimationFrame
 	});
