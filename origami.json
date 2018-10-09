@@ -127,6 +127,7 @@
 				"expanded": "true"
 			},
 			"documentClasses": "o-table-demo-pad",
+			"hidden": true,
 			"description": "Open demo and shrink browser to preview. When expanding Responsive Overflow tables are tall and can be scrolled past, the left/right arrows \"dock\" next to the \"show more\" expand button."
 		},
 		{
