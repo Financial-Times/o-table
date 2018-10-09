@@ -12,12 +12,12 @@ class BasicTable extends BaseTable {
 	 * @param {Bool} opts.sortable [true]
 	 * @returns {BasicTable}
 	 */
-    constructor(rootEl, sorter, opts = {}) {
-        super(rootEl, sorter, opts);
-        window.requestAnimationFrame(this.addSortButtons.bind(this));
-        this._ready();
-        return this;
-    }
+	constructor(rootEl, sorter, opts = {}) {
+		super(rootEl, sorter, opts);
+		window.requestAnimationFrame(this.addSortButtons.bind(this));
+		this._ready();
+		return this;
+	}
 }
 
 export default BasicTable;
