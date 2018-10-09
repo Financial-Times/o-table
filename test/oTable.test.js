@@ -9,6 +9,7 @@ import BaseTable from './../src/js/Tables/BaseTable';
 import OverflowTable from './../src/js/Tables/OverflowTable';
 import FlatTable from './../src/js/Tables/FlatTable';
 import ScrollTable from './../src/js/Tables/ScrollTable';
+import BasicTable from './../src/js/Tables/BasicTable';
 
 describe('OTable constructs', () => {
 	let oTableEl;
@@ -43,6 +44,18 @@ describe('OTable constructs', () => {
 		oTableEl.setAttribute('data-o-table-responsive', 'flat');
 		testOTable = new OTable(oTableEl);
 		proclaim.isInstanceOf(testOTable, FlatTable);
+	});
+
+	it('a BasicTable when the table has attribute data-o-table-responsive=""', () => {
+		oTableEl.setAttribute('data-o-table-responsive', '');
+		testOTable = new OTable(oTableEl);
+		proclaim.isInstanceOf(testOTable, BasicTable);
+	});
+
+	it('a BasicTable when the table does not have the data-o-table-responsive attribute', () => {
+		oTableEl.removeAttribute('data-o-table-responsive');
+		testOTable = new OTable(oTableEl);
+		proclaim.isInstanceOf(testOTable, BasicTable);
 	});
 });
 

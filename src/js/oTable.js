@@ -1,6 +1,7 @@
 import FlatTable from './Tables/FlatTable';
 import ScrollTable from './Tables/ScrollTable';
 import OverflowTable from './Tables/OverflowTable';
+import BasicTable from './Tables/BasicTable';
 
 import TableSorter from './Sort/TableSorter';
 const sorter = new TableSorter();
@@ -21,7 +22,7 @@ class OTable {
 	 *
 	 * @param {HTMLElement} - An o-table element.
 	 * @param {...OTable~opts} opts - A table options object.
-	 * @returns {FlatTable | ScrollTable | OverflowTable} - A table instance.
+	 * @returns {FlatTable | ScrollTable | OverflowTable | BasicTable} - A table instance.
 	 */
 	constructor(rootEl, opts = {}) {
 		const tableType = rootEl.getAttribute('data-o-table-responsive');
@@ -33,8 +34,11 @@ class OTable {
 			case 'scroll':
 				Table = ScrollTable;
 				break;
-			default:
+			case 'overflow':
 				Table = OverflowTable;
+				break;
+			default:
+				Table = BasicTable;
 				break;
 		}
 		return new Table(rootEl, sorter, opts);
@@ -46,7 +50,7 @@ class OTable {
 	 * @access public
 	 * @param {(HTMLElement|string)} [el=document.body] - Element where to search for o-table components. You can pass an HTMLElement or a selector string.
 	 * @param {...OTable~opts} opts - A table options object.
-	 * @returns {Array<FlatTable | ScrollTable | OverflowTable> | FlatTable | ScrollTable | OverflowTable} - A table instance or array of table instances.
+	 * @returns {Array<FlatTable | ScrollTable | OverflowTable | BasicTable> | FlatTable | ScrollTable | OverflowTable | BasicTable} - A table instance or array of table instances.
 	 */
 	static init(el = document.body, opts = {}) {
 		if (!(el instanceof HTMLElement)) {
