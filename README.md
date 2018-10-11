@@ -114,7 +114,7 @@ Or to disable sort per table column, add `data-o-table-heading-disable-sort` to 
 
 There are three options for small viewports where the table does not fit.
 
-1. [overflow](https://www.ft.com/__origami/service/build/v2/demos/o-table/responsive-overflow) (default) - Scroll the whole table including headings horizontally. This option also supports an [expander](#expander).
+1. [overflow](https://www.ft.com/__origami/service/build/v2/demos/o-table/responsive-overflow) - Scroll the whole table including headings horizontally. This option also supports an [expander](#expander).
 2. [scroll](https://www.ft.com/__origami/service/build/v2/demos/o-table/responsive-scroll) - Flip the table so headings are in the first column and sticky, data is scrollable horizontally.
 3. [flat](https://www.ft.com/__origami/service/build/v2/demos/o-table/responsive-flat) - Split each row into an individual item and repeat headings.
 
@@ -233,7 +233,7 @@ const OTable = require('o-table');
 oTable = new OTable(document.body);
 ```
 
-This will return an instance of `OverflowTable` (default), `FlatTable`, or `ScrollTable` depending on the value of `data-o-table-responsive`. All three table types extend `BaseTable`.
+This will return an instance of `BasicTable` (default), `OverflowTable`, `FlatTable`, or `ScrollTable` depending on the value of `data-o-table-responsive`. All four table types extend `BaseTable`.
 
 Instantiation will add column sorting to all tables. It will also add scroll controls and, if configured, an [expander](#expander) to any `OverflowTable`. These can be configured with [data attributes](#disable-sort) or imperatively with an options object:
 
@@ -404,7 +404,7 @@ The following events are fired by `o-table`.
 `oTable.ready` fires when the table has been initialised.
 
 The event provides the following properties:
-- `detail.instance` - The initialised `o-table` instance _(FlatTable | ScrollTable | OverflowTable)_.
+- `detail.instance` - The initialised `o-table` instance _(FlatTable | ScrollTable | OverflowTable | BasicTable)_.
 
 ##### oTable.sorted
 
@@ -413,7 +413,7 @@ The event provides the following properties:
 The event provides the following properties:
 - `detail.sortOrder` - The sort order e.g. "ascending" _(String)_.
 - `detail.columnIndex` - The index of the sorted column heading _(Number)_.
-- `detail.instance` - The effected `o-table` instance _(FlatTable | ScrollTable | OverflowTable)_.
+- `detail.instance` - The effected `o-table` instance _(FlatTable | ScrollTable | OverflowTable | BasicTable)_.
 
 ```js
 document.addEventListener('oTable.sorted', (event) => {
@@ -428,7 +428,7 @@ This event is fired just before a table sorts based on user interaction. It may 
 The event provides the following properties:
 - `detail.sortOrder` - The sort requested e.g. "ascending" _(String)_.
 - `detail.columnIndex` - The index of the column heading which will be sorted _(Number)_.
-- `detail.instance` - The effected `o-table` instance _(FlatTable | ScrollTable | OverflowTable)_.
+- `detail.instance` - The effected `o-table` instance _(FlatTable | ScrollTable | OverflowTable | BasicTable)_.
 
 When intercepting the default sort the `sorted` method must be called with relevant parameters when the custom sort is completed.
 
@@ -513,7 +513,7 @@ Known issues:
 + @include oTableResponsiveFlat;
 ```
 - JS updates:
-	- `OTable` returns an instance of `FlatTable`, `ScrollTable`, `OverflowTable` on construction, according to the type of table. All extend from `BaseTable`.
+	- `OTable` returns an instance of `BasicTable`, `FlatTable`, `ScrollTable`, `OverflowTable` on construction, according to the type of table. All extend from `BaseTable`.
 	- Table properties removed or made private: `isResponsive`, `listeners`.
 	- Table methods removed or made private:
 		- `wrap`: for a responsive table manually wrap the table in a container and wrapper class.
