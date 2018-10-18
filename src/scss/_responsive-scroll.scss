@@ -2,18 +2,23 @@
 @mixin oTableResponsiveScroll {
 	.o-table--responsive-scroll {
 
-		&.o-table--horizontal-lines .o-table__duplicate-row:not(:first-child) {
-			border: 0;
-			td {
-				border-top: 1px solid _oTableGet('table-border-color');
-			}
-		}
-
 		.o-table__duplicate-row {
 			display: none;
 		}
 
 		@include oGridRespondTo($until: S) {
+			// Remove standard border.
+			&.o-table--horizontal-lines .o-table__duplicate-row:not(:first-child) {
+				border: 0;
+			}
+
+			// Add responsive border.
+			&.o-table--horizontal-lines .o-table__duplicate-row:not(:last-child) {
+				td {
+					border-bottom: 1px solid _oTableGet('table-border-color');
+				}
+			}
+
 			tr:not(.o-table__duplicate-row) {
 				display: none;
 			}
