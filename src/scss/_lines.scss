@@ -1,8 +1,8 @@
 /// Add horizontal lines to a table
 @mixin oTableHorizontalLines {
 	.o-table--horizontal-lines {
-		tr:not(:last-child) {
-			border-bottom: 1px solid _oTableGet('table-border-color');
+		tr:not(:first-child) {
+			border-top: 1px solid _oTableGet('table-border-color');
 		}
 	}
 }

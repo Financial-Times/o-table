@@ -6,6 +6,10 @@
 		margin: 0;
 		width: 100%;
 
+		thead {
+			border-bottom: 2px solid _oTableGet('table-header-border-color');
+		}
+
 		th,
 		td {
 			padding: 10px;
