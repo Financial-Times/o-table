@@ -3,7 +3,7 @@
 	.o-table--responsive-scroll {
 
 		&.o-table--horizontal-lines .o-table__duplicate-row:not(:first-child) {
-			border: none;
+			border: 0;
 			td {
 				border-top: 1px solid _oTableGet('table-border-color');
 			}
