@@ -47,6 +47,7 @@
 
 		.o-table__cell--numeric {
 			text-align: right;
+			font-feature-settings: "tnum" 1;
 		}
 
 		.o-table__cell--content-secondary {
