@@ -7,7 +7,7 @@
 		width: 100%;
 
 		thead {
-			border-bottom: 2px solid _oTableGet('table-header-border-color');
+			border-bottom: 2px solid _oTableGet('table-data-color');
 		}
 
 		th,
@@ -15,11 +15,11 @@
 			padding: 10px;
 			text-align: left;
 			vertical-align: top;
+			color: _oTableGet('table-data-color');
 		}
 
 		th {
 			@include oTypographySansBold(1);
-			color: _oTableGet('table-header-color');
 			background-color: _oTableGet('header-background');
 			&:not([scope=row]) {
 				vertical-align: bottom;
@@ -28,7 +28,6 @@
 
 		td {
 			@include oTypographySans(1);
-			color: _oTableGet('table-data-color');
 			scroll-snap-align: none center;
 			&:empty:before {
 				@include oIconsGetIcon('minus', $container-width: 15,  $container-height: 15, $iconset-version: 1);

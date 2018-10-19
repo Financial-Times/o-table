@@ -15,11 +15,8 @@
 		'variables': (
 			table-background: oColorsGetPaletteColor('paper'),
 			table-alternate-background: oColorsGetPaletteColor('wheat'),
-			table-header-color: oColorsGetPaletteColor('black-90'),
-			table-header-border-color: oColorsGetPaletteColor('black-80'),
 			table-border-color: oColorsGetPaletteColor('black-20'),
-			table-caption-border-color: oColorsGetPaletteColor('black-30'),
-			table-data-color: oColorsGetPaletteColor('black-70'),
+			table-data-color: oColorsGetColorFor(body, text),
 			table-footnote-color: oColorsGetPaletteColor('black-60')
 		),
 		'supports-variants': (
@@ -34,11 +31,8 @@
 		'variables': (
 			table-background: oColorsGetPaletteColor('white'),
 			table-alternate-background: oColorsGetPaletteColor('slate-white-5'),
-			table-header-color: oColorsGetPaletteColor('black-90'),
-			header-border-border-color: oColorsGetPaletteColor('black-80'),
 			table-border-color: oColorsGetPaletteColor('black-20'),
-			table-caption-border-color: oColorsGetPaletteColor('black-30'),
-			table-data-color: oColorsGetPaletteColor('black-70'),
+			table-data-color: oColorsGetColorFor(body, text),
 			table-footnote-color: oColorsGetPaletteColor('black-60')
 		),
 		'supports-variants': (
