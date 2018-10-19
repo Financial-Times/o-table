@@ -57,10 +57,11 @@
 			"name": "row-stripes",
 			"template": "demos/src/basic.mustache",
 			"data": {
-				"modifierClass": "o-table--row-stripes"
+				"modifierClass": "o-table--row-stripes",
+				"isStriped": true
 			},
 			"documentClasses": "o-table-demo-constrain",
-			"description": "Adds a modifier class to make alternate table rows striped."
+			"description": "Adds a modifier class to make alternate table rows striped. An alternative to lined tables."
 		},
 		{
 			"title": "Row headings",
@@ -82,8 +83,7 @@
 			"name": "responsive-overflow",
 			"template": "demos/src/base.mustache",
 			"data": {
-				"tableType": "overflow",
-				"modifierClass": "o-table--row-stripes"
+				"tableType": "overflow"
 			},
 			"documentClasses": "o-table-demo-constrain",
 			"description": "Open demo and shrink browser to preview. On small viewports this table overflows and may be scrolled left/right. This demo includes the optional row stripes from the previous demo."
@@ -93,8 +93,7 @@
 			"name": "responsive-scroll",
 			"template": "demos/src/base.mustache",
 			"data": {
-				"tableType": "scroll",
-				"modifierClass": "o-table--row-stripes"
+				"tableType": "scroll"
 			},
 			"documentClasses": "o-table-demo-constrain",
 			"description": "Open demo and shrink browser to preview. This table moves headers into the first column on small viewports. The headers stick to the left edge as the table data is scrolled. This demo includes the optional row stripes from the previous demo."
@@ -104,8 +103,7 @@
 			"name": "responsive-flat",
 			"template": "demos/src/base.mustache",
 			"data": {
-				"tableType": "flat",
-				"modifierClass": "o-table--row-stripes"
+				"tableType": "flat"
 			},
 			"documentClasses": "o-table-demo-constrain",
 			"description": "Open demo and shrink browser to preview. Each entry in the flat table is shown individually with headers on small viewports. This demo includes the optional row stripes from the previous demo."
@@ -146,26 +144,6 @@
 			},
 			"documentClasses": "o-table-demo-constrain",
 			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2. The footer may also include any flow content, but in this case uses the footnote class to style a source."
-		},
-		{
-			"title": "Borders",
-			"name": "borders",
-			"template": "demos/src/basic.mustache",
-			"data": {
-				"modifierClass": "o-table--horizontal-borders o-table--vertical-borders"
-			},
-			"documentClasses": "o-table-demo-constrain",
-			"description": "Borders may be placed around the table."
-		},
-		{
-			"title": "Cell Lines",
-			"name": "lines",
-			"template": "demos/src/basic.mustache",
-			"data": {
-				"modifierClass": "o-table--horizontal-lines o-table--vertical-lines"
-			},
-			"documentClasses": "o-table-demo-constrain",
-			"description": "Lines may be added to the table."
 		},
 		{
 			"title": "Pa11y",

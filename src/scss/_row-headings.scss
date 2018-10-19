@@ -3,5 +3,6 @@
 @mixin oTableRowHeadings() {
 	.o-table--row-headings > tbody th {
 		background-color: _oTableGet('table-alternate-background');
+		border-right: 2px solid _oTableGet('table-header-border-color');
 	}
 }

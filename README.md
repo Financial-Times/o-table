@@ -124,7 +124,7 @@ To enable these set `data-o-table-responsive` to the type of responsive table de
 <div class="o-table-container">
 	<div class="o-table-overlay-wrapper">
 		<div class="o-table-scroll-wrapper">
-			<table class="o-table o-table--row-stripes o-table--responsive-overflow o-table--responsive-flat" data-o-component="o-table" data-o-table-responsive="overflow">
+			<table class="o-table o-table--horizontal-lines o-table--responsive-overflow o-table--responsive-flat" data-o-component="o-table" data-o-table-responsive="overflow">
 				...
 			</table>
 		</div>
@@ -142,7 +142,7 @@ The "overflow" style of responsive table ([see above](#responsive-options)) supp
 <div class="o-table-container">
 	<div class="o-table-overlay-wrapper">
 		<div class="o-table-scroll--wrapper">
-			<table class="o-table o-table--row-stripes o-table--responsive-overflow o-table--responsive-flat"
+			<table class="o-table o-table--horizontal-lines o-table--responsive-overflow o-table--responsive-flat"
 			data-o-component="o-table"
 			data-o-table-responsive="overflow"
 			data-o-table-expanded="false"
@@ -174,7 +174,7 @@ To add a footnote to an expandable table, for example with disclaimers or source
 
 #### Table Utility Styles
 - `o-table--row-stripes` - Apply to the table for alternating stripes on the table rows.
-- `o-table__footnote` - Style a `tfoot` element subtily for sources, disclaimers, etc.
+- `o-table-footnote` - Style a `tfoot` element subtily for sources, disclaimers, etc.
 - `o-table__cell--numeric` - Apply to numeric cells to align content to the right.
 - `o-table__cell--vertically-center` - Apply to cells which should center vertically.
 
