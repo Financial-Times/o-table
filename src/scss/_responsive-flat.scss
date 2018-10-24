@@ -1,75 +1,55 @@
 /// Styles for a 'FlatTable'
 @mixin oTableResponsiveFlat {
 	.o-table--responsive-flat {
-		float: left;
 		width: 100%;
 
-		*,
-		*:before,
-		*:after {
-			box-sizing: border-box;
-		}
-
-		@include oGridRespondTo(S) {
-			display: table;
-		}
-
-		@include oGridRespondTo($until: S) {
-			.o-table__cell--numeric {
-				text-align: left;
-			}
-		}
-
-		td {
-			padding: 10px;
-			width: 50%;
-
-			@include oGridRespondTo(S) {
-				display: table-cell;
-			}
-		}
-
-		thead th {
+		.o-table__duplicate-heading {
 			display: none;
-			padding: 10px;
-
-			@include oGridRespondTo(S) {
-				display: table-cell;
-			}
-		}
-
-		tr {
-			display: flex;
-			flex-flow: row wrap;
-			width: 100%;
-
-			@include oGridRespondTo(S) {
-				display: table-row;
-			}
-		}
-
-		tbody tr th {
-			border-right: 1px solid _oTableGet('table-border-color');
-			float: left;
-			padding: 10px;
-			width: 50%;
-
-			@include oGridRespondTo(S) {
-				display: none;
-			}
 		}
 
 		@include oGridRespondTo($until: S) {
+			display: block;
+
+			td,
+			th,
+			tr {
+				box-sizing: border-box;
+			}
+
+			tr {
+				display: flex;
+				flex-flow: row wrap;
+				width: 100%;
+			}
+
+			td {
+				padding: 10px;
+				width: 50%;
+			}
+
+			thead th {
+				display: none;
+				padding: 10px;
+			}
+
 			thead tr {
 				display: none;
 			}
 
-			tbody tr {
-				border-top: 0px;
+			&.o-table--horizontal-lines tbody tr:not(:first-child) {
+				border-top: 2px solid _oTableGet('table-data-color');
 			}
 
-			tbody tr:not(:first-child) {
-				border-top: 2px solid _oTableGet('table-data-color');
+			.o-table__duplicate-heading {
+				display: block;
+				border-right: 1px solid _oTableGet('table-border-color');
+				float: left;
+				padding: 10px;
+				width: 50%;
+			}
+
+			.o-table__cell--numeric {
+				text-align: left;
 			}
 		}
 	}
