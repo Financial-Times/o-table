@@ -139,19 +139,23 @@
 
 	// Show horizontal fade when the table is scrolled.
 	.o-table-overflow-fade-overlay--scroll {
-		background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-start)),
-		linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
+		@if _oTableGet('table-background') {
+			background: linear-gradient(to right, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-start)),
+			linear-gradient(to left, _oTableGet('table-background') 2px, rgba(_oTableGet('table-background'), 0) var(--o-table-fade-from-end));
+		}
 	}
 
 	// Show vertical fade when the table is contracted.
 	.o-table-container--contracted .o-table-overflow-fade-overlay:after {
-		content: '';
-		position: absolute;
-		height: 80px;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background: linear-gradient(to top, _oTableGet('table-background') 30px, rgba(_oTableGet('table-background'), 0) 80px);
-		pointer-events: none;
+		@if _oTableGet('table-background') {
+			content: '';
+			position: absolute;
+			height: 80px;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background: linear-gradient(to top, _oTableGet('table-background') 30px, rgba(_oTableGet('table-background'), 0) 80px);
+			pointer-events: none;
+		}
 	}
 }
