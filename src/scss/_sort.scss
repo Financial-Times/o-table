@@ -1,5 +1,10 @@
 /// Tables styles to support sort buttons.
 @mixin oTableSort {
+
+	.o-table--sortable thead th:not([data-o-table-heading-disable-sort]) {
+		padding-right: 0; // No header padding with a child sort icon.
+	}
+
 	// Sort button.
 	.o-table__sort {
 		// sass-lint:disable no-vendor-prefixes

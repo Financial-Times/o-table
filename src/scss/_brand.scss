@@ -17,7 +17,10 @@
 			table-alternate-background: oColorsGetPaletteColor('wheat'),
 			table-border-color: oColorsGetPaletteColor('black-20'),
 			table-data-color: oColorsGetColorFor(body, text),
-			table-footnote-color: oColorsGetPaletteColor('black-60')
+			table-footnote-color: oColorsGetPaletteColor('black-60'),
+			'flat': (
+				table-flat-alternate-background: oColorsMix('wheat', 'paper', 40)
+			)
 		),
 		'supports-variants': (
 			'stripes',
@@ -33,7 +36,10 @@
 			table-alternate-background: oColorsGetPaletteColor('slate-white-5'),
 			table-border-color: oColorsGetPaletteColor('black-20'),
 			table-data-color: oColorsGetColorFor(body, text),
-			table-footnote-color: oColorsGetPaletteColor('black-60')
+			table-footnote-color: oColorsGetPaletteColor('black-60'),
+			'flat': (
+				table-flat-alternate-background: oColorsGetPaletteColor('slate-white-5')
+			)
 		),
 		'supports-variants': (
 			'stripes',

@@ -74,6 +74,7 @@ class BaseTable {
 		if (!this._opts.sortable) {
 			return;
 		}
+		this.rootEl.classList.add('o-table--sortable');
 		this.tableHeaders.forEach(function (th, columnIndex) {
 			// Don't add sort buttons to unsortable columns.
 			if (th.hasAttribute('data-o-table-heading-disable-sort')) {
