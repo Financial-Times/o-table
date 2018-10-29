@@ -53,15 +53,15 @@
 			"description": ""
 		},
 		{
-			"title": "Row Stripes",
-			"name": "row-stripes",
+			"title": "Caption and footnote",
+			"name": "captions",
 			"template": "demos/src/basic.mustache",
 			"data": {
-				"modifierClass": "o-table--row-stripes",
-				"isStriped": true
+				"showCaption": true,
+				"showFooter": true
 			},
 			"documentClasses": "o-table-demo-constrain",
-			"description": "Adds a modifier class to make alternate table rows striped. An alternative to lined tables."
+			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2. The footer may also include any flow content, but in this case uses the footnote class to style a source."
 		},
 		{
 			"title": "Row headings",
@@ -71,13 +71,6 @@
 			"template": "demos/src/row-headings.mustache",
 			"description": ""
 		},
-        {
-			"title": "Cell styles",
-			"name": "cell-styles",
-			"template": "demos/src/cell-styles.mustache",
-			"documentClasses": "o-table-demo-constrain",
-			"description": ""
-        },
 		{
 			"title": "Responsive Overflow",
 			"name": "responsive-overflow",
@@ -135,15 +128,22 @@
 			"description": "This demo shows sorting columns of various data types, including FT style dates, times, and abbreviated numbers. The demo also shows a column with sort disabled."
 		},
 		{
-			"title": "Caption and footnote",
-			"name": "captions",
+			"title": "Row Stripes",
+			"name": "row-stripes",
 			"template": "demos/src/basic.mustache",
 			"data": {
-				"showCaption": true,
-				"showFooter": true
+				"modifierClass": "o-table--row-stripes",
+				"isStriped": true
 			},
 			"documentClasses": "o-table-demo-constrain",
-			"description": "Caption elements may include flow content such as a heading, this demo uses o-typography to add a h2. The footer may also include any flow content, but in this case uses the footnote class to style a source."
+			"description": "Adds a modifier class to make alternate table rows striped. An alternative to lined tables."
+		},
+		{
+			"title": "Vertically centre",
+			"name": "cell-styles",
+			"template": "demos/src/cell-styles.mustache",
+			"documentClasses": "o-table-demo-constrain",
+			"description": ""
 		},
 		{
 			"title": "Pa11y",
