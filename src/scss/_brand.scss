@@ -19,7 +19,7 @@
 			table-data-color: oColorsGetColorFor(body, text),
 			table-footnote-color: oColorsGetPaletteColor('black-60'),
 			'flat': (
-				table-flat-alternate-background: oColorsMix('wheat', 'paper', 40)
+				table-item-alternate-background: oColorsMix('wheat', 'paper', 40)
 			)
 		),
 		'supports-variants': (
@@ -38,7 +38,7 @@
 			table-data-color: oColorsGetColorFor(body, text),
 			table-footnote-color: oColorsGetPaletteColor('black-60'),
 			'flat': (
-				table-flat-alternate-background: oColorsGetPaletteColor('slate-white-5')
+				table-item-alternate-background: oColorsGetPaletteColor('slate-white-5')
 			)
 		),
 		'supports-variants': (
