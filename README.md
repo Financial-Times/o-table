@@ -479,6 +479,13 @@ Known issues:
 +   </div>
 +</div>
 ```
+- Style updates:
+	- The default bottom margin of `o-table` has been removed. Please apply the margin as needed, depending on the context of the table e.g. within an article:
+	```scss
+		.o-table
+			margin-bottom: oTypographySpacingSize($units: 4);
+		}
+	```
 - Mixin updates:
 	- All `o-table` mixins have been made private except for a new mixin `@include oTable($opts)`. It accepts an feature list `$opts` to include `o-table` styles granularly. Replace previous mixins with one call to the [`oTable` mixin with an optional `$opts` flag](#silent-mode). Please [contact us](#contact) if this does not suit you product.
 	- `oTableAll` has been replaced with `oTable`, which does not accept a class name `$classname`. Instead use the default `o-table` class name. As the mixin now output classes directly, they must not be wrapped in an `.o-table` class manually.
