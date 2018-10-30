@@ -1,5 +1,6 @@
 /// Base tables styles and simple utility classes.
-@mixin oTableBase() {
+/// @access private
+@mixin _oTableBase() {
 	.o-table {
 		border-collapse: collapse;
 		border-spacing: 0;

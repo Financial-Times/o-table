@@ -1,6 +1,7 @@
 /// Styles for a table wrapper to allow table to overflow.
 /// The wrapped table becomes scrollable on small viewports.
-@mixin oTableWrapper {
+/// @access private
+@mixin _oTableWrapper {
 	.o-table-scroll-wrapper {
 		overflow-y: hidden;
 		overflow-x: auto;

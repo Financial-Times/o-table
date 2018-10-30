@@ -1,5 +1,5 @@
 /// Add horizontal lines to a table
-@mixin oTableHorizontalLines {
+@mixin _oTableHorizontalLines {
 	.o-table--horizontal-lines {
 		tr:not(:first-child) {
 			border-top: 1px solid _oTableGet('table-border-color');
@@ -9,7 +9,7 @@
 
 
 /// Add verticle lines to a table
-@mixin oTableVerticalLines {
+@mixin _oTableVerticalLines {
 	.o-table--vertical-lines {
 		th:not(:last-child):not(:first-child),
 		td:not(:last-child):not(:first-child) {

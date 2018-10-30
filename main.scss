@@ -9,7 +9,6 @@ $o-table-is-silent: true !default;
 @import "o-typography/main";
 @import "o-visual-effects/main";
 // Branding
-@import "src/scss/variables";
 @import "src/scss/brand";
 // Main
 @import "src/scss/base";
@@ -27,7 +26,7 @@ $o-table-is-silent: true !default;
 @import "src/scss/wrapper";
 
 @if ($o-table-is-silent == false) {
-	@include oTableAll;
+	@include oTable();
 
 	// Set table to silent again to avoid being output twice
 	$o-table-is-silent: true !global;

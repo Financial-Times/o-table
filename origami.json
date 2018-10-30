@@ -19,10 +19,8 @@
 	},
 	"browserFeatures": {
 		"required": [
-			"Element.prototype.matches",
 			"IntersectionObserver",
-			"IntersectionObserverEntry",
-			"Array.prototype.findIndex"
+			"IntersectionObserverEntry"
 		]
 	},
 	"demosDefaults": {
