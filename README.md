@@ -510,7 +510,7 @@ Known issues:
 		- `wrap`: for a responsive table manually wrap the table in a container and wrapper class.
 		```html
 		<div class="o-table-container">
-			<div class="o-table-wrapper">
+			<div class="o-table-scroll-wrapper">
 				<!-- table -->
 			</div>
 		</div>
