@@ -1,6 +1,6 @@
 /// Styles for a 'FlatTable'
 @mixin oTableResponsiveFlat {
-	.o-table--responsive-flat {
+	.o-table.o-table--responsive-flat {
 		width: 100%;
 
 		.o-table__duplicate-heading {
@@ -36,13 +36,26 @@
 				display: none;
 			}
 
-			&.o-table--horizontal-lines tbody tr:not(:first-child) {
-				border-top: 2px solid _oTableGet('table-data-color');
+			tbody tr:not(:first-child) {
+				border-top: 1px solid _oTableGet('table-data-color');
+			}
+
+			&.o-table--row-stripes tbody tr:nth-child(even) th, // Remove stripes when flat.
+			tbody tr:nth-child(even) {
+				background-color: _oTableGet('table-item-alternate-background', 'flat');
+			}
+
+			&.o-table--horizontal-lines th:not(:last-of-type),
+			&.o-table--horizontal-lines td:not(:last-of-type), {
+				// When flat, only show row border if a colour is defined.
+				// Else the browser will use a black border.
+				@if _oTableGet('table-border-color') {
+					border-bottom: 1px solid _oTableGet('table-border-color');
+				}
 			}
 
 			.o-table__duplicate-heading {
 				display: block;
-				border-right: 1px solid _oTableGet('table-border-color');
 				float: left;
 				padding: 10px;
 				width: 50%;
