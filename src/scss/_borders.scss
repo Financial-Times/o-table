@@ -1,4 +1,5 @@
 /// Horizontal borders
+/// @access private
 @mixin _oTableHorizontalBorders {
 	.o-table--horizontal-borders {
 		border-bottom: 1px solid _oTableGet('table-border-color');
