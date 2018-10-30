@@ -1,5 +1,6 @@
 /// Styles for a 'ScrollTable'
-@mixin oTableResponsiveScroll {
+/// @access private
+@mixin _oTableResponsiveScroll {
 	.o-table--responsive-scroll {
 
 		.o-table__duplicate-row {

@@ -1,5 +1,6 @@
 /// Styles for a 'FlatTable'
-@mixin oTableResponsiveFlat {
+/// @access private
+@mixin _oTableResponsiveFlat {
 	.o-table.o-table--responsive-flat {
 		width: 100%;
 

@@ -1,5 +1,6 @@
 /// Tables styles to support sort buttons.
-@mixin oTableSort {
+/// @access private
+@mixin _oTableSort {
 
 	.o-table--sortable thead th:not([data-o-table-heading-disable-sort]) {
 		padding-right: 0; // No header padding with a child sort icon.

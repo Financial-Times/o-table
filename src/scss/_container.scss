@@ -1,10 +1,10 @@
 /// Styles for a table container, the parent of all other table elements.
 /// Enables child overlays such as to indicate the ability to scroll a table.
 /// Includes standard table margin.
-@mixin oTableContainer {
+/// @access private
+@mixin _oTableContainer {
 	.o-table-container {
 		position: relative;
-		margin-bottom: 20px;
 	}
 	// Leave space for controls such as "show more" when expanded/contracted.
 	.o-table-container--expanded,

@@ -141,7 +141,7 @@ function extractNumberFromRange(text) {
  * @returns {Number} Number representation of date and/or time for sorting.
  */
 function ftDateTimeToNumber(text) {
-	const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+	const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 	// FT style for writing dates: is June 23 2016 (no commas, month date year)
 	const date = text.match(/^([A-Za-z]{3,})(?:[\s])(?=[\d])((?:\d{1,2})?(?![\d]))?(?:\s)?(\d{4})?/);
 	// FT style for writing time:
@@ -149,7 +149,10 @@ function ftDateTimeToNumber(text) {
 	const time = text.match(/(?:\s|^)(\d{1,2}(?:[.](\d{2}))?)(pm|am)$/);
 	// Get date.
 	const month = date && date[1] ? date[1] : null;
-	const monthIndex = month ? months.findIndex((name) => name.indexOf(month) !== -1) : null;
+	// Get full month name from a given month e.g. 'January' for 'Jan'.
+	const matchingMonthNames = monthNames.filter((name) => name.indexOf(month) !== -1);
+	// Get the index of the matching month name.
+	const monthIndex = matchingMonthNames && matchingMonthNames[0] ? monthNames.indexOf(matchingMonthNames[0]) : null;
 	const day = date && date[2] ? parseInt(date[2], 10) : null;
 	let year = date && date[3] ? parseInt(date[3], 10) : null;
 	if (month && !year) {

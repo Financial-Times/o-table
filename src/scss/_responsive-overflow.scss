@@ -1,7 +1,8 @@
 /// Styles for an 'OverflowTable'
-/// @require oTableContainer
-/// @require oTableWrapper
-@mixin oTableResponsiveOverflow {
+/// @require _oTableContainer
+/// @require _oTableWrapper
+/// @access private
+@mixin _oTableResponsiveOverflow {
 	@include _oTableOverflowControlsOverlay;
 	@include _oTableOverflowFadeOverlay;
 }

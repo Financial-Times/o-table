@@ -170,54 +170,43 @@ To add a footnote to an expandable table, for example with disclaimers or source
 </div>
 ```
 
-### Sass
-
-#### Table Utility Styles
+#### Additional markup
+- `o-table--compact` - Apply to the table for smaller typography and padding.
 - `o-table--row-stripes` - Apply to the table for alternating stripes on the table rows.
 - `o-table-footnote` - Style a `tfoot` element subtily for sources, disclaimers, etc.
 - `o-table__cell--numeric` - Apply to numeric cells to align content to the right.
 - `o-table__cell--vertically-center` - Apply to cells which should center vertically.
 
-See more styles in the registry: [o-table demos](https://registry.origami.ft.com/components/o-table).
+See more in the registry: [o-table demos](https://registry.origami.ft.com/components/o-table).
 
+### Sass
 
 #### Silent mode
 
-If using `o-table` in silent mode, `@include oTableAll` includes every feature. Alternatively features may be included granularly:
+If using `o-table` in silent mode, `@include oTable()` includes styles for all features. Alternatively styles may be included granularly with an `$opts` map.
 
-Required:
+Include all table features:
 ```scss
-// Basic styles and utilities.
-@include oTableBase;
+@include oTable();
 ```
 
-Optional:
+Alternatively include base styles with only selected optional features. E.g. to include only the "overflow" responsive table and styles for table lines:
 ```scss
-// Sortable columns.
-@include oTableSort;
-
-// Respnsive solutions.
-@include oTableWrapper;
-@include oTableContainer;
-@include oTableResponsiveOverflow;
-@include oTableResponsiveFlat;
-@include oTableResponsiveScroll;
-
-// Lines.
-@include oTableHorizontalLines;
-@include oTableVerticalLines;
-@include oTableHorizontalBorders;
-@include oTableVerticalBorders;
-
-// Compact.
-@include oTableCompact;
-
-// Stripes.
-@include oTableRowStripes;
-
-// Row headings.
-@include oTableRowHeadings;
+@include oTable($opts: (
+	'responsive-overflow',
+	'lines'
+));
 ```
+
+| Feature             | Description                                             | Brand support                |
+|---------------------|---------------------------------------------------------|------------------------------|
+| responsive-overflow | See [responsive options](#responsive-options).          | master, internal, whitelabel |
+| responsive-flat     | See [responsive options](#responsive-options).          | master, internal, whitelabel |
+| responsive-scroll   | See [responsive options](#responsive-options).          | master, internal, whitelabel |
+| lines               | Styles for horizontal and vertical lines, plus borders. | master, internal, whitelabel |
+| compact             | A table with smaller typography and padding.            | master, internal, whitelabel |
+| stripes             | Alternating row stripe styles.                          | master, internal             |
+| row-headings        | Row heading styles.                                     | internal                     |
 
 ### JavaScript
 
@@ -464,7 +453,7 @@ Known issues:
 ## Migration guide
 
 ### How to upgrade from v5.x.x to v6.x.x?
-- To prevent errors in IE11, add support for `Array.prototype.findIndex`, `IntersectionObserverEntry`, and `IntersectionObserver` with the [polyfill service](https://polyfill.io/).
+- To prevent errors in IE11, add support for `IntersectionObserverEntry` and `IntersectionObserver` with the [polyfill service](https://polyfill.io/).
 - Data attribute `data-o-table-order` has been removed. To specify a custom sort order on `td` cells use `data-o-table-sort-value` instead.
 - Markup updates:
 	- Previous `o-table` demos omitted `thead` and `tbody` from `table`, including their child `tr` element. Ensure your table markup is correct and includes `thead` and `tbody`.
@@ -490,11 +479,16 @@ Known issues:
 +   </div>
 +</div>
 ```
+- Style updates:
+	- The default bottom margin of `o-table` has been removed. Please apply the margin as needed, depending on the context of the table e.g. within typical body copy:
+	```scss
+		.o-table {
+			margin-bottom: oTypographySpacingSize($units: 4);
+		}
+	```
 - Mixin updates:
-	- `oTableCaptionTop`, `oTableCaptionBottom` have been removed. Use only `oTableCaption` instead.
-	- `oTableCellNumeric`, `oTableCellContentSecondary`, `oTableCellVerticallyCenter`, `oTableCaption` have been removed. Their styles are now included as part of `oTableBase`.
-	- `oTableAll`: does not accept a class name `$classname`. Instead use the default `o-table` class name -- please [contact us](#contact) if this is a problem for your team.
-	- All mixins now output classes directly, so must not be wrapped in an `.o-table` class manually.
+	- All `o-table` mixins have been made private except for a new mixin `@include oTable($opts)`. It accepts an feature list `$opts` to include `o-table` styles granularly. Replace previous mixins with one call to the [`oTable` mixin with an optional `$opts` flag](#silent-mode). Please [contact us](#contact) if this does not suit your product.
+	- `oTableAll` has been replaced with `oTable`, which does not accept a class name `$classname`. Instead use the default `o-table` class name in your markup. As the mixin now output classes directly, they must not be wrapped in an `.o-table` class manually.
 ```diff
 -.o-table {
 -    @include oTableBase;
@@ -507,10 +501,7 @@ Known issues:
 -    @include oTableContainer;
 -}
 
-+ @include oTableBase;
-+ @include oTableWrapper;
-+ @include oTableContainer;
-+ @include oTableResponsiveFlat;
++ @include oTable($opts: ('responsive-flat'));
 ```
 - JS updates:
 	- `OTable` returns an instance of `BasicTable`, `FlatTable`, `ScrollTable`, `OverflowTable` on construction, according to the type of table. All extend from `BaseTable`.
@@ -519,7 +510,7 @@ Known issues:
 		- `wrap`: for a responsive table manually wrap the table in a container and wrapper class.
 		```html
 		<div class="o-table-container">
-			<div class="o-table-wrapper">
+			<div class="o-table-scroll-wrapper">
 				<!-- table -->
 			</div>
 		</div>

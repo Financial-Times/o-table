@@ -1,5 +1,6 @@
 /// Add this to the table element to get row stripes
-@mixin oTableRowStripes() {
+/// @access private
+@mixin _oTableRowStripes() {
 	.o-table--row-stripes {
 		background-color: _oTableGet('table-background');
 
