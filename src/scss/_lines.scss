@@ -1,4 +1,5 @@
 /// Add horizontal lines to a table
+/// @access private
 @mixin _oTableHorizontalLines {
 	.o-table--horizontal-lines {
 		tr:not(:first-child) {
