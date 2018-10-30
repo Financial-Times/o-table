@@ -1,5 +1,6 @@
 /// Outputs all features and styles available.
 /// @param $opts {list} [('responsive-overflow', 'responsive-flat', 'responsive-scroll', 'lines', 'compact', 'stripes', 'row-headings')] - Table features to output. Defaults to all table features.
+/// @access public
 @mixin oTable($opts: (
 	'responsive-overflow',
 	'responsive-flat',
