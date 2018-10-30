@@ -480,9 +480,9 @@ Known issues:
 +</div>
 ```
 - Style updates:
-	- The default bottom margin of `o-table` has been removed. Please apply the margin as needed, depending on the context of the table e.g. within an article:
+	- The default bottom margin of `o-table` has been removed. Please apply the margin as needed, depending on the context of the table e.g. within typical body copy:
 	```scss
-		.o-table
+		.o-table {
 			margin-bottom: oTypographySpacingSize($units: 4);
 		}
 	```
