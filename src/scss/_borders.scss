@@ -12,6 +12,7 @@
 }
 
 /// Vertical borders
+/// @access private
 @mixin _oTableVerticalBorders {
 	.o-table--vertical-borders {
 		border-left: 1px solid _oTableGet('table-border-color');
