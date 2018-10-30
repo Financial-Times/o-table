@@ -10,6 +10,7 @@
 
 
 /// Add verticle lines to a table
+/// @access private
 @mixin _oTableVerticalLines {
 	.o-table--vertical-lines {
 		th:not(:last-child):not(:first-child),
