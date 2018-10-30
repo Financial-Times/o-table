@@ -1,3 +1,5 @@
+import Delegate from 'dom-delegate';
+
 class BaseTable {
 
 	/**
@@ -24,6 +26,7 @@ class BaseTable {
 		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
+		this._rootElDomDelegate = new Delegate(this.rootEl);
 	}
 
 	/**
@@ -75,7 +78,7 @@ class BaseTable {
 			return;
 		}
 		this.rootEl.classList.add('o-table--sortable');
-		this.tableHeaders.forEach(function (th, columnIndex) {
+		this.tableHeaders.forEach(function (th) {
 			// Don't add sort buttons to unsortable columns.
 			if (th.hasAttribute('data-o-table-heading-disable-sort')) {
 				return;
@@ -90,14 +93,9 @@ class BaseTable {
 			sortButton.setAttribute('title', `sort table by ${heading}`);
 			th.innerHTML = '';
 			th.appendChild(sortButton);
-			// Add click event to button.
-			const listener = this._toggleColumnSort.bind(this, th, columnIndex);
-			sortButton.addEventListener('click', listener);
-			this._listeners.push({
-				element: sortButton,
-				listener,
-				type: 'click'
-			});
+			// Add click event to buttons.
+			const listener = this._sortButtonHandler.bind(this);
+			this._rootElDomDelegate.on('click', '.o-table__sort', listener)
 		}.bind(this));
 	}
 
@@ -129,6 +127,7 @@ class BaseTable {
 	 * @returns {undefined}
 	 */
 	destroy() {
+		this._rootElDomDelegate.destroy();
 		this._listeners.forEach(({ type, listener, element }) => {
 			element.removeEventListener(type, listener);
 		});
@@ -143,14 +142,19 @@ class BaseTable {
 	}
 
 	/**
-	 * @param {HTMLElement} th - The table header element for the column to sort by.
-	 * @param {Number} columnIndex - The index of the column to sort by.
+	 * Handles a sort button click event. Toggles column sort.
+	 * @param {MouseEvent} event - The click event.
 	 * @returns {undefined}
 	 */
-	_toggleColumnSort(th, columnIndex) {
-		const currentSort = th.getAttribute('aria-sort');
-		const sortOrder = [null, 'none', 'descending'].indexOf(currentSort) !== -1 ? 'ascending' : 'descending';
-		this.sortRowsByColumn(columnIndex, sortOrder);
+	_sortButtonHandler(event) {
+		const sortButton = event.target;
+		const th = sortButton.closest('th');
+		const columnIndex = this.tableHeaders.indexOf(th);
+		if (th && !isNaN(columnIndex)) {
+			const currentSort = th.getAttribute('aria-sort');
+			const sortOrder = [null, 'none', 'descending'].indexOf(currentSort) !== -1 ? 'ascending' : 'descending';
+			this.sortRowsByColumn(columnIndex, sortOrder);
+		}
 	}
 
 	/**
