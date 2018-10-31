@@ -95,7 +95,7 @@ class BaseTable {
 			th.appendChild(sortButton);
 			// Add click event to buttons.
 			const listener = this._sortButtonHandler.bind(this);
-			this._rootElDomDelegate.on('click', '.o-table__sort', listener)
+			this._rootElDomDelegate.on('click', '.o-table__sort', listener);
 		}.bind(this));
 	}
 
