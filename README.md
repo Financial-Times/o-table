@@ -459,14 +459,12 @@ Known issues:
 State | Major Version | Last Minor Release | Migration guide |
 :---: | :---: | :---: | :---:
 ✨ active | 7 | N/A | [migrate to v7](MIGRATION.md#migrating-from-v6-to-v7) |
-⚠ maintained | 6 | 2.4 | [migrate to v6](MIGRATION.md#migrating-from-v5-to-v6) |
-╳ deprecated | 5 | 1.0 | [migrate to v5](MIGRATION.md#migrating-from-v4-to-v5) |
-╳ deprecated | 4 | 1.0 | [migrate to v4](MIGRATION.md#migrating-from-v3-to-v4) |
-╳ deprecated | 3 | N/A | N/A |
-╳ deprecated | 2 | 2.4 | N/A |
-╳ deprecated | 1 | 1.0 | N/A |
-
-
+⚠ maintained | 6 | 6.9 | [migrate to v6](MIGRATION.md#migrating-from-v5-to-v6) |
+╳ deprecated | 5 | 5.2 | [migrate to v5](MIGRATION.md#migrating-from-v4-to-v5) |
+╳ deprecated | 4 | 4.1 | [migrate to v4](MIGRATION.md#migrating-from-v3-to-v4) |
+╳ deprecated | 3 | 3.0 | N/A |
+╳ deprecated | 2 | 2.0 | N/A |
+╳ deprecated | 1 | 1.7 | N/A |
 
 ## Contact
 
