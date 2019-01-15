@@ -10,6 +10,14 @@
     @return oBrandSupportsVariant($component: 'o-table', $variant: $variant);
 }
 
+/// Add support for custom brands.
+/// @param {string} $brand - The name of your custom brand.
+/// @param {map} $config - Your brand configuration, a map with variables and supports-variants E.g. ('variables': (), 'supports-variants': ()). See [the readme](https://registry.origami.ft.com/components/o-table@7.0.7/readme) for avalible options.
+/// @access public
+@function oTableDefine($brand, $config) {
+    @return oBrandDefine('o-table', $brand, $config);
+}
+
 @if oBrandGetCurrentBrand() == 'master' {
 	@include oBrandDefine('o-table', 'master', (
 		'variables': (
