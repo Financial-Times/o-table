@@ -13,7 +13,7 @@
 /// Customise your chosen brand.
 /// @param {Map} $variables - Brand variables to override.
 /// @access private
-@mixin _oTableSupports($variables) {
+@mixin oTableCustomise($variables) {
     @include oBrandCustomise('o-table', $variables);
 }
 
