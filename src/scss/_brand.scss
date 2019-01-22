@@ -10,6 +10,13 @@
     @return oBrandSupportsVariant($component: 'o-table', $variant: $variant);
 }
 
+/// Customise your chosen brand.
+/// @param {Map} $variables - Brand variables to override.
+/// @access private
+@mixin _oTableSupports($variables) {
+    @include oBrandCustomise('o-table', $variables);
+}
+
 @if oBrandGetCurrentBrand() == 'master' {
 	@include oBrandDefine('o-table', 'master', (
 		'variables': (
