@@ -11,10 +11,11 @@
 }
 
 /// Customise your chosen brand.
+/// @brand whitelabel
 /// @param {Map} $variables - Brand variables to override.
 /// @access private
-@mixin oTableCustomise($variables) {
-    @include oBrandCustomise('o-table', $variables);
+@mixin oTableCustomize($variables) {
+    @include oBrandCustomize('o-table', $variables);
 }
 
 @if oBrandGetCurrentBrand() == 'master' {
