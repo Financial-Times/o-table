@@ -46,8 +46,8 @@
 	}
 
 	// Show ascending icon in sort button with ascending sort applied or on hover with no sort.
-	th[aria-sort='none']:hover .o-table__sort, // sass-lint:disable-line no-qualifying-elements
-	th:not([aria-sort]):hover .o-table__sort, // sass-lint:disable-line no-qualifying-elements
+	th[aria-sort='none'] .o-table__sort:hover, // sass-lint:disable-line no-qualifying-elements
+	th:not([aria-sort]) .o-table__sort:hover, // sass-lint:disable-line no-qualifying-elements
 	[aria-sort='ascending'] .o-table__sort {
 		&:after {
 			@include oIconsGetIcon('arrow-up', $container-width: 1.25rem,  $container-height: 1.25rem, $iconset-version: 1);
