@@ -24,7 +24,7 @@
 		user-select: none;
 		text-align: left;
 		min-width: 60px;
-		margin: -($_o-table-sort-icon-size/2) 0;
+		margin: 0;
 		margin-right: -$_o-table-sort-icon-size;
 		padding: 0;
 		padding-right: $_o-table-sort-icon-size;
@@ -32,6 +32,7 @@
 			@include oIconsGetIcon('arrows-up-down', $container-width: $_o-table-sort-icon-size,  $container-height: $_o-table-sort-icon-size, $iconset-version: 1);
 			content: '';
 			vertical-align: middle;
+			margin: -($_o-table-sort-icon-size/2) 0;
 			margin-right: -$_o-table-sort-icon-size;
 		}
 	}
