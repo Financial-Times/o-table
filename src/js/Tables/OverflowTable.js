@@ -71,6 +71,8 @@ class OverflowTable extends BaseTable {
 		}, 0);
 		const extraHeight = (rowsToHide[0] ? rowsToHide[0].getBoundingClientRect().height / 2 : 0);
 		const contractedHeight = tableHeight + extraHeight - rowsToHideHeight;
+		// When the table is contracted, only the rows which will be visible need to be rendered immediately when sorting.
+		this._sortBatchNumber = this._opts.minimumRowCount && !this._opts.expanded ? parseInt(this._opts.minimumRowCount, 10) + 5 : null;
 		// Contract table.
 		window.requestAnimationFrame(() => {
 			this._updateRowVisibility(false);
@@ -105,6 +107,8 @@ class OverflowTable extends BaseTable {
 			this._opts.expanded = true;
 			return;
 		}
+		// When the table is expanded, render sorted rows at once as they are all visible.
+		this._sortBatchNumber = undefined;
 		const expanderButton = this.controls ? this.controls.expanderButton.querySelector('button') : null;
 		window.requestAnimationFrame(() => {
 			this.container.classList.remove('o-table-container--contracted');
@@ -256,6 +260,7 @@ class OverflowTable extends BaseTable {
 			this._setScrollPosition();
 			this._updateControls();
 		}.bind(this);
+
 		updateScroll();
 
 		// Observe controls scrolling beyond table and update.
@@ -323,9 +328,9 @@ class OverflowTable extends BaseTable {
 		}
 
 		if (this._opts.expanded){
-			this.expandTable();
+			window.requestAnimationFrame(this.expandTable.bind(this));
 		} else {
-			this.contractTable();
+			window.requestAnimationFrame(this.contractTable.bind(this));
 		}
 	}
 
