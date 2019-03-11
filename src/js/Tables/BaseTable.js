@@ -1,5 +1,39 @@
 import Delegate from 'dom-delegate';
 
+/**
+ * Append rows to table.
+ *
+ * @access private
+ * @param {Element} tbody - The table body to append the row batch to.
+ * @param {Array} rowBatch - An array of rows to append to the table body.
+ * @returns {undefined}
+ */
+function append(tbody, rowBatch) {
+	if (tbody.append) {
+		tbody.append(...rowBatch);
+	} else {
+		rowBatch.forEach(row => tbody.appendChild(row));
+	}
+}
+
+/**
+ * Prepend rows to table.
+ *
+ * @access private
+ * @param {Element} tbody - The table body to prepend the row batch to.
+ * @param {Array} rowBatch - An array of rows to prepend to the table body.
+ * @returns {undefined}
+ */
+function prepend(tbody, rowBatch) {
+	if (tbody.prepend) {
+		tbody.prepend(...rowBatch);
+	} else {
+		rowBatch.reverse().forEach(row => {
+			tbody.insertBefore(row, tbody.firstChild);
+		});
+	}
+}
+
 class BaseTable {
 
 	/**
@@ -27,6 +61,58 @@ class BaseTable {
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
 		this._rootElDomDelegate = new Delegate(this.rootEl);
+	}
+
+	/**
+	 * Render table rows.
+	 *
+	 * @access private
+	 * @returns {undefined}
+	 */
+	renderRows() {
+		const batch = this._renderRowsBatchNumber;
+		const rows = this.tableRows.slice(0);
+
+		// Ensure the correct aria-hidden attribute
+		// based on the tables current state.
+		this._updateRowVisibility();
+
+		// Render table rows in batches.
+		let updatedRowCount = 0;
+		const updateSortedRowBatch = function() {
+			window.requestAnimationFrame(() => {
+				if (updatedRowCount === 0 && isNaN(batch) === false) {
+					// On first run, update a batch of rows.
+					const rowBatch = rows.slice(updatedRowCount, batch);
+					prepend(this.tbody, rowBatch);
+					updatedRowCount = updatedRowCount + batch;
+				} else {
+					// On second run, update all the rest.
+					const rowBatch = rows.slice(updatedRowCount);
+					append(this.tbody, rowBatch);
+					updatedRowCount = rows.length;
+				}
+				if (updatedRowCount < rows.length) {
+					updateSortedRowBatch();
+				}
+			});
+		}.bind(this);
+		updateSortedRowBatch();
+	}
+
+	/**
+	 * Update row aria attributes to show/hide them.
+	 * E.g. After performing a sort, rows which where hidden in the colapsed table may have become visible.
+	 * @returns {undefined}
+	 */
+	_updateRowVisibility() {
+		const rowsToHide = this._rowsToHide || [];
+		window.requestAnimationFrame(function () {
+			this.tableRows.forEach((row) => {
+				const hide = rowsToHide.indexOf(row) !== -1;
+				row.setAttribute('aria-hidden', hide ? 'true' : 'false');
+			});
+		}.bind(this));
 	}
 
 	/**
@@ -65,7 +151,7 @@ class BaseTable {
 		}, { cancelable: true });
 
 		if (defaultSort) {
-			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder, this._sortBatchNumber);
+			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder, this._renderRowsBatchNumber);
 		}
 	}
 
@@ -77,15 +163,16 @@ class BaseTable {
 		if (!this._opts.sortable) {
 			return;
 		}
-		this.rootEl.classList.add('o-table--sortable');
-		this.tableHeaders.forEach((th) => {
+
+		// Create buttons for each table header.
+		const tableHeaderButtons = this.tableHeaders.map((th) => {
 			// Don't add sort buttons to unsortable columns.
 			if (th.hasAttribute('data-o-table-heading-disable-sort')) {
-				return;
+				return null;
 			}
 			// Don't add sort buttons to columns with no headings.
 			if (!th.hasChildNodes()) {
-				return;
+				return null;
 			}
 			// Move heading text into button.
 			const headingNodes = Array.from(th.childNodes);
@@ -101,17 +188,27 @@ class BaseTable {
 				}
 				return html + node.textContent;
 			}, '');
-			window.requestAnimationFrame(() => {
-				const sortButton = document.createElement('button');
-				sortButton.innerHTML = headingHTML;
-				// In VoiceOver, button `aria-label` is repeated when moving from one column of tds to the next.
-				// Using `title` avoids this, but risks not being announced by other screen readers.
-				sortButton.classList.add('o-table__sort');
-				sortButton.setAttribute('title', `sort table by ${th.textContent}`);
-				th.innerHTML = '';
-				th.appendChild(sortButton);
-			});
+
+			const sortButton = document.createElement('button');
+			sortButton.innerHTML = headingHTML;
+			sortButton.classList.add('o-table__sort');
+			// In VoiceOver, button `aria-label` is repeated when moving from one column of tds to the next.
+			// Using `title` avoids this, but risks not being announced by other screen readers.
+			sortButton.setAttribute('title', `sort table by ${th.textContent}`);
+			return sortButton;
 		});
+
+		// Add sort buttons to table headers.
+		window.requestAnimationFrame(function (){
+			this.rootEl.classList.add('o-table--sortable');
+			this.tableHeaders.forEach((th, index) => {
+				if (tableHeaderButtons[index]) {
+					th.innerHTML = '';
+					th.appendChild(tableHeaderButtons[index]);
+				}
+			});
+		}.bind(this));
+
 		// Add click event to buttons.
 		const listener = this._sortButtonHandler.bind(this);
 		this._rootElDomDelegate.on('click', '.o-table__sort', listener);

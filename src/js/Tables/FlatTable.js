@@ -15,14 +15,15 @@ class FlatTable extends BaseTable {
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
 		// Flat table can only work given headers.
+		// Duplicate row headings before adding sort buttons.
 		if (this.tableHeaders.length > 0) {
 			this._duplicateHeaders(rootEl);
 		} else {
 			console.warn('Could not create a "flat" table as no headers were found. Ensure table headers are placed within "<thead>". Removing class "o-table--responsive-flat".', rootEl);
 			rootEl.classList.remove('o-table--responsive-flat');
 		}
-		window.requestAnimationFrame(this.addSortButtons.bind(this));
-		this._ready();
+		window.setTimeout(this.addSortButtons.bind(this), 0);
+		window.setTimeout(this._ready.bind(this), 0);
 		return this;
 	}
 
@@ -32,12 +33,19 @@ class FlatTable extends BaseTable {
 	_duplicateHeaders() {
 		this.tableRows.forEach((row) => {
 			const data = Array.from(row.getElementsByTagName('td'));
-			data.forEach((td, dataIndex) => {
+			const dataHeadings = data.map((td, dataIndex) => {
 				const clonedHeader = this.tableHeaders[dataIndex].cloneNode(true);
 				clonedHeader.setAttribute('scope', 'row');
 				clonedHeader.setAttribute('role', 'rowheader');
 				clonedHeader.classList.add('o-table__duplicate-heading');
-				td.parentNode.insertBefore(clonedHeader, td);
+				return clonedHeader;
+			});
+
+			window.requestAnimationFrame(() => {
+				dataHeadings.forEach((clonedHeader, index) => {
+					const td = data[index];
+					td.parentNode.insertBefore(clonedHeader, td);
+				});
 			});
 		});
 	}

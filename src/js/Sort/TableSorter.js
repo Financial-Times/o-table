@@ -47,41 +47,6 @@ function descendingSort(...args) {
 }
 
 /**
- * Append rows to table.
- *
- * @access private
- * @param {Element} tbody - The table body to append the row batch to.
- * @param {Array} rowBatch - An array of rows to append to the table body.
- * @returns {undefined}
- */
-function append(tbody, rowBatch) {
-	if (tbody.append) {
-		tbody.append(...rowBatch);
-	} else {
-		rowBatch.forEach(row => tbody.appendChild(row));
-	}
-
-}
-
-/**
- * Prepend rows to table.
- *
- * @access private
- * @param {Element} tbody - The table body to prepend the row batch to.
- * @param {Array} rowBatch - An array of rows to prepend to the table body.
- * @returns {undefined}
- */
-function prepend(tbody, rowBatch) {
-	if (tbody.prepend) {
-		tbody.prepend(...rowBatch);
-	} else {
-		rowBatch.reverse().forEach(row => {
-			tbody.insertBefore(row, tbody.firstChild);
-		});
-	}
-}
-
-/**
  * Provides methods to sort table instances.
  */
 class TableSorter {
@@ -96,7 +61,7 @@ class TableSorter {
 	 * @access public
 	 * @param {BaseTable} table - The table instance to sort.
 	 * @param {Number} columnIndex - The index of the table column to sort.
-	 * @param {Number} sortOrder - How to sort the column, "ascending" or "descending"
+	 * @param {String} sortOrder - How to sort the column, "ascending" or "descending"
 	 * @param {Number} batch [100] - How many rows to update at once when sorting.
 	 * @returns {undefined}
 	 */
@@ -110,7 +75,7 @@ class TableSorter {
 		const intlCollator = getIntlCollator();
 		const cellFormatter = this._cellFormatter;
 		const type = tableHeaderElement.getAttribute('data-o-table-data-type') || undefined;
-		table.tableRows.sort((a, b) => {
+		table.tableRows = table.tableRows.sort((a, b) => {
 			let aCol = a.querySelectorAll('td,th:not(.o-table__duplicate-heading)')[columnIndex];
 			let bCol = b.querySelectorAll('td,th:not(.o-table__duplicate-heading)')[columnIndex];
 			aCol = cellFormatter.formatCell({ cell: aCol, type });
@@ -122,27 +87,10 @@ class TableSorter {
 			}
 		});
 
-		let updatedRowCount = 0;
-		function updateSortedRowBatch() {
-			window.requestAnimationFrame(() => {
-				if (updatedRowCount === 0 && isNaN(batch) === false) {
-					// On first run, update a batch of rows.
-					const rowBatch = table.tableRows.slice(updatedRowCount, batch);
-					prepend(table.tbody, rowBatch);
-					updatedRowCount = updatedRowCount + batch;
-				} else {
-					// On second run, update all the rest.
-					const rowBatch = table.tableRows.slice(updatedRowCount);
-					append(table.tbody, rowBatch);
-					updatedRowCount = table.tableRows.length;
-				}
-				if (updatedRowCount < table.tableRows.length) {
-					updateSortedRowBatch();
-				}
-			});
-		}
-		updateSortedRowBatch();
+		// Render sorted table rows.
+		table.renderRows(batch);
 
+		// Table sorted.
 		window.requestAnimationFrame(() => {
 			table.tableHeaders.forEach((header) => {
 				const headerSort = (header === tableHeaderElement ? sortOrder : 'none');
