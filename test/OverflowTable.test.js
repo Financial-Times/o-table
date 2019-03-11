@@ -10,8 +10,12 @@ import TableSorter from './../src/js/Sort/TableSorter';
 const sorter = new TableSorter();
 
 function expandable(oTableEl, { minimumRowCount, expanded }) {
-	oTableEl.setAttribute('data-o-table-expanded', expanded);
-	oTableEl.setAttribute('data-o-table-minimum-row-count', minimumRowCount);
+	if (expanded !== undefined) {
+		oTableEl.setAttribute('data-o-table-expanded', expanded);
+	}
+	if (minimumRowCount !== undefined) {
+		oTableEl.setAttribute('data-o-table-minimum-row-count', minimumRowCount);
+	}
 }
 
 function noTableWrapperOrContainer(oTableEl) {
@@ -135,7 +139,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertExpanded(table, { expanded: true });
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("can be configured to be contracted by default", (done) => {
@@ -144,7 +148,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertExpanded(table, { expanded: false });
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("can toggle between expanded and contracted programmatically when expandable", (done) => {
@@ -167,7 +171,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertExpanded(table, { expanded: false, minimumRowCount: 2});
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("is not used if the number of rows to contract to is larger than the table", (done) => {
@@ -177,7 +181,7 @@ describe("OverflowTable", () => {
 				proclaim.isFalse(table.canExpand());
 				proclaim.isFalse(table.rootEl.hasAttribute('aria-expanded'), `Did not expect "aria-expanded" on a table which can not expand.`);
 				done();
-			}, 100);
+			}, 150);
 		});
 	});
 
@@ -194,7 +198,7 @@ describe("OverflowTable", () => {
 				proclaim.isNull(oTableEl.querySelector('.o-table-control--forward'), 'Did not expect to find a forward button.');
 				proclaim.isNull(oTableEl.querySelector('.o-table-control--back'), 'Did not expect to find a back button.');
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("forward / backward buttons are added given wrapper and container elements", (done) => {
@@ -203,7 +207,7 @@ describe("OverflowTable", () => {
 				proclaim.isNotNull(document.querySelector('.o-table-control--forward'), 'Did not find forward button.');
 				proclaim.isNotNull(document.querySelector('.o-table-control--back'), 'Did not find back button.');
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("backward button is disabled and visualy hidden at the start of the table, if the table is shorter than the viewport and scrolling past the table is not possible", (done) => {
@@ -218,7 +222,7 @@ describe("OverflowTable", () => {
 					visuallyHidden: true
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("forward button is disabled and visualy hidden at the end of the table, if the table is shorter than the viewport and scrolling past the table is not possible", (done) => {
@@ -233,7 +237,7 @@ describe("OverflowTable", () => {
 					visuallyHidden: true
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("backward button is disabled but visible at the start of the table, when the table can be scrolled past", (done) => {
@@ -245,7 +249,7 @@ describe("OverflowTable", () => {
 					visuallyHidden: false
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 
 		it("forward button is disabled but visible at the end of the table, when the table can be scrolled past", (done) => {
@@ -258,7 +262,7 @@ describe("OverflowTable", () => {
 					visuallyHidden: false
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("forward / backward buttons are sticky and hidden when the table is scrolled past", (done) => {
 			canScrollPastTable();
@@ -276,7 +280,7 @@ describe("OverflowTable", () => {
 					sticky: true
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("forward / backward buttons are not sticky when the table can not be scrolled past", (done) => {
 			// reset sandbox to use a table smaller than the viewport
@@ -295,7 +299,7 @@ describe("OverflowTable", () => {
 					sticky: false
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 	});
 
@@ -313,7 +317,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertDock(true);
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("is not added given the table is smaller than the viewport", (done) => {
 			canScrollTable();
@@ -322,7 +326,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertDock(false);
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("is added if the table is smaller than the viewport and can be scrolled past", (done) => {
 			canScrollTable();
@@ -332,7 +336,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertDock(true);
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("is not added given the table is not scrollable", (done) => {
 			expandable(oTableEl, { expanded: false });
@@ -340,7 +344,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertDock(false);
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("is not added given the table is not expandable", (done) => {
 			canScrollTable();
@@ -348,7 +352,7 @@ describe("OverflowTable", () => {
 			setTimeout(() => {
 				assertDock(false);
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("scroll controls are not sticky and instead \"dock\" given the dock exists and the table is shorter than the viewport", (done) => {
 			canScrollTable();
@@ -362,7 +366,7 @@ describe("OverflowTable", () => {
 					dock: true
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("scroll controls do not \"dock\" if the dock does not exist", (done) => {
 			canScrollTable();
@@ -374,7 +378,7 @@ describe("OverflowTable", () => {
 					dock: false
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("scroll controls do not \"dock\" when the table is taller than the viewport", (done) => {
 			canScrollTable();
@@ -388,7 +392,7 @@ describe("OverflowTable", () => {
 					dock: false
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("sticky scroll controls are visually hidden when scrolling past a table with no \"dock\".", (done) => {
 			canScrollTable();
@@ -403,7 +407,7 @@ describe("OverflowTable", () => {
 					dock: false
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 		it("sticky scroll controls remain visible when scrolling past a table with a \"dock\".", (done) => {
 			canScrollTable();
@@ -419,7 +423,7 @@ describe("OverflowTable", () => {
 					dock: true
 				});
 				done();
-			}, 100);
+			}, 150);
 		});
 	});
 });

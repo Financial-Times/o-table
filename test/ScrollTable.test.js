@@ -45,7 +45,7 @@ describe("ScrollTable", () => {
 				done(error);
 			}
 			done();
-		}, 2); // wait for window.requestAnimationFrame
+		}, 100); // wait for window.requestAnimationFrame
 	});
 
 });

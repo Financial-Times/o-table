@@ -13,9 +13,9 @@ class ScrollTable extends BaseTable {
 	 */
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
-		this._duplicateRowsWithAddedHeader();
-		window.requestAnimationFrame(this.addSortButtons.bind(this));
-		this._ready();
+		this._duplicateRowsWithAddedHeader(); // Duplicate rows before adding heading sort buttons.
+		window.setTimeout(this.addSortButtons.bind(this), 0);
+		window.setTimeout(this._ready.bind(this), 0);
 		return this;
 	}
 
@@ -24,7 +24,8 @@ class ScrollTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	_duplicateRowsWithAddedHeader() {
-		this.tableHeaders.forEach((header, index) => {
+		// Clone headings and data into new rows.
+		const clonedRows = this.tableHeaders.map((header, index) => {
 			const headerRow = document.createElement('tr');
 			headerRow.classList.add('o-table__duplicate-row');
 			// Clone column heading and turn into a row heading.
@@ -37,8 +38,17 @@ class ScrollTable extends BaseTable {
 				const data = row.querySelectorAll('td')[index];
 				headerRow.appendChild(data.cloneNode(true));
 			});
-			this.tbody.appendChild(headerRow);
+			return headerRow;
 		});
+
+		// Add new rows, which have a row rather than column headings, to the table body.
+		window.requestAnimationFrame(function () {
+			if (this.tbody.append) {
+				this.tbody.append(...clonedRows);
+			} else {
+				clonedRows.forEach(row => this.tbody.appendChild(row));
+			}
+		}.bind(this));
 	}
 }
 
