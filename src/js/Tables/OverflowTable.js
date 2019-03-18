@@ -28,6 +28,20 @@ class OverflowTable extends BaseTable {
 	}
 
 	/**
+	 * Filter the table.
+	 *
+	 * @access public
+	 * @param {Number} headerIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
+	 * @returns {undefined}
+	 */
+	filter(headerIndex, filter) {
+		this._filterRowsByColumn(headerIndex, filter);
+		this.renderRows();
+		this._renderExpander();
+	}
+
+	/**
 	 * Check if the table is expanded (true) or collapsed (false).
 	 * @access public
 	 * @returns {Bool}
@@ -53,7 +67,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {Bool}
 	 */
 	canExpand() {
-		return typeof this._opts.expanded === 'boolean' && (this._minimumRowCount < this.tableRows.length);
+		return typeof this._opts.expanded === 'boolean' && (this._minimumRowCount < this.tableRows.filter(row => row.getAttribute('data-o-table-filtered') !== 'true').length);
 	}
 
 	_renderExpander() {
@@ -100,15 +114,15 @@ class OverflowTable extends BaseTable {
 				window.requestAnimationFrame(function () {
 					// Calculate contracted table height.
 					// Extra height to tease half of the first hidden row.
-					const rowsToHide = this._rowsToHide;
+					const rowsHiddenByExpander = this._rowsHiddenByExpander;
 					const originalButtonTopOffset = expanderButtonContainer.getBoundingClientRect().top;
 					const buttonHeight = expanderButtonContainer.getBoundingClientRect().height;
 					const tableHeight = this.rootEl.getBoundingClientRect().height;
-					const rowsToHideHeight = rowsToHide.reduce((accumulatedHeight, row) => {
+					const rowsHiddenByExpanderHeight = rowsHiddenByExpander.reduce((accumulatedHeight, row) => {
 						return accumulatedHeight + row.getBoundingClientRect().height;
 					}, 0);
-					const extraHeight = (rowsToHide[0] ? rowsToHide[0].getBoundingClientRect().height / 2 : 0);
-					const contractedHeight = rowsToHideHeight === 0 ? '' : `${tableHeight + buttonHeight + extraHeight - rowsToHideHeight}px`;
+					const extraHeight = (rowsHiddenByExpander[0] ? rowsHiddenByExpander[0].getBoundingClientRect().height / 2 : 0);
+					const contractedHeight = rowsHiddenByExpanderHeight === 0 ? '' : `${tableHeight + buttonHeight + extraHeight - rowsHiddenByExpanderHeight}px`;
 					window.requestAnimationFrame(function () {
 						// Update table height and sort button.
 						this.wrapper.style.height = contractedHeight;
@@ -452,12 +466,22 @@ class OverflowTable extends BaseTable {
 	}
 
 	/**
-	 * Which rows are hidden by the expander.
+	 * Which rows are hidden, either by a filter or by the expander.
 	 * @returns {Array[Node]}
 	 */
 	get _rowsToHide() {
+		const hiddenByFilter = this._rowsHiddenByFilter;
+		return [...hiddenByFilter, ...this._rowsHiddenByExpander];
+	}
+
+	/**
+	 * The rows which will be hidden if the table is collapsed.
+	 * @returns {Array[Node]}
+	 */
+	get _rowsHiddenByExpander() {
 		const visibleRowCount = Math.min(this.tableRows.length, this._minimumRowCount);
-		return this.isContracted() ? this.tableRows.slice(visibleRowCount, this.tableRows.length) : [];
+		const nonFilteredRows = this.tableRows.filter(row => row.getAttribute('data-o-table-filtered') !== 'true');
+		return this.isContracted() ? nonFilteredRows.slice(visibleRowCount, nonFilteredRows.length) : [];
 	}
 
 	/**

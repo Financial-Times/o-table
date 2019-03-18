@@ -77,6 +77,20 @@ class BaseTable {
 		// based on the tables current state.
 		this._updateRowVisibility();
 
+		// Render filtered rows at the end of the table,
+		// to maintain the striped table style.
+		rows.sort((a, b) => {
+			const aHidden = a.getAttribute('data-o-table-filtered') === 'true';
+			const bHidden = b.getAttribute('data-o-table-filtered') === 'true';
+			if (aHidden && !bHidden) {
+				return 1;
+			}
+			if (!aHidden && bHidden) {
+				return -1;
+			}
+			return 0;
+		});
+
 		// Render table rows in batches.
 		let updatedRowCount = 0;
 		const updateSortedRowBatch = function() {
@@ -101,8 +115,61 @@ class BaseTable {
 	}
 
 	/**
+	 * Filter the table.
+	 *
+	 * @access public
+	 * @param {Number} headerIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
+	 * @returns {undefined}
+	 */
+	filter(headerIndex, filter) {
+		this._filterRowsByColumn(headerIndex, filter);
+		this.renderRows();
+	}
+
+	/**
+	 * Filter the table.
+	 *
+	 * @access public
+	 * @param {Number} columnIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
+	 * @returns {undefined}
+	 */
+	_filterRowsByColumn(columnIndex, filter) {
+		if (typeof filter !== 'string' && typeof filter !== 'function') {
+			throw new Error(`Could not filter table column "${columnIndex}". Expected the filter to a string or function.`, this);
+		}
+		// Filter column headings.
+		this.tableRows.forEach(row => {
+			const cell = row.querySelector(`td:nth-of-type(${columnIndex + 1})`);
+			if(cell) {
+				const hideRow = typeof filter === 'function' ? filter(cell.cloneNode(true)) === false : cell.textContent !== filter;
+				row.setAttribute('data-o-table-filtered', hideRow);
+			}
+		});
+	}
+
+	/**
+	 * Which rows are hidden by a filter.
+	 * @returns {Array[Node]}
+	 */
+	get _rowsHiddenByFilter() {
+		const hiddenByFilter = this.tableRows.filter(row => row.getAttribute('data-o-table-filtered') === 'true');
+		return hiddenByFilter;
+	}
+
+	/**
+	 * Which rows are hidden, e.g. by a filter.
+	 * @returns {Array[Node]}
+	 */
+	get _rowsToHide() {
+		const hiddenByFilter = this._rowsHiddenByFilter;
+		return hiddenByFilter;
+	}
+
+	/**
 	 * Update row aria attributes to show/hide them.
-	 * E.g. After performing a sort, rows which where hidden in the colapsed table may have become visible.
+	 * E.g. After performing a sort or filter, rows which where hidden in the colapsed table may have become visible.
 	 * @returns {undefined}
 	 */
 	_updateRowVisibility() {

@@ -126,6 +126,12 @@
 			"description": "This demo shows sorting columns of various data types, including FT style dates, times, and abbreviated numbers. The demo also shows a column with sort disabled."
 		},
 		{
+			"title": "Filter",
+			"name": "filter",
+			"template": "demos/src/filter.mustache",
+			"description": "This demo shows a table with columns which may be filtered by a value."
+		},
+		{
 			"title": "Row Stripes",
 			"name": "row-stripes",
 			"template": "demos/src/basic.mustache",

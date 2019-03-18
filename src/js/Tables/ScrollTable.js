@@ -20,6 +20,32 @@ class ScrollTable extends BaseTable {
 	}
 
 	/**
+	 * Filter the table.
+	 *
+	 * @access public
+	 * @param {Number} headerIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
+	 * @returns {undefined}
+	 */
+	filter(headerIndex, filter) {
+		// Filter columns by rows (mobile view).
+		const rowHeadingRows = Array.from(this.tbody.querySelectorAll('.o-table__duplicate-row'));
+		const filterableCells = (rowHeadingRows.length ? rowHeadingRows[headerIndex].querySelectorAll('td') : []);
+		filterableCells.forEach((cell, index) => {
+			const showColumn = typeof filter === 'function' ? filter(cell.cloneNode(true)) : cell.textContent === filter;
+			rowHeadingRows.forEach(row => {
+				const hideCell = filter && !showColumn;
+				const cell = row.querySelector(`td:nth-of-type(${index + 1})`);
+				cell.setAttribute('data-o-table-filtered', hideCell);
+				cell.setAttribute('aria-hidden', hideCell);
+			});
+		});
+
+		// Filter rows by columns (desktop view).
+		this._filterRowsByColumn(headerIndex, filter);
+	}
+
+	/**
 	 * Duplicate the table headers into a one tbody row.
 	 * @returns {undefined}
 	 */
