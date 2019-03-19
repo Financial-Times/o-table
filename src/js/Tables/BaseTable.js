@@ -61,6 +61,33 @@ class BaseTable {
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
 		this._rootElDomDelegate = new Delegate(this.rootEl);
+		this._setupFilterElements();
+	}
+
+	_setupFilterElements() {
+		const tableId = this.rootEl.getAttribute('id');
+		if (!tableId) {
+			return;
+		}
+		// Do nothing if no filter is found for this table.
+		const filter = window.document.querySelector(`[data-o-table-filter-id="${tableId}"]`);
+		if (!filter) {
+			return;
+		}
+		// Warn if a misconfigured filter was found.
+		const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+		if (!filterColumn) {
+			console.warn(`Could not setup the filter for the table "${tableId}" as no column index was given to filter on. Add a \`data-o-table-filter-column="{columnIndex}"\` attribute to the filter.`, filter);
+			return;
+		}
+		// Apply the filter .
+		if (filter.value) {
+			this.filter(filterColumn, filter.value);
+		}
+		// Add a listener to filter the table.
+		filter.addEventListener('input', (event) => {
+			this.filter(filterColumn, event.target.value || '');
+		});
 	}
 
 	/**
@@ -139,14 +166,41 @@ class BaseTable {
 		if (typeof filter !== 'string' && typeof filter !== 'function') {
 			throw new Error(`Could not filter table column "${columnIndex}". Expected the filter to a string or function.`, this);
 		}
+
 		// Filter column headings.
 		this.tableRows.forEach(row => {
 			const cell = row.querySelector(`td:nth-of-type(${columnIndex + 1})`);
 			if(cell) {
-				const hideRow = typeof filter === 'function' ? filter(cell.cloneNode(true)) === false : cell.textContent !== filter;
+				const hideRow = this._filterMatch(cell, filter);
 				row.setAttribute('data-o-table-filtered', hideRow);
 			}
 		});
+	}
+
+	/**
+	 * Filter the table.
+	 *
+	 * @access public
+	 * @param {Element} cell - The table cell to test the filter function against.
+	 * @param {String|Function} filter - The filter, either a string or callback function.
+	 * @returns {Boolean}
+	 */
+	_filterMatch(cell, filter) {
+		// If the filter is a string create a filter function which:
+		// - Always matches an emtpy string (no filter).
+		// - Matches against only alpha numeric characters and ".".
+		// - Case insentivie.
+		// - Whitespace insentivie.
+		if (typeof filter === 'string') {
+			const filterValue = filter.replace(/[^\w\.]+/g, '').toLowerCase();
+			filter = (cell) => {
+				const cellValue = cell.textContent.replace(/[^\w\.]+/g, '').toLowerCase();
+				return filterValue ? cellValue.indexOf(filterValue) > -1 : true;
+			};
+		}
+
+		// Check if the filter matches the given table cell.
+		return filter(cell.cloneNode(true)) !== true;
 	}
 
 	/**

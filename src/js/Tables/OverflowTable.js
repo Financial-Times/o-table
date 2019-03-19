@@ -1,5 +1,35 @@
 import BaseTable from './BaseTable';
 
+function getNewContractedHeight(table) {
+	const buttonHeight = table.controls.expanderButton.getBoundingClientRect().height;
+	const rowsHiddenByExpander = table._rowsHiddenByExpander;
+	const tableHeight = table.rootEl.getBoundingClientRect().height;
+	const tableWrapperHeight = table.wrapper.style.height ? parseInt(table.wrapper.style.height, 10) : null;
+
+	const buffer = 200;
+	const currentHeight = tableWrapperHeight;
+	const maxHeight = tableHeight;
+	const rowsHiddenByExpanderHeight = rowsHiddenByExpander.reduce((accumulatedHeight, row) => {
+		return accumulatedHeight + row.getBoundingClientRect().height;
+	}, 0);
+	const extraHeight = (rowsHiddenByExpander[0] ? rowsHiddenByExpander[0].getBoundingClientRect().height / 2 : 0);
+	const updatedheight = tableHeight + buttonHeight + extraHeight - rowsHiddenByExpanderHeight;
+
+	if (!currentHeight || (maxHeight < currentHeight)) {
+		return updatedheight;
+	}
+
+	if (currentHeight > updatedheight + buffer) {
+		return updatedheight;
+	}
+
+	if (currentHeight < updatedheight - buffer) {
+		return updatedheight;
+	}
+
+	return currentHeight;
+}
+
 class OverflowTable extends BaseTable {
 
 	/**
@@ -111,32 +141,21 @@ class OverflowTable extends BaseTable {
 
 			// Render a contacted table.
 			if (contract) {
+				// Calculate contracted table height.
+				// Extra height to tease half of the first hidden row.
+				const contractedHeight = getNewContractedHeight(this);
 				window.requestAnimationFrame(function () {
-					// Calculate contracted table height.
-					// Extra height to tease half of the first hidden row.
-					const rowsHiddenByExpander = this._rowsHiddenByExpander;
-					const originalButtonTopOffset = expanderButtonContainer.getBoundingClientRect().top;
-					const buttonHeight = expanderButtonContainer.getBoundingClientRect().height;
-					const tableHeight = this.rootEl.getBoundingClientRect().height;
-					const rowsHiddenByExpanderHeight = rowsHiddenByExpander.reduce((accumulatedHeight, row) => {
-						return accumulatedHeight + row.getBoundingClientRect().height;
-					}, 0);
-					const extraHeight = (rowsHiddenByExpander[0] ? rowsHiddenByExpander[0].getBoundingClientRect().height / 2 : 0);
-					const contractedHeight = rowsHiddenByExpanderHeight === 0 ? '' : `${tableHeight + buttonHeight + extraHeight - rowsHiddenByExpanderHeight}px`;
-					window.requestAnimationFrame(function () {
-						// Update table height and sort button.
-						this.wrapper.style.height = contractedHeight;
-						expanderButton.textContent = 'Show more';
-						// Keep more/fewer button in viewport when contracting table.
-						// Using `window.scroll(x-coord, y-coord)` as IE11 did not scroll
-						// correctly with `window.scroll(options)`.
+					// Update table height and expander button.
+					this.wrapper.style.height = contractedHeight ? `${contractedHeight}px` : '';
+					expanderButton.textContent = 'Show more';
+					// Keep the expander button in viewport when contracting the table.
+					if (this._keepExpanderButtonTopOffset) {
 						window.requestAnimationFrame(() => {
-							if (originalButtonTopOffset) {
-								const top = window.pageYOffset + expanderButtonContainer.getBoundingClientRect().top - originalButtonTopOffset;
-								window.scroll(null, top);
-							}
+							const top = window.pageYOffset + expanderButtonContainer.getBoundingClientRect().top - this._keepExpanderButtonTopOffset;
+							window.scroll(null, top);
+							this._keepExpanderButtonTopOffset = undefined;
 						});
-					}.bind(this));
+					}
 				}.bind(this));
 			}
 		}.bind(this));
@@ -362,6 +381,7 @@ class OverflowTable extends BaseTable {
 		if (this.controls.expanderButton) {
 			const toggleExpanded = function () {
 				if (this.isExpanded()) {
+					this._keepExpanderButtonTopOffset = this.controls.expanderButton.getBoundingClientRect().top;
 					this.contractTable();
 				} else {
 					this.expandTable();

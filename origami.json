@@ -29,7 +29,9 @@
 		"dependencies": [
 			"o-fonts@^3.0.0",
 			"o-normalise@^1.0.0",
-			"o-typography@^5.7.8"
+			"o-typography@^5.7.8",
+			"o-forms@^6.0.1",
+			"o-buttons@^5.16.2"
 		]
 	},
 	"demos": [
@@ -128,6 +130,9 @@
 		{
 			"title": "Filter",
 			"name": "filter",
+			"data": {
+				"tableId": "fruit-table"
+			},
 			"template": "demos/src/filter.mustache",
 			"description": "This demo shows a table with columns which may be filtered by a value."
 		},
