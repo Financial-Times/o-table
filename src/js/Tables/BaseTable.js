@@ -402,6 +402,15 @@ class BaseTable {
 		this._listeners.forEach(({ type, listener, element }) => {
 			element.removeEventListener(type, listener);
 		});
+
+		// Remove DOM references.
+		delete this.thead;
+		delete this.tbody;
+		delete this.tableHeaders;
+		delete this.tableRows;
+		delete this.wrapper;
+		delete this.container;
+		delete this.overlayWrapper;
 	}
 
 	/**
