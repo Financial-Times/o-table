@@ -171,7 +171,7 @@ class BaseTable {
 		this.tableRows.forEach(row => {
 			const cell = row.querySelector(`td:nth-of-type(${columnIndex + 1})`);
 			if(cell) {
-				const hideRow = this._filterMatch(cell, filter);
+				const hideRow = BaseTable._filterMatch(cell, filter);
 				row.setAttribute('data-o-table-filtered', hideRow);
 			}
 		});
@@ -185,7 +185,7 @@ class BaseTable {
 	 * @param {String|Function} filter - The filter, either a string or callback function.
 	 * @returns {Boolean}
 	 */
-	_filterMatch(cell, filter) {
+	static _filterMatch(cell, filter) {
 		// If the filter is a string create a filter function which:
 		// - Always matches an emtpy string (no filter).
 		// - Matches against only alpha numeric characters and ".".

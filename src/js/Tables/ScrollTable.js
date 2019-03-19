@@ -32,7 +32,7 @@ class ScrollTable extends BaseTable {
 		const rowHeadingRows = Array.from(this.tbody.querySelectorAll('.o-table__duplicate-row'));
 		const filterableCells = (rowHeadingRows.length ? rowHeadingRows[headerIndex].querySelectorAll('td') : []);
 		filterableCells.forEach((cell, index) => {
-			const showColumn = this._filterMatch(cell, filter);
+			const showColumn = BaseTable._filterMatch(cell, filter);
 			rowHeadingRows.forEach(row => {
 				const hideCell = filter && !showColumn;
 				const cell = row.querySelector(`td:nth-of-type(${index + 1})`);
