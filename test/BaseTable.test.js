@@ -20,12 +20,115 @@ describe("BaseTable", () => {
 
 	beforeEach(() => {
 		sandbox.init();
-		sandbox.setContents(fixtures.shortTableWithContainer);
-		oTableEl = document.querySelector('[data-o-component=o-table]');
-		table = new BaseTable(oTableEl, sorter);
+	});
+
+	describe('filter', () => {
+		function getTableElementWithData(type, dataArray) {
+			const markup = fixtures.getTableMarkupFor(type, dataArray);
+			sandbox.setContents(markup);
+			return document.querySelector('[data-o-component=o-table]');
+		}
+
+		function assertFilter(data, expectedData) {
+			const tbody = oTableEl.querySelector('tbody');
+			const filterdRows = tbody.querySelectorAll('tr[data-o-table-filtered="true"]');
+			const visibleRows = tbody.querySelectorAll('tr[data-o-table-filtered="false"]');
+			const expectedFiltered = data.length - expectedData.length;
+			const expectedVisible = expectedData.length;
+			proclaim.equal(filterdRows.length, expectedFiltered, `Expected ${expectedFiltered} filtered rows but found ${filterdRows.length}.`);
+			proclaim.equal(visibleRows.length, expectedVisible, `Expected ${expectedVisible} visible rows but found ${visibleRows.length}.`);
+		}
+
+		describe('given a string filter', () => {
+			it('is case insensitive', done => {
+				const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, 'dragonfruit');
+				setTimeout(() => {
+					assertFilter(data, ['Dragonfruit']);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+			it('is whitespace insensitive', done => {
+				const data = ['       Dragon fruit       ', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, 'Dragonfruit');
+				setTimeout(() => {
+					assertFilter(data, ['Dragonfruit']);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+			it('ignores special characters', done => {
+				const data = ['Dragonfruit', 'Durian*', 'Naseberry', 'Strawberry', 'Apple'];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, 'Durian');
+				setTimeout(() => {
+					assertFilter(data, ['Durian']);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+			it('ignores non-breaking space characters', done => {
+				const data = ['Dragonfruit', 'Dur ian', 'Naseberry', 'Strawberry', 'Apple'];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, 'Durian');
+				setTimeout(() => {
+					assertFilter(data, ['Durian']);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+			it('filters on a partial match', done => {
+				const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, 'berry');
+				setTimeout(() => {
+					assertFilter(data, ['Naseberry', 'Strawberry']);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+		});
+
+		describe('given a function', () => {
+			it('keeps rows where the return value is true', done => {
+				const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, (cell) => {
+					return parseInt(cell.textContent, 10) > 3;
+				});
+				setTimeout(() => {
+					assertFilter(data, [4, 5, 6, 7, 8, 9, 10]);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+
+			it('filters rows where the return value is false', done => {
+				const data = ['a', 'b', 'aa', 'bb'];
+				oTableEl = getTableElementWithData('', data);
+				table = new BaseTable(oTableEl, sorter);
+				table.filter(0, (cell) => {
+					return cell.textContent === 'a';
+				});
+				setTimeout(() => {
+					assertFilter(data, ['a']);
+					done();
+				}, 100); // wait for window.requestAnimationFrame
+			});
+		});
 	});
 
 	describe('addSortButtons', () => {
+		beforeEach(() => {
+			sandbox.init();
+			sandbox.setContents(fixtures.shortTableWithContainer);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
+			table = new BaseTable(oTableEl, sorter);
+		});
+
 		it('adds buttons in the table column headers', done => {
 			table.addSortButtons();
 			setTimeout(() => {
@@ -138,6 +241,13 @@ describe("BaseTable", () => {
 	});
 
 	describe('sortRowsByColumn', () => {
+		beforeEach(() => {
+			sandbox.init();
+			sandbox.setContents(fixtures.shortTableWithContainer);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
+			table = new BaseTable(oTableEl, sorter);
+		});
+
 		it('sorts a given column in descending order', () => {
 			const columnIndex = 1;
 			const sortOrder = 'descending';
@@ -194,6 +304,13 @@ describe("BaseTable", () => {
 	});
 
 	describe('getTableHeader', () => {
+		beforeEach(() => {
+			sandbox.init();
+			sandbox.setContents(fixtures.shortTableWithContainer);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
+			table = new BaseTable(oTableEl, sorter);
+		});
+
 		it('gets a th element for a given column index', () => {
 			const thead = oTableEl.querySelector('thead');
 			const tableHeaders = thead.querySelectorAll('th');
@@ -210,6 +327,14 @@ describe("BaseTable", () => {
 	});
 
 	describe('sorted', () => {
+
+		beforeEach(() => {
+			sandbox.init();
+			sandbox.setContents(fixtures.shortTableWithContainer);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
+			table = new BaseTable(oTableEl, sorter);
+		});
+
 		it('fires the oTable.sorted event with column index and sort order', done => {
 			const columnIndex = 1;
 			const sortOrder = 'ascending';
@@ -249,6 +374,14 @@ describe("BaseTable", () => {
 	});
 
 	describe('destroy', () => {
+
+		beforeEach(() => {
+			sandbox.init();
+			sandbox.setContents(fixtures.shortTableWithContainer);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
+			table = new BaseTable(oTableEl, sorter);
+		});
+
 		it('removes sort button event listeners', () => {
 			// Mock removeEventListener
 			const realRemoveEventListener = Element.prototype.removeEventListener;

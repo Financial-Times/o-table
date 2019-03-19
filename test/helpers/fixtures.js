@@ -282,8 +282,28 @@ const tableWithContainerAndComplexHeadings = `
 </div>
 `;
 
+const getTableMarkupFor = function (type, dataArray) {
+	return `
+		<div class="o-table-container">
+			<div class="o-table-scroll-wrapper">
+				<table class="o-table" data-o-component="o-table">
+					<thead>
+						<tr>
+							<th scope="col" role="columnheader" data-o-table-data-type="${type}">Test Data</th>
+						</tr>
+					</thead>
+					<tbody>
+						${dataArray.map(data => `<tr><td>${data}</td></tr>`).join('')}
+					</tbody>
+			</table>
+			</div>
+		</div>
+	`;
+};
+
 export {
 	longTableWithContainer,
 	shortTableWithContainer,
 	tableWithContainerAndComplexHeadings,
+	getTableMarkupFor
 };
