@@ -75,7 +75,7 @@ class TableSorter {
 		const intlCollator = getIntlCollator();
 		const cellFormatter = this._cellFormatter;
 		const type = tableHeaderElement.getAttribute('data-o-table-data-type') || undefined;
-		table.tableRows = table.tableRows.sort((a, b) => {
+		table.tableRows.sort((a, b) => {
 			let aCol = a.querySelectorAll('td,th:not(.o-table__duplicate-heading)')[columnIndex];
 			let bCol = b.querySelectorAll('td,th:not(.o-table__duplicate-heading)')[columnIndex];
 			aCol = cellFormatter.formatCell({ cell: aCol, type });
