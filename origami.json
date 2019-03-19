@@ -131,9 +131,10 @@
 			"title": "Filter",
 			"name": "filter",
 			"data": {
-				"tableId": "fruit-table"
+				"tableId": "fruit-table",
+				"showFilter": true
 			},
-			"template": "demos/src/filter.mustache",
+			"template": "demos/src/huge.mustache",
 			"description": "This demo shows a table with columns which may be filtered by a value."
 		},
 		{

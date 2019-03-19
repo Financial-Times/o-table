@@ -6,6 +6,42 @@
 				class="o-table o-table--row-stripes o-table--compact o-table--responsive-overflow o-table--responsive-overflow"
 				data-o-component="o-table" data-o-table-responsive="overflow" data-o-table-minimum-row-count="20"
 				data-o-table-expanded="false" aria-expanded="false">
+			{{#showFilter}}
+				<caption class="o-table__caption">
+					<h2 class="o-typography-heading-level-2">Table Caption</h2>
+					<div class="o--if-js o-forms o-forms--inline">
+						<div class="o-forms__inline-item">
+							<label aria-describedby="select-box-info" for="demo-filter-select" class="o-forms__label">
+								Showing data for:
+							</label>
+						</div>
+						<select data-o-table-filter-id="{{tableId}}" data-o-table-filter-column="2" id="demo-filter-select" class="o-forms__select">
+							<option value="">All</option>
+							<option value="​Austria">​Austria</option>
+							<option value="​Belgium">​Belgium</option>
+							<option value="​Bulgaria">​Bulgaria</option>
+							<option value="​Croatia">​Croatia</option>
+							<option value="​Czech Republic">​Czech Republic</option>
+							<option value="​Finland">​Finland</option>
+							<option value="​France">​France</option>
+							<option value="​Germany">​Germany</option>
+							<option value="​Hungary">​Hungary</option>
+							<option value="​Iceland">​Iceland</option>
+							<option value="Ireland">Ireland</option>
+							<option value="Italy">Italy</option>
+							<option value="Norway">Norway</option>
+							<option value="Poland">Poland</option>
+							<option value="Portugal">Portugal</option>
+							<option value="Romania">Romania</option>
+							<option value="Spain">Spain</option>
+							<option value="Sweden">Sweden</option>
+							<option value="Switzerland">Switzerland</option>
+							<option value="The Netherlands">The Netherlands</option>
+							<option value="United Kingdom" selected>United Kingdom</option>
+						</select>
+					</div>
+				</caption>
+			{{/showFilter}}
 				<thead>
 					<tr>
 						<th data-column-default-sort="ascending" scope="col" role="columnheader"
