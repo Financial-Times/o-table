@@ -152,6 +152,7 @@ class OverflowTable extends BaseTable {
 					// Keep the expander button in viewport when contracting the table.
 					if (this._keepExpanderButtonTopOffset) {
 						window.requestAnimationFrame(() => {
+							const expanderButtonContainer = this.controls.expanderButton;
 							const top = window.pageYOffset + expanderButtonContainer.getBoundingClientRect().top - this._keepExpanderButtonTopOffset;
 							window.scroll(null, top);
 							this._keepExpanderButtonTopOffset = undefined;
