@@ -118,6 +118,7 @@ class OverflowTable extends BaseTable {
 			this.rootEl.setAttribute('aria-expanded', expand);
 		} else {
 			this.rootEl.removeAttribute('aria-expanded');
+			this.wrapper.style.height = '';
 		}
 
 		// Update table attributes.
@@ -234,7 +235,7 @@ class OverflowTable extends BaseTable {
 						</div>
 					` : ''}
 
-					${this.canExpand() ? `
+					${typeof this._opts.expanded === 'boolean' ? `
 						<div class="o-table-control o-table-control--expander">
 							<button class="o-buttons o-buttons--primary o-buttons--big">Show fewer</button>
 						</div>
@@ -362,7 +363,7 @@ class OverflowTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	_setupExpander() {
-		if (!this.canExpand()) {
+		if (typeof this._opts.expanded !== 'boolean') {
 			return;
 		}
 
