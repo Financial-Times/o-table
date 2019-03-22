@@ -55,16 +55,18 @@ class BaseTable {
 		}, opts);
 		this.thead = this.rootEl.querySelector('thead');
 		this.tbody = this.rootEl.querySelector('tbody');
+		this.tableCaption = this.rootEl.querySelector('caption');
 		this.tableHeaders = this.thead ? Array.from(this.thead.querySelectorAll('th')) : [];
 		this.tableRows = this.tbody ? Array.from(this.tbody.getElementsByTagName('tr')) : [];
+		this._filteredTableRows = [];
 		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
-		this._rootElDomDelegate = new Delegate(this.rootEl);
-		this._setupFilterElements();
+		this._currentSort = null;
+		this._currentFilter = null;
 	}
 
-	_setupFilterElements() {
+	setupFilters() {
 		const tableId = this.rootEl.getAttribute('id');
 		if (!tableId) {
 			return;
@@ -91,54 +93,64 @@ class BaseTable {
 	}
 
 	/**
-	 * Render table rows.
+	 * Update table rows.
 	 *
 	 * @access private
 	 * @returns {undefined}
 	 */
-	renderRows() {
-		const batch = this._renderRowsBatchNumber;
-		const rows = this.tableRows.slice(0);
+	updateRows() {
+		this._hideFilteredRows();
+		this._updateRowAriaHidden();
+		this._updateRowOrder();
+	}
 
-		// Ensure the correct aria-hidden attribute
-		// based on the tables current state.
-		this._updateRowVisibility();
+	_hideFilteredRows() {
+		if (this._hideFilteredRowsScheduled) {
+			window.cancelAnimationFrame(this._hideFilteredRowsScheduled);
+		}
 
-		// Render filtered rows at the end of the table,
-		// to maintain the striped table style.
-		rows.sort((a, b) => {
-			const aHidden = a.getAttribute('data-o-table-filtered') === 'true';
-			const bHidden = b.getAttribute('data-o-table-filtered') === 'true';
-			if (aHidden && !bHidden) {
-				return 1;
-			}
-			if (!aHidden && bHidden) {
-				return -1;
-			}
-			return 0;
-		});
-
-		// Render table rows in batches.
-		let updatedRowCount = 0;
-		const updateSortedRowBatch = function() {
-			window.requestAnimationFrame(() => {
-				if (updatedRowCount === 0 && isNaN(batch) === false) {
-					// On first run, update a batch of rows.
-					const rowBatch = rows.slice(updatedRowCount, batch);
-					prepend(this.tbody, rowBatch);
-					updatedRowCount = updatedRowCount + batch;
-				} else {
-					// On second run, update all the rest.
-					const rowBatch = rows.slice(updatedRowCount);
-					append(this.tbody, rowBatch);
-					updatedRowCount = rows.length;
-				}
-				if (updatedRowCount < rows.length) {
-					updateSortedRowBatch();
-				}
+		const filteredRows = this._filteredTableRows || [];
+		this._hideFilteredRowsScheduled = window.requestAnimationFrame(function () {
+			this.tableRows.forEach((row) => {
+				row.setAttribute('data-o-table-filtered', filteredRows.includes(row));
 			});
-		}.bind(this);
-		updateSortedRowBatch();
+		}.bind(this));
+	}
+
+	_updateRowAriaHidden() {
+		if (this._updateRowAriaHiddenScheduled) {
+			window.cancelAnimationFrame(this._updateRowAriaHiddenScheduled);
+		}
+
+		const rowsToHide = this._rowsToHide || [];
+		this._updateRowAriaHiddenScheduled = window.requestAnimationFrame(function () {
+			this.tableRows.forEach((row) => {
+				row.setAttribute('aria-hidden', rowsToHide.includes(row));
+			});
+		}.bind(this));
+	}
+
+	_updateRowOrder() {
+		if (this._updateRowOrderScheduled) {
+			window.cancelAnimationFrame(this._updateRowOrderScheduled);
+		}
+		if (this._updateRowOrderFilrtedBatchScheduled) {
+			window.cancelAnimationFrame(this._updateRowOrderFilrtedBatchScheduled);
+		}
+
+		if (!this._currentSort && !this._currentFilter) {
+			return;
+		}
+
+		const nonFilteredRows = this.tableRows.filter(row => !this._filteredTableRows.includes(row));
+		this._updateRowOrderScheduled = window.requestAnimationFrame(function () {
+			// Move all non-filtered rows to the top, with current sort order.
+			prepend(this.tbody, nonFilteredRows);
+			this._updateRowOrderFilrtedBatchScheduled = window.requestAnimationFrame(function () {
+				// Move all filtered rows to the bottom, with current sort order.
+				append(this.tbody, this._filteredTableRows);
+			}.bind(this));
+		}.bind(this));
 	}
 
 	/**
@@ -151,7 +163,7 @@ class BaseTable {
 	 */
 	filter(headerIndex, filter) {
 		this._filterRowsByColumn(headerIndex, filter);
-		this.renderRows();
+		this.updateRows();
 	}
 
 	/**
@@ -163,16 +175,24 @@ class BaseTable {
 	 * @returns {undefined}
 	 */
 	_filterRowsByColumn(columnIndex, filter) {
+		this._currentFilter = {
+			columnIndex,
+			filter
+		};
+
 		if (typeof filter !== 'string' && typeof filter !== 'function') {
 			throw new Error(`Could not filter table column "${columnIndex}". Expected the filter to a string or function.`, this);
 		}
 
 		// Filter column headings.
+		this._filteredTableRows = [];
 		this.tableRows.forEach(row => {
 			const cell = row.querySelector(`td:nth-of-type(${columnIndex + 1})`);
-			if(cell) {
+			if (cell) {
 				const hideRow = BaseTable._filterMatch(cell, filter);
-				row.setAttribute('data-o-table-filtered', hideRow);
+				if (hideRow) {
+					this._filteredTableRows.push(row);
+				}
 			}
 		});
 	}
@@ -200,16 +220,7 @@ class BaseTable {
 		}
 
 		// Check if the filter matches the given table cell.
-		return filter(cell.cloneNode(true)) !== true;
-	}
-
-	/**
-	 * Which rows are hidden by a filter.
-	 * @returns {Array[Node]}
-	 */
-	get _rowsHiddenByFilter() {
-		const hiddenByFilter = this.tableRows.filter(row => row.getAttribute('data-o-table-filtered') === 'true');
-		return hiddenByFilter;
+		return filter(cell) !== true;
 	}
 
 	/**
@@ -217,23 +228,7 @@ class BaseTable {
 	 * @returns {Array[Node]}
 	 */
 	get _rowsToHide() {
-		const hiddenByFilter = this._rowsHiddenByFilter;
-		return hiddenByFilter;
-	}
-
-	/**
-	 * Update row aria attributes to show/hide them.
-	 * E.g. After performing a sort or filter, rows which where hidden in the colapsed table may have become visible.
-	 * @returns {undefined}
-	 */
-	_updateRowVisibility() {
-		const rowsToHide = this._rowsToHide || [];
-		window.requestAnimationFrame(function () {
-			this.tableRows.forEach((row) => {
-				const hide = rowsToHide.indexOf(row) !== -1;
-				row.setAttribute('aria-hidden', hide ? 'true' : 'false');
-			});
-		}.bind(this));
+		return this._filteredTableRows;
 	}
 
 	/**
@@ -272,7 +267,7 @@ class BaseTable {
 		}, { cancelable: true });
 
 		if (defaultSort) {
-			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder, this._renderRowsBatchNumber);
+			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder);
 		}
 	}
 
@@ -332,6 +327,7 @@ class BaseTable {
 
 		// Add click event to buttons.
 		const listener = this._sortButtonHandler.bind(this);
+		this._rootElDomDelegate = this._rootElDomDelegate || new Delegate(this.rootEl);
 		this._rootElDomDelegate.on('click', '.o-table__sort', listener);
 	}
 
@@ -350,10 +346,11 @@ class BaseTable {
 		if (!sortOrder) {
 			throw new Error(`Expected a sort order e.g. "ascending" or "descending".`);
 		}
-		this._dispatchEvent('sorted', {
+		this._currentSort = {
 			sortOrder,
 			columnIndex
-		});
+		};
+		this._dispatchEvent('sorted', this._currentSort);
 	}
 
 	/**
@@ -363,7 +360,9 @@ class BaseTable {
 	 * @returns {undefined}
 	 */
 	destroy() {
-		this._rootElDomDelegate.destroy();
+		if (this._rootElDomDelegate) {
+			this._rootElDomDelegate.destroy();
+		}
 		this._listeners.forEach(({ type, listener, element }) => {
 			element.removeEventListener(type, listener);
 		});

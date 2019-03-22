@@ -62,11 +62,15 @@ class TableSorter {
 	 * @param {BaseTable} table - The table instance to sort.
 	 * @param {Number} columnIndex - The index of the table column to sort.
 	 * @param {String} sortOrder - How to sort the column, "ascending" or "descending"
-	 * @param {Number} batch [100] - How many rows to update at once when sorting.
+	 * @param {Number} batch [100] - Deprecated. No longer used. How many rows to render at once when sorting.
 	 * @returns {undefined}
 	 */
 	sortRowsByColumn(table, columnIndex, sortOrder, batch) {
 		const tableHeaderElement = table.getTableHeader(columnIndex);
+
+		if (batch) {
+			console.warn('o-table: The "batch" argument is deprecated and no longer used.');
+		}
 
 		if (['ascending', 'descending'].indexOf(sortOrder) === -1) {
 			throw new Error(`Sort order "${sortOrder}" is not supported. Must be "ascending" or "descending".`);
@@ -87,18 +91,20 @@ class TableSorter {
 			}
 		});
 
-		// Render sorted table rows.
-		table.renderRows(batch);
-
 		// Table sorted.
+		table.sorted({
+			columnIndex,
+			sortOrder
+		});
+
+		// Render sorted table rows.
+		table.updateRows();
+
+		// Update table headings.
 		window.requestAnimationFrame(() => {
 			table.tableHeaders.forEach((header) => {
 				const headerSort = (header === tableHeaderElement ? sortOrder : 'none');
 				header.setAttribute('aria-sort', headerSort);
-			});
-			table.sorted({
-				columnIndex,
-				sortOrder
 			});
 		});
 	}

@@ -23,6 +23,7 @@ class FlatTable extends BaseTable {
 			rootEl.classList.remove('o-table--responsive-flat');
 		}
 		window.setTimeout(this.addSortButtons.bind(this), 0);
+		window.setTimeout(this.setupFilters.bind(this), 0);
 		window.setTimeout(this._ready.bind(this), 0);
 		return this;
 	}
