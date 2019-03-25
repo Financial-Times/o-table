@@ -13,8 +13,11 @@ class ScrollTable extends BaseTable {
 	 */
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
+		// Duplicate row headings before adding sort buttons.
 		this._tableHeadersWithoutSort = this.tableHeaders.map(header => header.cloneNode(true));
-		this._duplicateRowsWithAddedHeader();
+		// Create scrollable layout for devices with small viewports.
+		this._createScrollTableStructure();
+		// Defer other tasks.
 		window.setTimeout(this.addSortButtons.bind(this), 0);
 		window.setTimeout(this.setupFilters.bind(this), 0);
 		window.setTimeout(this._ready.bind(this), 0);
@@ -30,20 +33,23 @@ class ScrollTable extends BaseTable {
 	 * @returns {undefined}
 	 */
 	filter(headerIndex, filter) {
-		this._filterRowsByColumn(headerIndex, filter);
-
 		// Filter rows by columns (desktop view).
+		this._filterRowsByColumn(headerIndex, filter);
+		// Render filtered table (desktop view).
 		this.updateRows();
-
-		// Filter columns by rows (mobile view).
-		this._duplicateRowsWithAddedHeader();
+		// Recreate scrollable table with filtered rows (mobile view).
+		this._createScrollTableStructure();
 	}
 
 	/**
-	 * Duplicate the table headers into a one tbody row.
+	 * Duplicate table headers and rows to create a table which has row headings
+	 * rather than column headings. I.e. The table is consumed left to right,
+	 * rather than top to bottom.
+	 *
+	 * @access private
 	 * @returns {undefined}
 	 */
-	_duplicateRowsWithAddedHeader() {
+	_createScrollTableStructure() {
 		// Clone headings and data into new rows.
 		const clonedRows = this._tableHeadersWithoutSort.map((header, index) => {
 			const headerRow = document.createElement('tr');
@@ -67,7 +73,7 @@ class ScrollTable extends BaseTable {
 			return headerRow;
 		});
 
-		// Add new rows, which have a row rather than column headings, to the table body.
+		// Add new rows to the table body.
 		window.requestAnimationFrame(function () {
 			const rowHeadingRows = Array.from(this.tbody.querySelectorAll('.o-table__duplicate-row'));
 			rowHeadingRows.forEach(row => this.tbody.removeChild(row));
