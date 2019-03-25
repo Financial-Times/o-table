@@ -107,9 +107,11 @@ class BaseTable {
 			this.filter(filterColumn, filter.value);
 		}
 		// Add a listener to filter the table.
-		filter.addEventListener('input', (event) => {
+		const filterHandler = function(event) {
 			this.filter(filterColumn, event.target.value || '');
-		});
+		}.bind(this);
+		filter.addEventListener('input', filterHandler);
+		this._listeners.push({ element: filter, filterHandler, type: 'input' });
 	}
 
 	/**
