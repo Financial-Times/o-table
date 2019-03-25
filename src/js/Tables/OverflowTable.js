@@ -424,14 +424,14 @@ class OverflowTable extends BaseTable {
 		const outsideTable = element.getAttribute('data-o-table-intersection') === 'true';
 		const elementButton = element.querySelector('button');
 		window.requestAnimationFrame(() => {
-			// Show scroll control if the table doe not fit within the viewport.
+			// Show scroll control if the table does not fit within the viewport.
 			element.style.display = canScrollTable ? '': 'none';
 			// Make arrows sticky if table is tall and can be scrolled past.
 			element.classList.toggle('o-table-control--sticky', showStickyArrows);
-			// Place the arrows in the doc if they are not sticky.
+			// Place the arrows in the dock if they are not sticky.
 			element.classList.toggle('o-table-control--dock', arrowsDocked);
 			// Hide scroll control if they are outside the table boundry.
-			// E.g. the table has been scrolled past, or the scroll control is obscuring the table headings.
+			// E.g. the table has been scrolled past.
 			if (outsideTable) {
 				elementButton.setAttribute('disabled', true);
 				element.classList.add('o-table-control--hide');
