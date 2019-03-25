@@ -280,7 +280,7 @@ Alternatively a callback function may be given. The callback should accept a tab
 	const table = new OTable(tableElement);
 	table.filter(0, (cell) => {
 		return parseInt(cell.textContent, 10) > 3;
-	}); // Filter the first table column. Keep rows with a value less than 3.
+	}); // Filter the first table column. Keep rows with a value more than 3.
 ```
 
 ### Sorting
