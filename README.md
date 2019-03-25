@@ -11,6 +11,7 @@ Styling for tables.
 - [Sass](#sass)
 - [JavaScript](#javascript)
 	- [Sorting](#sorting)
+	- [Filtering](#filtering)
 	- [Events](#events)
 - [Troubleshooting](#troubleshooting)
 - [Migration](#migration)
