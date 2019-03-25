@@ -89,7 +89,6 @@ class OverflowTable extends BaseTable {
 	/**
 	* Update table rows.
 	*
-	* @access private
 	* @returns {undefined}
 	*/
 	updateRows() {
