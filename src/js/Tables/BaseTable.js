@@ -227,9 +227,9 @@ class BaseTable {
 	}
 
 	/**
-	 * Filter the table.
+	 * Check if a given table cell matches the table filter.
 	 *
-	 * @access public
+	 * @access private
 	 * @param {Element} cell - The table cell to test the filter function against.
 	 * @param {String|Function} filter - The filter, either a string or callback function.
 	 * @returns {Boolean}
