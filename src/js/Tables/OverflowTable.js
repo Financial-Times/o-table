@@ -170,20 +170,6 @@ class OverflowTable extends BaseTable {
 	}
 
 	/**
-	 * Performs post-sort actions such as updating row visibility and firing a `oTable.sorted` event.
-	 * Required as the sort event can be intercepted for a custom implementation.
-	 *
-	 * @access public
-	 * @param {Object} sortDetail An object containing information about the sort.
-	 * @param {Number} sortDetail.columnIndex The index of the column which has been sorted.
-	 * @param {String} sortDetail.sortAscending The order of the sort i.e. ascending or descending.
-	 * @returns undefined
-	 */
-	sorted({columnIndex, sortOrder}) {
-		super.sorted({ columnIndex, sortOrder });
-	}
-
-	/**
 	 * Add controls such as the back, forward, "show more" buttons to DOM,
 	 * plus wrappers needed for them to function.
 	 * @returns {undefined}
