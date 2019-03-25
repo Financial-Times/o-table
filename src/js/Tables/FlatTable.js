@@ -25,7 +25,6 @@ class FlatTable extends BaseTable {
 		}
 		// Defer other tasks.
 		window.setTimeout(this.addSortButtons.bind(this), 0);
-		window.setTimeout(this.setupFilters.bind(this), 0);
 		window.setTimeout(this._ready.bind(this), 0);
 		return this;
 	}

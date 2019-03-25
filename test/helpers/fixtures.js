@@ -282,11 +282,11 @@ const tableWithContainerAndComplexHeadings = `
 </div>
 `;
 
-const getTableMarkupFor = function (type, dataArray) {
+const getTableMarkupFor = function (type, dataArray, id) {
 	return `
 		<div class="o-table-container">
 			<div class="o-table-scroll-wrapper">
-				<table class="o-table" data-o-component="o-table">
+				<table ${id ? `id="${id}"` : ''} class="o-table" data-o-component="o-table">
 					<thead>
 						<tr>
 							<th scope="col" role="columnheader" data-o-table-data-type="${type}">Test Data</th>

@@ -62,25 +62,31 @@ class BaseTable {
 		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
+
 		/**
 		 * @property {Object|Null} _currentSort - The current sort applied.
 		 * @property {Number} _currentSort.columnIndex - The index of the currently sorted column.
 		 * @property {String} _currentSort.sortOrder - The type of sort, "ascending" or "descending"
 		 */
 		this._currentSort = null;
+
 		/**
 		 * @property {Object|Null} _currentFilter - The filter currently applied.
 		 * @property {Number} _currentFilter.columnIndex - The index of the column which is filtered.
 		 * @property {String|Function} _currentFilter.filter - The filter applied.
 		 */
 		this._currentFilter = null;
+
+		// Defer filter setup.
+		window.setTimeout(this._setupFilters.bind(this), 0);
 	}
 
 	/**
 	 * Apply and add event listeners to any filter controls for this table.
 	 * E.g. form inputs with the data attribute `[data-o-table-filter-id="tableId"]`
+	 * @access private
 	 */
-	setupFilters() {
+	_setupFilters() {
 		const tableId = this.rootEl.getAttribute('id');
 		if (!tableId) {
 			return;
@@ -92,7 +98,7 @@ class BaseTable {
 		}
 		// Warn if a misconfigured filter was found.
 		const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
-		if (!filterColumn) {
+		if (isNaN(filterColumn)) {
 			console.warn(`Could not setup the filter for the table "${tableId}" as no column index was given to filter on. Add a \`data-o-table-filter-column="{columnIndex}"\` attribute to the filter.`, filter);
 			return;
 		}

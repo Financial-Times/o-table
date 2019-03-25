@@ -39,7 +39,6 @@ class OverflowTable extends BaseTable {
 		window.setTimeout(this.addSortButtons.bind(this), 0);
 		window.setTimeout(this._setupScroll.bind(this), 0);
 		window.setTimeout(this._setupExpander.bind(this), 0);
-		window.setTimeout(this.setupFilters.bind(this), 0);
 		this._ready();
 		return this;
 	}

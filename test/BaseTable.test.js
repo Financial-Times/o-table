@@ -12,6 +12,22 @@ describe("BaseTable", () => {
 	let oTableEl;
 	let table;
 
+	function getTableElementWithData(type, dataArray, tableId) {
+		const markup = fixtures.getTableMarkupFor(type, dataArray, tableId);
+		sandbox.setContents(markup);
+		return document.querySelector('[data-o-component=o-table]');
+	}
+
+	function assertFilter(data, expectedData) {
+		const tbody = oTableEl.querySelector('tbody');
+		const filterdRows = tbody.querySelectorAll('tr[data-o-table-filtered="true"]');
+		const visibleRows = tbody.querySelectorAll('tr[data-o-table-filtered="false"]');
+		const expectedFiltered = data.length - expectedData.length;
+		const expectedVisible = expectedData.length;
+		proclaim.equal(filterdRows.length, expectedFiltered, `Expected ${expectedFiltered} filtered rows but found ${filterdRows.length}.`);
+		proclaim.equal(visibleRows.length, expectedVisible, `Expected ${expectedVisible} visible rows but found ${visibleRows.length}.`);
+	}
+
 	const click = element => {
 		const click = document.createEvent('MouseEvent');
 		click.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -22,23 +38,38 @@ describe("BaseTable", () => {
 		sandbox.init();
 	});
 
+	describe.only('constructor', () => {
+		it('applies declaritive table filters', (done) => {
+			// Setup markup: Table + filter input.
+			const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+			const tableId = 'constructor-test-table';
+			oTableEl = getTableElementWithData('', data, tableId);
+			sandbox.addContents(`
+				<select
+					id="filter-input"
+					data-o-table-filter-id="${tableId}"
+					data-o-table-filter-column="0"
+				>
+					<option value="">All</option>
+					<!-- "selected" indicates the default filter -->
+					<option value="Naseberry" selected>Naseberry</option>
+				</select>
+			`);
+			// Init table.
+			table = new BaseTable(oTableEl, sorter);
+			// Confirm default filter (set declaritively).
+			setTimeout(() => {
+				try {
+					assertFilter(data, ['Naseberry']);
+					done();
+				} catch(error) {
+					done(error);
+				}
+			}, 100); // wait for window.requestAnimationFrame
+		});
+	});
+
 	describe('filter', () => {
-		function getTableElementWithData(type, dataArray) {
-			const markup = fixtures.getTableMarkupFor(type, dataArray);
-			sandbox.setContents(markup);
-			return document.querySelector('[data-o-component=o-table]');
-		}
-
-		function assertFilter(data, expectedData) {
-			const tbody = oTableEl.querySelector('tbody');
-			const filterdRows = tbody.querySelectorAll('tr[data-o-table-filtered="true"]');
-			const visibleRows = tbody.querySelectorAll('tr[data-o-table-filtered="false"]');
-			const expectedFiltered = data.length - expectedData.length;
-			const expectedVisible = expectedData.length;
-			proclaim.equal(filterdRows.length, expectedFiltered, `Expected ${expectedFiltered} filtered rows but found ${filterdRows.length}.`);
-			proclaim.equal(visibleRows.length, expectedVisible, `Expected ${expectedVisible} visible rows but found ${visibleRows.length}.`);
-		}
-
 		describe('given a string filter', () => {
 			it('is case insensitive', done => {
 				const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
@@ -46,8 +77,12 @@ describe("BaseTable", () => {
 				table = new BaseTable(oTableEl, sorter);
 				table.filter(0, 'dragonfruit');
 				setTimeout(() => {
-					assertFilter(data, ['Dragonfruit']);
-					done();
+					try {
+						assertFilter(data, ['Dragonfruit']);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 			it('is whitespace insensitive', done => {
@@ -56,8 +91,12 @@ describe("BaseTable", () => {
 				table = new BaseTable(oTableEl, sorter);
 				table.filter(0, 'Dragonfruit');
 				setTimeout(() => {
-					assertFilter(data, ['Dragonfruit']);
-					done();
+					try {
+						assertFilter(data, ['Dragonfruit']);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 			it('ignores special characters', done => {
@@ -66,8 +105,12 @@ describe("BaseTable", () => {
 				table = new BaseTable(oTableEl, sorter);
 				table.filter(0, 'Durian');
 				setTimeout(() => {
-					assertFilter(data, ['Durian']);
-					done();
+					try {
+						assertFilter(data, ['Durian']);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 			it('ignores non-breaking space characters', done => {
@@ -76,8 +119,12 @@ describe("BaseTable", () => {
 				table = new BaseTable(oTableEl, sorter);
 				table.filter(0, 'Durian');
 				setTimeout(() => {
-					assertFilter(data, ['Durian']);
-					done();
+					try {
+						assertFilter(data, ['Durian']);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 			it('filters on a partial match', done => {
@@ -86,8 +133,12 @@ describe("BaseTable", () => {
 				table = new BaseTable(oTableEl, sorter);
 				table.filter(0, 'berry');
 				setTimeout(() => {
-					assertFilter(data, ['Naseberry', 'Strawberry']);
-					done();
+					try {
+						assertFilter(data, ['Naseberry', 'Strawberry']);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 		});
@@ -101,8 +152,12 @@ describe("BaseTable", () => {
 					return parseInt(cell.textContent, 10) > 3;
 				});
 				setTimeout(() => {
-					assertFilter(data, [4, 5, 6, 7, 8, 9, 10]);
-					done();
+					try {
+						assertFilter(data, [4, 5, 6, 7, 8, 9, 10]);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 
@@ -114,8 +169,12 @@ describe("BaseTable", () => {
 					return cell.textContent === 'a';
 				});
 				setTimeout(() => {
-					assertFilter(data, ['a']);
-					done();
+					try {
+						assertFilter(data, ['a']);
+						done();
+					} catch(error) {
+						done(error);
+					}
 				}, 100); // wait for window.requestAnimationFrame
 			});
 		});
