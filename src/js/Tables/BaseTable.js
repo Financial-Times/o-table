@@ -62,7 +62,17 @@ class BaseTable {
 		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
+		/**
+		 * @property {Object|Null} _currentSort - The current sort applied.
+		 * @property {Number} _currentSort.columnIndex - The index of the currently sorted column.
+		 * @property {String} _currentSort.sortOrder - The type of sort, "ascending" or "descending"
+		 */
 		this._currentSort = null;
+		/**
+		 * @property {Object|Null} _currentFilter - The filter currently applied.
+		 * @property {Number} _currentFilter.columnIndex - The index of the column which is filtered.
+		 * @property {String|Function} _currentFilter.filter - The filter applied.
+		 */
 		this._currentFilter = null;
 	}
 
