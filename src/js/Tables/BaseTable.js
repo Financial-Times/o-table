@@ -76,6 +76,10 @@ class BaseTable {
 		this._currentFilter = null;
 	}
 
+	/**
+	 * Apply and add event listeners to any filter controls for this table.
+	 * E.g. form inputs with the data attribute `[data-o-table-filter-id="tableId"]`
+	 */
 	setupFilters() {
 		const tableId = this.rootEl.getAttribute('id');
 		if (!tableId) {
@@ -114,6 +118,11 @@ class BaseTable {
 		this._updateRowOrder();
 	}
 
+	/**
+	 * Hide filtered rows by updating the "data-o-table-filtered" attribute.
+	 * Filtered rows are removed from the table using CSS so column width is
+	 * not recalculated.
+	 */
 	_hideFilteredRows() {
 		if (this._hideFilteredRowsScheduled) {
 			window.cancelAnimationFrame(this._hideFilteredRowsScheduled);
@@ -127,6 +136,10 @@ class BaseTable {
 		}.bind(this));
 	}
 
+	/**
+	* Update the "aria-hidden" attribute of all hidden table rows.
+	* Rows may be hidden for a number of reasons, including being filtered.
+	*/
 	_updateRowAriaHidden() {
 		if (this._updateRowAriaHiddenScheduled) {
 			window.cancelAnimationFrame(this._updateRowAriaHiddenScheduled);
@@ -140,6 +153,11 @@ class BaseTable {
 		}.bind(this));
 	}
 
+	/**
+	* Updates the order of table rows in the DOM. This is required upon sort,
+	* but also on filter as hidden rows must be at the bottom of the table.
+	* Otherwise the stripped pattern of the stripped table is not maintained.
+	*/
 	_updateRowOrder() {
 		if (this._updateRowOrderScheduled) {
 			window.cancelAnimationFrame(this._updateRowOrderScheduled);
@@ -164,7 +182,7 @@ class BaseTable {
 	}
 
 	/**
-	 * Filter the table.
+	 * Filter the table and render the result.
 	 *
 	 * @access public
 	 * @param {Number} headerIndex - The index of the table column to filter.
@@ -177,9 +195,10 @@ class BaseTable {
 	}
 
 	/**
-	 * Filter the table.
+	 * Filters the table rows by a given column and filter.
+	 * This does not render the result to the DOM.
 	 *
-	 * @access public
+	 * @access private
 	 * @param {Number} columnIndex - The index of the table column to filter.
 	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
 	 * @returns {undefined}
