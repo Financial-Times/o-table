@@ -38,7 +38,7 @@ describe("BaseTable", () => {
 		sandbox.init();
 	});
 
-	describe.only('constructor', () => {
+	describe('constructor', () => {
 		it('applies declaritive table filters', (done) => {
 			// Setup markup: Table + filter input.
 			const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
