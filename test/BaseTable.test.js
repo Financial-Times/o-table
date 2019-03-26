@@ -472,7 +472,6 @@ describe("BaseTable", () => {
 				'container',
 				'overlayWrapper'
 			];
-			// Call destroy
 			table.destroy();
 			expectedToBeRemoved.forEach(property => {
 				proclaim.isUndefined(table[property], `Expected the table property ${property} to be removed when the "destroy" method is called.`);
