@@ -13,19 +13,44 @@ class ScrollTable extends BaseTable {
 	 */
 	constructor(rootEl, sorter, opts = {}) {
 		super(rootEl, sorter, opts);
-		this._duplicateRowsWithAddedHeader(); // Duplicate rows before adding heading sort buttons.
+		// Duplicate row headings before adding sort buttons.
+		this._tableHeadersWithoutSort = this.tableHeaders.map(header => header.cloneNode(true));
+		// Create scrollable layout for devices with small viewports.
+		this._createScrollTableStructure();
+		// Defer other tasks.
 		window.setTimeout(this.addSortButtons.bind(this), 0);
 		window.setTimeout(this._ready.bind(this), 0);
 		return this;
 	}
 
 	/**
-	 * Duplicate the table headers into a one tbody row.
+	 * Filter the table.
+	 *
+	 * @access public
+	 * @param {Number} headerIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
 	 * @returns {undefined}
 	 */
-	_duplicateRowsWithAddedHeader() {
+	filter(headerIndex, filter) {
+		// Filter rows by columns (desktop view).
+		this._filterRowsByColumn(headerIndex, filter);
+		// Render filtered table (desktop view).
+		this.updateRows();
+		// Recreate scrollable table with filtered rows (mobile view).
+		this._createScrollTableStructure();
+	}
+
+	/**
+	 * Duplicate table headers and rows to create a table which has row headings
+	 * rather than column headings. I.e. The table is consumed left to right,
+	 * rather than top to bottom.
+	 *
+	 * @access private
+	 * @returns {undefined}
+	 */
+	_createScrollTableStructure() {
 		// Clone headings and data into new rows.
-		const clonedRows = this.tableHeaders.map((header, index) => {
+		const clonedRows = this._tableHeadersWithoutSort.map((header, index) => {
 			const headerRow = document.createElement('tr');
 			headerRow.classList.add('o-table__duplicate-row');
 			// Clone column heading and turn into a row heading.
@@ -35,18 +60,28 @@ class ScrollTable extends BaseTable {
 			headerRow.appendChild(clonedHeader);
 			// Clone data for the column into the new row.
 			this.tableRows.forEach(row => {
-				const data = row.querySelectorAll('td')[index];
-				headerRow.appendChild(data.cloneNode(true));
+				const cell = row.querySelectorAll('td')[index];
+				if (cell) {
+					const cellClone = cell.cloneNode(true);
+					const filteredData = this._filteredTableRows.includes(row);
+					cellClone.setAttribute('data-o-table-filtered', filteredData);
+					cellClone.setAttribute('aria-hidden', filteredData);
+					headerRow.appendChild(cellClone);
+				}
 			});
 			return headerRow;
 		});
 
-		// Add new rows, which have a row rather than column headings, to the table body.
+		// Add new rows to the table body.
 		window.requestAnimationFrame(function () {
-			if (this.tbody.append) {
-				this.tbody.append(...clonedRows);
+			const rowHeadingRows = Array.from(this.tbody.querySelectorAll('.o-table__duplicate-row'));
+			rowHeadingRows.forEach(row => this.tbody.removeChild(row));
+			if (this.tbody.prepend) {
+				this.tbody.prepend(...clonedRows);
 			} else {
-				clonedRows.forEach(row => this.tbody.appendChild(row));
+				clonedRows.reverse().forEach(row => {
+					this.tbody.insertBefore(row, this.tbody.firstChild);
+				});
 			}
 		}.bind(this));
 	}

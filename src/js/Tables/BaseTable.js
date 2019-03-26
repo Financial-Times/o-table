@@ -55,64 +55,216 @@ class BaseTable {
 		}, opts);
 		this.thead = this.rootEl.querySelector('thead');
 		this.tbody = this.rootEl.querySelector('tbody');
+		this.tableCaption = this.rootEl.querySelector('caption');
 		this.tableHeaders = this.thead ? Array.from(this.thead.querySelectorAll('th')) : [];
 		this.tableRows = this.tbody ? Array.from(this.tbody.getElementsByTagName('tr')) : [];
+		this._filteredTableRows = [];
 		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
-		this._rootElDomDelegate = new Delegate(this.rootEl);
+
+		/**
+		 * @property {Object|Null} _currentSort - The current sort applied.
+		 * @property {Number} _currentSort.columnIndex - The index of the currently sorted column.
+		 * @property {String} _currentSort.sortOrder - The type of sort, "ascending" or "descending"
+		 */
+		this._currentSort = null;
+
+		/**
+		 * @property {Object|Null} _currentFilter - The filter currently applied.
+		 * @property {Number} _currentFilter.columnIndex - The index of the column which is filtered.
+		 * @property {String|Function} _currentFilter.filter - The filter applied.
+		 */
+		this._currentFilter = null;
+
+		// Defer filter setup.
+		window.setTimeout(this._setupFilters.bind(this), 0);
 	}
 
 	/**
-	 * Render table rows.
-	 *
+	 * Apply and add event listeners to any filter controls for this table.
+	 * E.g. form inputs with the data attribute `[data-o-table-filter-id="tableId"]`
 	 * @access private
-	 * @returns {undefined}
 	 */
-	renderRows() {
-		const batch = this._renderRowsBatchNumber;
-		const rows = this.tableRows.slice(0);
-
-		// Ensure the correct aria-hidden attribute
-		// based on the tables current state.
-		this._updateRowVisibility();
-
-		// Render table rows in batches.
-		let updatedRowCount = 0;
-		const updateSortedRowBatch = function() {
-			window.requestAnimationFrame(() => {
-				if (updatedRowCount === 0 && isNaN(batch) === false) {
-					// On first run, update a batch of rows.
-					const rowBatch = rows.slice(updatedRowCount, batch);
-					prepend(this.tbody, rowBatch);
-					updatedRowCount = updatedRowCount + batch;
-				} else {
-					// On second run, update all the rest.
-					const rowBatch = rows.slice(updatedRowCount);
-					append(this.tbody, rowBatch);
-					updatedRowCount = rows.length;
-				}
-				if (updatedRowCount < rows.length) {
-					updateSortedRowBatch();
-				}
-			});
+	_setupFilters() {
+		const tableId = this.rootEl.getAttribute('id');
+		if (!tableId) {
+			return;
+		}
+		// Do nothing if no filter is found for this table.
+		const filter = window.document.querySelector(`[data-o-table-filter-id="${tableId}"]`);
+		if (!filter) {
+			return;
+		}
+		// Warn if a misconfigured filter was found.
+		const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+		if (isNaN(filterColumn)) {
+			console.warn(`Could not setup the filter for the table "${tableId}" as no column index was given to filter on. Add a \`data-o-table-filter-column="{columnIndex}"\` attribute to the filter.`, filter);
+			return;
+		}
+		// Apply the filter .
+		if (filter.value) {
+			this.filter(filterColumn, filter.value);
+		}
+		// Add a listener to filter the table.
+		const filterHandler = function(event) {
+			this.filter(filterColumn, event.target.value || '');
 		}.bind(this);
-		updateSortedRowBatch();
+		filter.addEventListener('input', filterHandler);
+		this._listeners.push({ element: filter, filterHandler, type: 'input' });
 	}
 
 	/**
-	 * Update row aria attributes to show/hide them.
-	 * E.g. After performing a sort, rows which where hidden in the colapsed table may have become visible.
+	 * Update table rows.
+	 *
 	 * @returns {undefined}
 	 */
-	_updateRowVisibility() {
-		const rowsToHide = this._rowsToHide || [];
-		window.requestAnimationFrame(function () {
+	updateRows() {
+		this._hideFilteredRows();
+		this._updateRowAriaHidden();
+		this._updateRowOrder();
+	}
+
+	/**
+	 * Hide filtered rows by updating the "data-o-table-filtered" attribute.
+	 * Filtered rows are removed from the table using CSS so column width is
+	 * not recalculated.
+	 */
+	_hideFilteredRows() {
+		if (this._hideFilteredRowsScheduled) {
+			window.cancelAnimationFrame(this._hideFilteredRowsScheduled);
+		}
+
+		const filteredRows = this._filteredTableRows || [];
+		this._hideFilteredRowsScheduled = window.requestAnimationFrame(function () {
 			this.tableRows.forEach((row) => {
-				const hide = rowsToHide.indexOf(row) !== -1;
-				row.setAttribute('aria-hidden', hide ? 'true' : 'false');
+				row.setAttribute('data-o-table-filtered', filteredRows.includes(row));
 			});
 		}.bind(this));
+	}
+
+	/**
+	* Update the "aria-hidden" attribute of all hidden table rows.
+	* Rows may be hidden for a number of reasons, including being filtered.
+	*/
+	_updateRowAriaHidden() {
+		if (this._updateRowAriaHiddenScheduled) {
+			window.cancelAnimationFrame(this._updateRowAriaHiddenScheduled);
+		}
+
+		const rowsToHide = this._rowsToHide || [];
+		this._updateRowAriaHiddenScheduled = window.requestAnimationFrame(function () {
+			this.tableRows.forEach((row) => {
+				row.setAttribute('aria-hidden', rowsToHide.includes(row));
+			});
+		}.bind(this));
+	}
+
+	/**
+	* Updates the order of table rows in the DOM. This is required upon sort,
+	* but also on filter as hidden rows must be at the bottom of the table.
+	* Otherwise the stripped pattern of the stripped table is not maintained.
+	*/
+	_updateRowOrder() {
+		if (this._updateRowOrderScheduled) {
+			window.cancelAnimationFrame(this._updateRowOrderScheduled);
+		}
+		if (this._updateRowOrderFilrtedBatchScheduled) {
+			window.cancelAnimationFrame(this._updateRowOrderFilrtedBatchScheduled);
+		}
+
+		if (!this._currentSort && !this._currentFilter) {
+			return;
+		}
+
+		const nonFilteredRows = this.tableRows.filter(row => !this._filteredTableRows.includes(row));
+		this._updateRowOrderScheduled = window.requestAnimationFrame(function () {
+			// Move all non-filtered rows to the top, with current sort order.
+			prepend(this.tbody, nonFilteredRows);
+			this._updateRowOrderFilrtedBatchScheduled = window.requestAnimationFrame(function () {
+				// Move all filtered rows to the bottom, with current sort order.
+				append(this.tbody, this._filteredTableRows);
+			}.bind(this));
+		}.bind(this));
+	}
+
+	/**
+	 * Filter the table and render the result.
+	 *
+	 * @access public
+	 * @param {Number} headerIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
+	 * @returns {undefined}
+	 */
+	filter(headerIndex, filter) {
+		this._filterRowsByColumn(headerIndex, filter);
+		this.updateRows();
+	}
+
+	/**
+	 * Filters the table rows by a given column and filter.
+	 * This does not render the result to the DOM.
+	 *
+	 * @access private
+	 * @param {Number} columnIndex - The index of the table column to filter.
+	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
+	 * @returns {undefined}
+	 */
+	_filterRowsByColumn(columnIndex, filter) {
+		this._currentFilter = {
+			columnIndex,
+			filter
+		};
+
+		if (typeof filter !== 'string' && typeof filter !== 'function') {
+			throw new Error(`Could not filter table column "${columnIndex}". Expected the filter to a string or function.`, this);
+		}
+
+		// Filter column headings.
+		this._filteredTableRows = [];
+		this.tableRows.forEach(row => {
+			const cell = row.querySelector(`td:nth-of-type(${columnIndex + 1})`);
+			if (cell) {
+				const hideRow = BaseTable._filterMatch(cell, filter);
+				if (hideRow) {
+					this._filteredTableRows.push(row);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Check if a given table cell matches the table filter.
+	 *
+	 * @access private
+	 * @param {Element} cell - The table cell to test the filter function against.
+	 * @param {String|Function} filter - The filter, either a string or callback function.
+	 * @returns {Boolean}
+	 */
+	static _filterMatch(cell, filter) {
+		// If the filter is a string create a filter function which:
+		// - Always matches an emtpy string (no filter).
+		// - Matches against only alpha numeric characters and ".".
+		// - Case insentivie.
+		// - Whitespace insentivie.
+		if (typeof filter === 'string') {
+			const filterValue = filter.replace(/[^\w\.]+/g, '').toLowerCase();
+			filter = (cell) => {
+				const cellValue = cell.textContent.replace(/[^\w\.]+/g, '').toLowerCase();
+				return filterValue ? cellValue.indexOf(filterValue) > -1 : true;
+			};
+		}
+
+		// Check if the filter matches the given table cell.
+		return filter(cell) !== true;
+	}
+
+	/**
+	 * Which rows are hidden, e.g. by a filter.
+	 * @returns {Array[Node]}
+	 */
+	get _rowsToHide() {
+		return this._filteredTableRows;
 	}
 
 	/**
@@ -151,7 +303,7 @@ class BaseTable {
 		}, { cancelable: true });
 
 		if (defaultSort) {
-			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder, this._renderRowsBatchNumber);
+			this._sorter.sortRowsByColumn(this, columnIndex, sortOrder);
 		}
 	}
 
@@ -211,6 +363,7 @@ class BaseTable {
 
 		// Add click event to buttons.
 		const listener = this._sortButtonHandler.bind(this);
+		this._rootElDomDelegate = this._rootElDomDelegate || new Delegate(this.rootEl);
 		this._rootElDomDelegate.on('click', '.o-table__sort', listener);
 	}
 
@@ -229,10 +382,11 @@ class BaseTable {
 		if (!sortOrder) {
 			throw new Error(`Expected a sort order e.g. "ascending" or "descending".`);
 		}
-		this._dispatchEvent('sorted', {
+		this._currentSort = {
 			sortOrder,
 			columnIndex
-		});
+		};
+		this._dispatchEvent('sorted', this._currentSort);
 	}
 
 	/**
@@ -242,7 +396,9 @@ class BaseTable {
 	 * @returns {undefined}
 	 */
 	destroy() {
-		this._rootElDomDelegate.destroy();
+		if (this._rootElDomDelegate) {
+			this._rootElDomDelegate.destroy();
+		}
 		this._listeners.forEach(({ type, listener, element }) => {
 			element.removeEventListener(type, listener);
 		});
