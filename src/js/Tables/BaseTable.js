@@ -408,6 +408,7 @@ class BaseTable {
 		delete this.tbody;
 		delete this.tableHeaders;
 		delete this.tableRows;
+		delete this._filteredTableRows;
 		delete this.wrapper;
 		delete this.container;
 		delete this.overlayWrapper;
