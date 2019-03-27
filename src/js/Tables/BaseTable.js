@@ -456,6 +456,7 @@ class BaseTable {
 		delete this.wrapper;
 		delete this.container;
 		delete this.overlayWrapper;
+		delete this.filterContainer;
 	}
 
 	/**

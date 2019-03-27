@@ -470,7 +470,8 @@ describe("BaseTable", () => {
 				'_filteredTableRows',
 				'wrapper',
 				'container',
-				'overlayWrapper'
+				'overlayWrapper',
+				'filterContainer'
 			];
 			table.destroy();
 			expectedToBeRemoved.forEach(property => {
