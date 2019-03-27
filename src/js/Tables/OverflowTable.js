@@ -92,8 +92,8 @@ class OverflowTable extends BaseTable {
 	*/
 	updateRows() {
 		this._updateExpander();
-		this._hideFilteredRows();
 		this._updateRowAriaHidden();
+		this._updateTableHeight();
 		this._updateRowOrder();
 	}
 
@@ -111,9 +111,9 @@ class OverflowTable extends BaseTable {
 		const canExpand = expand || contract;
 		const expanderButtonContainer = this.controls.expanderButton;
 		const expanderButton = expanderButtonContainer.querySelector('button');
-		if (contract && !this._contractedWrapperHeight) {
-			this._contractedWrapperHeight = getContractedWrapperHeight(this);
-		}
+
+		this._updateTableHeight();
+		this._updateRowAriaHidden();
 
 		this._expanderUpdateScheduled = window.requestAnimationFrame(function () {
 			this.rootEl.setAttribute('data-o-table-expanded', Boolean(expand));
@@ -122,23 +122,18 @@ class OverflowTable extends BaseTable {
 			expanderButton.style.display = (canExpand ? '' : 'none');
 
 			if (!canExpand) {
-				this.wrapper.style.height = '';
 				this.rootEl.removeAttribute('aria-expanded');
 			}
 
 			if (expand) {
-				this.wrapper.style.height = '';
 				expanderButton.textContent = 'Show fewer';
 				this.rootEl.setAttribute('aria-expanded', true);
 			}
 
 			if (contract) {
-				this.wrapper.style.height = this._contractedWrapperHeight ? `${this._contractedWrapperHeight}px` : '';
 				expanderButton.textContent = 'Show more';
 				this.rootEl.setAttribute('aria-expanded', false);
 			}
-
-			this._updateRowAriaHidden();
 		}.bind(this));
 	}
 
@@ -166,6 +161,28 @@ class OverflowTable extends BaseTable {
 		}
 		this._expand = true;
 		this._updateExpander();
+	}
+
+	/**
+	 * Get the table height, accounting for "hidden" rows.
+	 */
+	_getTableHeight() {
+		if (this.isContracted()) {
+			if (!this._contractedWrapperHeight) {
+				const rowsToHide = this._rowsToHide;
+				const buttonHeight = this.controls.expanderButton.getBoundingClientRect().height;
+				const extraHeight = rowsToHide ? rowsToHide[0].getBoundingClientRect().height / 2 : 0;
+				this._contractedWrapperHeight = super._getTableHeight() + buttonHeight + (this.isContracted() ? extraHeight : 0);
+			}
+			return this._contractedWrapperHeight;
+		}
+
+		if (this.isExpanded()) {
+			const buttonHeight = this.controls.expanderButton.getBoundingClientRect().height;
+			return super._getTableHeight() + buttonHeight;
+		}
+
+		return super._getTableHeight();
 	}
 
 	/**

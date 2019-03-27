@@ -251,6 +251,7 @@ To enable declarative table filtering add the `data-o-table-filter-id` and `data
 For example, to filter a table based on a users selected option:
 ```html
 	<label>Filter the table by country:</label>
+	<!-- the filter input specifies the table id in "data-o-table-filter-id" -->
 	<select data-o-table-filter-id="example-table" data-o-table-filter-column="0">
 		<option value="" selected>All</option>
 		<option value="​Austria">​Austria</option>
@@ -258,9 +259,13 @@ For example, to filter a table based on a users selected option:
 		<!-- more options  -->
 	</select>
 
-	<table id="example-table">
-		<!-- table markup -->
-	</table>
+	<!-- the table markup, this may be a resposnive table -->
+	<div class="o-table-container">
+		<!-- the table element with an id -->
+		<table id="example-table">
+			<!-- ... -->
+		</table>
+	</div>
 ```
 
 Declarative filters are case insensitive and perform partial matches, e.g. a filter of "Kingdom" would reveal "United Kingdom".

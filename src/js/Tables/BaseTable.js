@@ -62,6 +62,7 @@ class BaseTable {
 		this.wrapper = this.rootEl.closest('.o-table-scroll-wrapper');
 		this.container = this.rootEl.closest('.o-table-container');
 		this.overlayWrapper = this.rootEl.closest('.o-table-overlay-wrapper');
+		this.filterContainer = this.wrapper || this.container;
 
 		/**
 		 * @property {Object|Null} _currentSort - The current sort applied.
@@ -96,6 +97,11 @@ class BaseTable {
 		if (!filter) {
 			return;
 		}
+		// Do not setup filter if markup is missing.
+		if (!this.filterContainer) {
+			console.warn(`Could not setup the filter for the table "${tableId}" as markup is missing. A filterable table must be within a div with class "o-table-container".`);
+			return;
+		}
 		// Warn if a misconfigured filter was found.
 		const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
 		if (isNaN(filterColumn)) {
@@ -112,6 +118,19 @@ class BaseTable {
 		}.bind(this);
 		filter.addEventListener('input', filterHandler);
 		this._listeners.push({ element: filter, filterHandler, type: 'input' });
+
+
+		let pendingTableHeightUpdate;
+		const updateTableHeightDebounced = function () {
+			if (pendingTableHeightUpdate) {
+				clearTimeout(pendingTableHeightUpdate);
+			}
+			pendingTableHeightUpdate = setTimeout(function() {
+				this._updateTableHeight();
+			}.bind(this), 33);
+		}.bind(this);
+		window.addEventListener('resize', updateTableHeightDebounced);
+		this._listeners.push({ element: window, updateTableHeightDebounced, type: 'resize' });
 	}
 
 	/**
@@ -120,27 +139,44 @@ class BaseTable {
 	 * @returns {undefined}
 	 */
 	updateRows() {
-		this._hideFilteredRows();
 		this._updateRowAriaHidden();
+		this._updateTableHeight();
 		this._updateRowOrder();
 	}
 
 	/**
-	 * Hide filtered rows by updating the "data-o-table-filtered" attribute.
-	 * Filtered rows are removed from the table using CSS so column width is
-	 * not recalculated.
+	 * Hide filtered rows by updating the container height.
+	 * Filtered rows are not removed from the table so column width is not
+	 * recalculated. Unfortunately "visibility: collaposed" has inconsitent
+	 * support.
 	 */
-	_hideFilteredRows() {
-		if (this._hideFilteredRowsScheduled) {
-			window.cancelAnimationFrame(this._hideFilteredRowsScheduled);
+	_updateTableHeight() {
+		if (!this.filterContainer) {
+			console.warn(`The table has missing markup. A resposnive or filterable table must be within a div with class "o-table-container".`, this.rootEl);
+			return;
 		}
 
-		const filteredRows = this._filteredTableRows || [];
-		this._hideFilteredRowsScheduled = window.requestAnimationFrame(function () {
-			this.tableRows.forEach((row) => {
-				row.setAttribute('data-o-table-filtered', filteredRows.includes(row));
-			});
+		if (this._updateTableHeightScheduled) {
+			window.cancelAnimationFrame(this._updateTableHeightScheduled);
+		}
+
+		const tableHeight = this._getTableHeight();
+
+		this._updateTableHeightScheduled = window.requestAnimationFrame(function () {
+			this.filterContainer.style.height = !isNaN(tableHeight) ? `${tableHeight}px` : '';
 		}.bind(this));
+	}
+
+	/**
+	 * Get the table height, accounting for "hidden" rows.
+	 */
+	_getTableHeight() {
+		const tableHeight = this.rootEl.getBoundingClientRect().height;
+		const filteredRowsHeight = this._rowsToHide.reduce((accumulatedHeight, row) => {
+			return accumulatedHeight + row.getBoundingClientRect().height;
+		}, 0);
+
+		return tableHeight - filteredRowsHeight;
 	}
 
 	/**

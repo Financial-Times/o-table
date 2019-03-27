@@ -83,6 +83,7 @@ class ScrollTable extends BaseTable {
 					this.tbody.insertBefore(row, this.tbody.firstChild);
 				});
 			}
+			this._updateTableHeight();
 		}.bind(this));
 	}
 }
