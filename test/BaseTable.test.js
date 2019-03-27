@@ -460,5 +460,22 @@ describe("BaseTable", () => {
 				Element.prototype.removeEventListener = realRemoveEventListener;
 			}
 		});
+
+		it('removes properties with DOM references', () => {
+			const expectedToBeRemoved = [
+				'thead',
+				'tbody',
+				'tableHeaders',
+				'tableRows',
+				'_filteredTableRows',
+				'wrapper',
+				'container',
+				'overlayWrapper'
+			];
+			table.destroy();
+			expectedToBeRemoved.forEach(property => {
+				proclaim.isUndefined(table[property], `Expected the table property ${property} to be removed when the "destroy" method is called.`);
+			});
+		});
 	});
 });

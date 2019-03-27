@@ -488,7 +488,7 @@ class OverflowTable extends BaseTable {
 	 */
 	get _rowsHiddenByExpander() {
 		const visibleRowCount = Math.min(this.tableRows.length, this._minimumRowCount);
-		const nonFilteredRows = this.tableRows.filter(row => !this._filteredTableRows.includes(row));
+		const nonFilteredRows = this.tableRows.filter(row => this._filteredTableRows.indexOf(row) === -1);
 		return this.isContracted() ? nonFilteredRows.slice(visibleRowCount, nonFilteredRows.length) : [];
 	}
 
