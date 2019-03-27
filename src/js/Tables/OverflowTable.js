@@ -1,18 +1,5 @@
 import BaseTable from './BaseTable';
 
-function getContractedWrapperHeight(table) {
-	const tableHeight = table.rootEl.getBoundingClientRect().height;
-
-	const buttonHeight = table.controls.expanderButton.getBoundingClientRect().height;
-	const hiddenRows = table._rowsToHide;
-	const hiddenRowsHeight = table._rowsToHide.reduce((accumulatedHeight, row) => {
-		return accumulatedHeight + row.getBoundingClientRect().height;
-	}, 0);
-	const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
-
-	return tableHeight + buttonHeight + extraHeight - hiddenRowsHeight;
-}
-
 class OverflowTable extends BaseTable {
 
 	/**
