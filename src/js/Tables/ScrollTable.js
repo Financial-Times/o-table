@@ -63,7 +63,7 @@ class ScrollTable extends BaseTable {
 				const cell = row.querySelectorAll('td')[index];
 				if (cell) {
 					const cellClone = cell.cloneNode(true);
-					const filteredData = this._filteredTableRows.includes(row);
+					const filteredData = this._filteredTableRows.indexOf(row) !== -1;
 					cellClone.setAttribute('data-o-table-filtered', filteredData);
 					cellClone.setAttribute('aria-hidden', filteredData);
 					headerRow.appendChild(cellClone);

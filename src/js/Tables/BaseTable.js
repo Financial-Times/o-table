@@ -107,11 +107,20 @@ class BaseTable {
 			this.filter(filterColumn, filter.value);
 		}
 		// Add a listener to filter the table.
-		const filterHandler = function(event) {
-			this.filter(filterColumn, event.target.value || '');
+		let pendingFilterTimeout;
+		const debouncedFilterHandler = function(event) {
+			if (pendingFilterTimeout) {
+				clearTimeout(pendingFilterTimeout);
+			}
+			pendingFilterTimeout = setTimeout(function () {
+				this.filter(filterColumn, event.target.value || '');
+				pendingFilterTimeout = null;
+			}.bind(this), 33);
 		}.bind(this);
-		filter.addEventListener('input', filterHandler);
-		this._listeners.push({ element: filter, filterHandler, type: 'input' });
+		filter.addEventListener('input', debouncedFilterHandler);
+		filter.addEventListener('change', debouncedFilterHandler);
+		this._listeners.push({ element: filter, debouncedFilterHandler, type: 'input' });
+		this._listeners.push({ element: filter, debouncedFilterHandler, type: 'change' });
 	}
 
 	/**
@@ -138,7 +147,7 @@ class BaseTable {
 		const filteredRows = this._filteredTableRows || [];
 		this._hideFilteredRowsScheduled = window.requestAnimationFrame(function () {
 			this.tableRows.forEach((row) => {
-				row.setAttribute('data-o-table-filtered', filteredRows.includes(row));
+				row.setAttribute('data-o-table-filtered', filteredRows.indexOf(row) !== -1);
 			});
 		}.bind(this));
 	}
@@ -155,7 +164,7 @@ class BaseTable {
 		const rowsToHide = this._rowsToHide || [];
 		this._updateRowAriaHiddenScheduled = window.requestAnimationFrame(function () {
 			this.tableRows.forEach((row) => {
-				row.setAttribute('aria-hidden', rowsToHide.includes(row));
+				row.setAttribute('aria-hidden', rowsToHide.indexOf(row) !== -1);
 			});
 		}.bind(this));
 	}
@@ -177,7 +186,7 @@ class BaseTable {
 			return;
 		}
 
-		const nonFilteredRows = this.tableRows.filter(row => !this._filteredTableRows.includes(row));
+		const nonFilteredRows = this.tableRows.filter(row => this._filteredTableRows.indexOf(row) === -1);
 		this._updateRowOrderScheduled = window.requestAnimationFrame(function () {
 			// Move all non-filtered rows to the top, with current sort order.
 			prepend(this.tbody, nonFilteredRows);
@@ -331,7 +340,7 @@ class BaseTable {
 			const headingHTML = headingNodes.reduce((html, node) => {
 				// Maintain child elements of the heading which make sense in a button.
 				const maintainedElements = ['ABBR', 'B', 'BDI', 'BDO', 'BR', 'CODE', 'CITE', 'DATA', 'DFN', 'DEL', 'EM', 'I', 'S', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TIME', 'U', 'VAR', 'WBR'];
-				if (node.nodeType === Node.ELEMENT_NODE && maintainedElements.includes(node.nodeName)) {
+				if (node.nodeType === Node.ELEMENT_NODE && maintainedElements.indexOf(node.nodeName) !== -1) {
 					return html + node.outerHTML;
 				}
 				// Otherwise return text content.
