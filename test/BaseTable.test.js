@@ -20,12 +20,13 @@ describe("BaseTable", () => {
 
 	function assertFilter(data, expectedData) {
 		const tbody = oTableEl.querySelector('tbody');
-		const filterdRows = tbody.querySelectorAll('tr[data-o-table-filtered="true"]');
-		const visibleRows = tbody.querySelectorAll('tr[data-o-table-filtered="false"]');
+		const filterdRows = tbody.querySelectorAll('tr[aria-hidden="true"]');
+		const visibleRows = tbody.querySelectorAll('tr[aria-hidden="false"]');
 		const expectedFiltered = data.length - expectedData.length;
 		const expectedVisible = expectedData.length;
 		proclaim.equal(filterdRows.length, expectedFiltered, `Expected ${expectedFiltered} filtered rows but found ${filterdRows.length}.`);
 		proclaim.equal(visibleRows.length, expectedVisible, `Expected ${expectedVisible} visible rows but found ${visibleRows.length}.`);
+		proclaim.isTrue(table.wrapper.style.height !== '', `Expect the table to have a set height on its parent container to hide rows visually.`);
 	}
 
 	const click = element => {

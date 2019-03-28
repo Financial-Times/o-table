@@ -152,6 +152,7 @@ class OverflowTable extends BaseTable {
 
 	/**
 	 * Get the table height, accounting for "hidden" rows.
+	 * @return {Number|Null}
 	 */
 	_getTableHeight() {
 		if (this.isContracted()) {

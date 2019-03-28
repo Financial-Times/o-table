@@ -84,11 +84,12 @@ function assertExpanded(table, { expanded, minimumRowCount }) {
 	const expectedButtonContent = expanded ? 'show fewer' : 'show more';
 	const expectedAriaExpanded = expanded ? 'true' : 'false';
 	const expectedHidden = expanded ? 0 : table.tableRows.length - minimumRowCount;
-	const wrapperHeightCorrect = (table.wrapper.style.height === '' && expanded) || (table.wrapper.style.height !== '' && !expanded);
 	proclaim.include(table.container.innerHTML.toLowerCase(), expectedButtonContent, `Expected to see "${expectedButtonContent}" within an expanded table.`);
 	proclaim.isTrue(table.rootEl.getAttribute('aria-expanded') === expectedAriaExpanded, `Expected to see \'aria-expanded="${expectedAriaExpanded}"\' on an expanded table.`);
 	proclaim.equal(table.tbody.querySelectorAll('tr[aria-hidden="true"]').length, expectedHidden, `Expected ${expectedHidden} table rows to be hidden in an expanded table,`);
-	proclaim.isTrue(wrapperHeightCorrect, `Expect the table wrapper to ${expanded ? 'not have' : 'have'} a set height to hide rows visually.`);
+	if (expanded) {
+		proclaim.isTrue(table.wrapper.style.height !== '', `Expect an expanded table to have a set height on its wrapper to hide rows visually.`);
+	}
 }
 
 describe("OverflowTable", () => {

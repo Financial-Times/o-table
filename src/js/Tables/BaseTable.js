@@ -177,6 +177,7 @@ class BaseTable {
 
 	/**
 	 * Get the table height, accounting for "hidden" rows.
+	 * @return {Number|Null}
 	 */
 	_getTableHeight() {
 		const tableHeight = this.rootEl.getBoundingClientRect().height;
