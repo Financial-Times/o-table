@@ -80,6 +80,7 @@ class OverflowTable extends BaseTable {
 	updateRows() {
 		this._updateExpander();
 		this._updateRowAriaHidden();
+		this._hideFilteredRows();
 		this._updateTableHeight();
 		this._updateRowOrder();
 	}
@@ -101,6 +102,7 @@ class OverflowTable extends BaseTable {
 
 		this._updateTableHeight();
 		this._updateRowAriaHidden();
+		this._updateControls();
 
 		this._expanderUpdateScheduled = window.requestAnimationFrame(function () {
 			this.rootEl.setAttribute('data-o-table-expanded', Boolean(expand));
@@ -156,11 +158,12 @@ class OverflowTable extends BaseTable {
 	 */
 	_getTableHeight() {
 		if (this.isContracted()) {
-			if (!this._contractedWrapperHeight) {
+			const maxTableHeight = super._getTableHeight();
+			if (!this._contractedWrapperHeight || this._contractedWrapperHeight > maxTableHeight) {
 				const rowsToHide = this._rowsToHide;
 				const buttonHeight = this.controls.expanderButton.getBoundingClientRect().height;
 				const extraHeight = rowsToHide ? rowsToHide[0].getBoundingClientRect().height / 2 : 0;
-				this._contractedWrapperHeight = super._getTableHeight() + buttonHeight + (this.isContracted() ? extraHeight : 0);
+				this._contractedWrapperHeight = maxTableHeight + buttonHeight + extraHeight;
 			}
 			return this._contractedWrapperHeight;
 		}
