@@ -55,13 +55,6 @@
 				}
 			}
 
-			// Totally hide any hidden row when the table is flat.
-			// sass-lint:disable no-qualifying-elements
-			tr[aria-hidden="true"] {
-				display: none;
-			}
-			// sass-lint:enable no-qualifying-elements
-
 			.o-table__duplicate-heading {
 				display: block;
 				float: left;

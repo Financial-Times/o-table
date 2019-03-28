@@ -1,18 +1,5 @@
 import BaseTable from './BaseTable';
 
-function getContractedWrapperHeight(table) {
-	const tableHeight = table.rootEl.getBoundingClientRect().height;
-
-	const buttonHeight = table.controls.expanderButton.getBoundingClientRect().height;
-	const hiddenRows = table._rowsToHide;
-	const hiddenRowsHeight = table._rowsToHide.reduce((accumulatedHeight, row) => {
-		return accumulatedHeight + row.getBoundingClientRect().height;
-	}, 0);
-	const extraHeight = (hiddenRows[0] ? hiddenRows[0].getBoundingClientRect().height / 2 : 0);
-
-	return tableHeight + buttonHeight + extraHeight - hiddenRowsHeight;
-}
-
 class OverflowTable extends BaseTable {
 
 	/**
@@ -92,8 +79,9 @@ class OverflowTable extends BaseTable {
 	*/
 	updateRows() {
 		this._updateExpander();
-		this._hideFilteredRows();
 		this._updateRowAriaHidden();
+		this._hideFilteredRows();
+		this._updateTableHeight();
 		this._updateRowOrder();
 	}
 
@@ -111,9 +99,10 @@ class OverflowTable extends BaseTable {
 		const canExpand = expand || contract;
 		const expanderButtonContainer = this.controls.expanderButton;
 		const expanderButton = expanderButtonContainer.querySelector('button');
-		if (contract && !this._contractedWrapperHeight) {
-			this._contractedWrapperHeight = getContractedWrapperHeight(this);
-		}
+
+		this._updateTableHeight();
+		this._updateRowAriaHidden();
+		this._updateControls();
 
 		this._expanderUpdateScheduled = window.requestAnimationFrame(function () {
 			this.rootEl.setAttribute('data-o-table-expanded', Boolean(expand));
@@ -122,23 +111,18 @@ class OverflowTable extends BaseTable {
 			expanderButton.style.display = (canExpand ? '' : 'none');
 
 			if (!canExpand) {
-				this.wrapper.style.height = '';
 				this.rootEl.removeAttribute('aria-expanded');
 			}
 
 			if (expand) {
-				this.wrapper.style.height = '';
 				expanderButton.textContent = 'Show fewer';
 				this.rootEl.setAttribute('aria-expanded', true);
 			}
 
 			if (contract) {
-				this.wrapper.style.height = this._contractedWrapperHeight ? `${this._contractedWrapperHeight}px` : '';
 				expanderButton.textContent = 'Show more';
 				this.rootEl.setAttribute('aria-expanded', false);
 			}
-
-			this._updateRowAriaHidden();
 		}.bind(this));
 	}
 
@@ -166,6 +150,30 @@ class OverflowTable extends BaseTable {
 		}
 		this._expand = true;
 		this._updateExpander();
+	}
+
+	/**
+	 * Get the table height, accounting for "hidden" rows.
+	 * @return {Number|Null}
+	 */
+	_getTableHeight() {
+		if (this.isContracted()) {
+			const maxTableHeight = super._getTableHeight();
+			if (!this._contractedWrapperHeight || this._contractedWrapperHeight > maxTableHeight) {
+				const rowsToHide = this._rowsToHide;
+				const buttonHeight = this.controls.expanderButton.getBoundingClientRect().height;
+				const extraHeight = rowsToHide ? rowsToHide[0].getBoundingClientRect().height / 2 : 0;
+				this._contractedWrapperHeight = maxTableHeight + buttonHeight + extraHeight;
+			}
+			return this._contractedWrapperHeight;
+		}
+
+		if (this.isExpanded()) {
+			const buttonHeight = this.controls.expanderButton.getBoundingClientRect().height;
+			return super._getTableHeight() + buttonHeight;
+		}
+
+		return super._getTableHeight();
 	}
 
 	/**

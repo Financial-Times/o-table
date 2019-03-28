@@ -77,10 +77,12 @@
 		margin-bottom: oTypographySpacingSize($units: 4);
 	}
 
-	// Collapse filtered rows.
-	// The size of columns are still calculated.
-	// https://developer.mozilla.org/en-US/docs/Web/CSS/visibility#Values
-	.o-table [data-o-table-filtered="true"] {
-		visibility: collapse;
+	// Visually hide any filtered rows.
+	// `display: none` is not used to avoid recalculating column row.
+	// `visibility: collaposed` is not used due to inconsistent browser support.
+	// sass-lint:disable no-qualifying-elements
+	tr[data-o-table-filtered="true"] {
+		visibility: hidden;
 	}
+	// sass-lint:enable no-qualifying-elements
 }
