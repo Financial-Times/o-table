@@ -77,11 +77,11 @@
 		margin-bottom: oTypographySpacingSize($units: 4);
 	}
 
-	// Visually hide any hidden row.
+	// Visually hide any filtered rows.
 	// `display: none` is not used to avoid recalculating column row.
 	// `visibility: collaposed` is not used due to inconsistent browser support.
 	// sass-lint:disable no-qualifying-elements
-	tr[aria-hidden="true"] {
+	tr[data-o-table-filtered="true"] {
 		visibility: hidden;
 	}
 	// sass-lint:enable no-qualifying-elements

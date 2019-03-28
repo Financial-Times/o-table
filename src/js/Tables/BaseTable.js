@@ -148,6 +148,7 @@ class BaseTable {
 	 */
 	updateRows() {
 		this._updateRowAriaHidden();
+		this._hideFilteredRows();
 		this._updateTableHeight();
 		this._updateRowOrder();
 	}
@@ -201,6 +202,24 @@ class BaseTable {
 		this._updateRowAriaHiddenScheduled = window.requestAnimationFrame(function () {
 			this.tableRows.forEach((row) => {
 				row.setAttribute('aria-hidden', rowsToHide.indexOf(row) !== -1);
+			});
+		}.bind(this));
+	}
+
+	/**
+	 * Hide filtered rows by updating the "data-o-table-filtered" attribute.
+	 * Filtered rows are removed from the table using CSS so column width is
+	 * not recalculated.
+	 */
+	_hideFilteredRows() {
+		if (this._hideFilteredRowsScheduled) {
+			window.cancelAnimationFrame(this._hideFilteredRowsScheduled);
+		}
+
+		const filteredRows = this._filteredTableRows || [];
+		this._hideFilteredRowsScheduled = window.requestAnimationFrame(function () {
+			this.tableRows.forEach((row) => {
+				row.setAttribute('data-o-table-filtered', filteredRows.indexOf(row) !== -1);
 			});
 		}.bind(this));
 	}
