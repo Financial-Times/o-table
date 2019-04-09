@@ -153,7 +153,7 @@
 				"showFilter": true,
 				"tableType": "overflow"
 			},
-			"template": "demos/src/huge.mustache",
+			"template": "demos/src/base.mustache",
 			"description": "This demo shows a table with columns which may be filtered by a value."
 		},
 		{
