@@ -458,23 +458,22 @@ describe("BaseTable", () => {
 			}, 100); // wait for window.requestAnimationFrame
 		});
 
-		it('applies an existing filter to any row inserted after it was initialised', () => {
+		it('applies an existing filter to any row inserted after it was initialised', (done) => {
 			// Tell o-table the rows have updated.
 			table.updateRows();
 			setTimeout(() => {
 				// The filter includes the original Apple row and the clone
 				// added after the table was initialised.
-				assertFilter(data, [cloneData, cloneData]);
+				done(assertFilter(data, [cloneData, cloneData]));
 			}, 100); // wait for window.requestAnimationFrame
 		});
 
-		it('applies an existing sort to any row inserted after it was initialised', () => {
+		it('applies an existing sort to any row inserted after it was initialised', (done) => {
 			const sorterSpy = sinon.spy(sorter, "sortRowsByColumn");
 			// Tell o-table the rows have updated.
 			table.updateRows();
 			setTimeout(() => {
-				proclaim.isTrue(sorterSpy.calledWith(table, headerIndex, sortOrder));
-				sorterSpy.restore();
+				done(proclaim.isTrue(sorterSpy.calledWith(table, headerIndex, sortOrder)));
 			}, 100); // wait for window.requestAnimationFrame
 		});
 	});

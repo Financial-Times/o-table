@@ -152,7 +152,7 @@ class BaseTable {
 		// Find rows added.
 		const newRows = rows.filter(function (row) {
 			return this.tableRows.indexOf(row) === -1;
-		}.bind(this));
+		}, this);
 		// Set o-table rows.
 		this.tableRows = rows;
 		// Re-apply sort if rows added.
