@@ -75,7 +75,7 @@ class FlatTable extends BaseTable {
 						td.parentNode.insertBefore(clonedHeader, td);
 					});
 				});
-		});
+			});
 	}
 }
 

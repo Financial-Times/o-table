@@ -93,7 +93,7 @@ describe("ScrollTable", () => {
 								originalDataNode[index].textContent,
 								'Expected each "td" of the new "tr" to be cloned and appened into rows for the scroll view.'
 							);
-						})
+						});
 						done();
 					} catch (error) {
 						done(error);
