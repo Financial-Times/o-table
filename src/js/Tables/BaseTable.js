@@ -185,6 +185,10 @@ class BaseTable {
 	 * applies aria-labels to hidden rows, updates the table height to
 	 * efficiently hide them.
 	 *
+	 * Note this does not calculate which rows should be sorted or filtered,
+	 * and does not look for new rows added to the dom. See `updateRows`.
+	 *
+	 * @see updateRows
 	 * @returns {undefined}
 	 */
 	renderRowUpdates() {
