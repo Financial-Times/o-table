@@ -7,6 +7,6 @@
 		"start": "serve -l $PORT"
 	},
 	"devDependencies": {
-		"origami-ci-tools": "1.0.2-peers.2"
+		"origami-ci-tools": "1.0.2-peers.3"
 	}
 }
