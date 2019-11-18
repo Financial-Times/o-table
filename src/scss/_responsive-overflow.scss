@@ -56,9 +56,9 @@
 		.o-table-control--back button,
 		.o-table-control--forward button {
 				@include oButtonsContent((
-					'type': 'primary',
+					'size': 'big',
 					'icon-only': true
-				));
+				), $include-base-styles: false);
 		}
 
 		.o-table-control--back {
@@ -66,11 +66,14 @@
 			float: left; //sticky
 			margin: 0 10px;
 			button {
-				@include oButtonsContent((
-					'size': 'big',
-					'icon': 'arrow-left',
-					'icon-only': true
-				));
+				@include oButtonsContent(
+					$opts: (
+						'type': 'primary',
+						'icon': 'arrow-left'
+					),
+					$include-base-styles: false,
+					$include-base-icon-styles: false
+				);
 			}
 		}
 
@@ -79,11 +82,14 @@
 			float: right; //sticky
 			margin: 0 10px;
 			button {
-				@include oButtonsContent((
-					'size': 'big',
-					'icon': 'arrow-right',
-					'icon-only': true
-				));
+				@include oButtonsContent(
+					$opts: (
+						'type': 'primary',
+						'icon': 'arrow-right'
+					),
+					$include-base-styles: false,
+					$include-base-icon-styles: false
+				);
 			}
 		}
 
