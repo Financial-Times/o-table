@@ -1,5 +1,16 @@
 import BaseTable from './BaseTable';
 
+// function to return a unique id to link header to data cells
+let headerCount = 0;
+const generateCellId = (cell) => {
+	// Return an id if one already exists.
+	if (cell instanceof Node && cell.getAttribute('id')) {
+		return cell.getAttribute('id');
+	}
+	// Otherwise create an o-table id.
+	return `o-table-flat-header-${headerCount++}`;
+};
+
 class FlatTable extends BaseTable {
 
 	/**
@@ -62,18 +73,64 @@ class FlatTable extends BaseTable {
 	_createFlatTableStructure(rows = this.tableRows) {
 		rows
 			.filter(row => !row.hasAttribute('data-o-table-flat-headings')) // only process rows once
-			.forEach((row) => {
+			.forEach((row, index) => {
 				const data = Array.from(row.getElementsByTagName('td'));
 				row.setAttribute('data-o-table-flat-headings', true);
 				window.requestAnimationFrame(() => {
+					// Create a new table body for every row.
+					const newGroupBody = document.createElement('tbody');
+					newGroupBody.classList.add('o-table__responsive-body');
+					// Create a row in the new bodies for every data cell.
+					const newGroupRow = document.createElement('tr');
+					newGroupRow.classList.add('o-table__duplicate-row');
+					// Create a column header "item x" for each new body.
+					// First create a blank cell which will be the header for
+					// for our new column header. This will prevent some assistive
+					// technologies from reading a header our heading cell.
+					// https://www.w3.org/WAI/tutorials/tables/multi-level/
+					const newItemHeaderBlankItem = document.createElement('td');
+					const newItemHeaderBlankItemId = generateCellId(newItemHeaderBlankItem);
+					newItemHeaderBlankItem.setAttribute('id', newItemHeaderBlankItemId);
+					newItemHeaderBlankItem.innerHTML = '&nbsp;';
+					// Second create the actual header cell and set its headings
+					// to the blank heading cell.
+					const newItemHeader = document.createElement('th');
+					newItemHeader.innerText = `Item ${index + 1}`;
+					const groupHeaderId = generateCellId(newItemHeader);
+					newItemHeader.setAttribute('id', groupHeaderId);
+					newItemHeader.setAttribute('headers', `${newItemHeaderBlankItemId}`);
+					newItemHeader.setAttribute('scope', 'colgroup');
+					newItemHeader.classList.add('o-table__group-heading');
+					// Append the heading items to the new row,
+					// and append the new row to the new body.
+					newGroupRow.appendChild(newItemHeader);
+					newGroupRow.appendChild(newItemHeaderBlankItem);
+					newGroupBody.appendChild(newGroupRow);
+					// Append all the other rows as heading / value pairs.
 					this._tableHeadersWithoutSort.forEach((header, index) => {
-						const td = data[index];
+						// Create the row.
+						const newRow = document.createElement('tr');
+						newRow.classList.add('o-table__duplicate-row');
+						// Duplicate the original heading cell and set headings.
 						const clonedHeader = header.cloneNode(true);
+						const clonedHeaderId = generateCellId(clonedHeader);
+						clonedHeader.setAttribute('id', clonedHeaderId);
+						clonedHeader.setAttribute('headers', `${groupHeaderId}`);
 						clonedHeader.setAttribute('scope', 'row');
-						clonedHeader.setAttribute('role', 'rowheader');
-						clonedHeader.classList.add('o-table__duplicate-heading');
-						td.parentNode.insertBefore(clonedHeader, td);
+						clonedHeader.removeAttribute('role');
+						// Duplicate the original data cell and set headings.
+						const clonedTd = data[index].cloneNode(true);
+						clonedTd.setAttribute('headers', `${groupHeaderId} ${clonedHeaderId}`);
+						// Append the header and data cell to the row.
+						newRow.appendChild(clonedHeader);
+						newRow.appendChild(clonedTd);
+						// Append the row to the body.
+						newGroupBody.appendChild(newRow);
 					});
+
+					// Append the new bodies, which represent each row on
+					// desktop, to the root element.
+					this.rootEl.appendChild(newGroupBody);
 				});
 			});
 	}
