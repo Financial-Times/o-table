@@ -62,7 +62,7 @@ class FlatTable extends BaseTable {
 	_createFlatTableStructure(rows = this.tableRows) {
 		rows
 			.filter(row => !row.hasAttribute('data-o-table-flat-headings')) // only process rows once
-			.forEach((row, index) => {
+			.forEach(row => {
 				const data = Array.from(row.getElementsByTagName('td'));
 				row.setAttribute('data-o-table-flat-headings', true);
 				window.requestAnimationFrame(() => {
