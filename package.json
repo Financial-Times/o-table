@@ -2,6 +2,6 @@
 	"private": true,
 	"name": "o-table",
 	"devDependencies": {
-		"origami-ci-tools": "^1.0.0"
+		"origami-ci-tools": "financial-times/origami-ci-tools#branch-package-tests"
 	}
 }
