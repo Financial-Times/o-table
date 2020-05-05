@@ -2,13 +2,6 @@
 /// @access private
 @mixin _oTableResponsiveFlat {
 	.o-table.o-table--responsive-flat {
-		width: 100%;
-
-		// hide elements added for the mobile version of the flat table
-		.o-table__duplicate-row,
-		.o-table__responsive-body {
-			display: none;
-		}
 
 		@include oGridRespondTo($until: S) {
 			// hide elements for the desktop version of the table
@@ -70,6 +63,13 @@
 			.o-table__cell--numeric {
 				text-align: left;
 			}
+		}
+		width: 100%;
+
+		// hide elements added for the mobile version of the flat table
+		.o-table__duplicate-row,
+		.o-table__responsive-body {
+			display: none;
 		}
 	}
 }
