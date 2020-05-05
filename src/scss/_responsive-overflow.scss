@@ -58,7 +58,7 @@
 			@include oButtonsContent((
 				'size': 'big',
 				'icon-only': true
-				), $include-base-styles: false);
+			), $include-base-styles: false);
 		}
 
 		.o-table-control--back {
