@@ -1,5 +1,6 @@
 # o-table
 
+
 Styling for tables.
 
 - [Markup](#markup)
