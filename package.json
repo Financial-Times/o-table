@@ -1,6 +1,6 @@
 {
 	"private": true,
-	"name": "4table",
+	"name": "o-table",
 	"devDependencies": {
 		"eslint": "^7.1.0",
 		"eslint-config-origami-component": "^2.0.1",
