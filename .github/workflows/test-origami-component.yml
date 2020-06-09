@@ -11,6 +11,7 @@ jobs:
       with:
         node-version: 12.x
     - run: npm install --only=dev
+    - uses: xt0rted/stylelint-problem-matcher@v1
     - name: Repository name
       id: repo_name
       run: echo ::set-output name=REPO_NAME::${GITHUB_REPOSITORY/*\//}
