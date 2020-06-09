@@ -1,5 +1,5 @@
 // Dependancies
-@import "o-spacing/main";
+@import 'o-spacing/main';
 @import "o-brand/main";
 @import "o-buttons/main";
 @import "o-colors/main";
@@ -44,17 +44,17 @@
 	$stripes-enabled: index($opts, 'stripes');
 	$row-headings-enabled: index($opts, 'row-headings');
 
-	// Basic styles and simple utilities.
+// 	Basic styles and simple utilities.
 	@include _oTableBase;
 
 	// Sortable columns.
-	@include _oTableSort;
+@include _oTableSort;
 
 	// Respnsive solutions.
-	@if $flat-enabled or $scroll-enabled or $overflow-enabled {
-		@include _oTableWrapper;
-		@include _oTableContainer($expandable: $overflow-enabled);
-	}
+ @if $flat-enabled or $scroll-enabled or $overflow-enabled {
+@include _oTableWrapper;
+  @include _oTableContainer($expandable: $overflow-enabled);
+}
 	@if $overflow-enabled {
 		@include _oTableResponsiveOverflow;
 	}
@@ -75,23 +75,18 @@
 
 	// Compact.
 	@if $compact-enabled and _oTableSupports('compact') {
-		@include _oTableCompact;
+		@include _oTableCompact
 	}
 
 	// Stripes.
 	@if $stripes-enabled and _oTableSupports('stripes') {
-		@include _oTableRowStripes;
+		@include _oTableRowStripes
 	}
 
 	// Row headings.
 	@if $row-headings-enabled and _oTableSupports('row-headings') {
-		@include _oTableRowHeadings;
+		@include _oTableRowHeadings
 	}
 }
 
-@if ($o-table-is-silent == false) {
-	@include oTable();
-
-	// Set table to silent again to avoid being output twice
-	$o-table-is-silent: true !global;
-}
+@if ($o-table-is-silent == false) {@include oTable();$o-table-is-silent: true !global;}
