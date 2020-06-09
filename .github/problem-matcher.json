@@ -4,12 +4,13 @@
       "owner": "origami-build-tools",
       "pattern": [
         {
-          "regexp": "^(\\S+?):(\\d+):(\\d+)(?:.*?)- (.*?)(\\(.*?\\))?$",
+          "regexp": "^(\\S+?):(\\d+):(\\d+)\\s+(.*?)\\s+-\\s+(.*?)(\\(.*?\\))?$",
           "file": 1,
           "line": 2,
           "column": 3,
-          "message": 4,
-          "code": 5
+          "severity": 4,
+          "message": 5,
+          "code": 6
         }
       ]
     }
