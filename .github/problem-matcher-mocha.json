@@ -11,8 +11,7 @@
         },
         {
           "regexp": "(AssertionError.*)$",
-          "message": 1,
-          "loop": true
+          "message": 1
         }
       ]
     }
