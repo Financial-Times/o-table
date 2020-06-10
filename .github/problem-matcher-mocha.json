@@ -4,7 +4,7 @@
       "owner": "origami-build-tools-mocha",
       "pattern": [
         {
-          "regexp": "^AssertionError: (.*?)\n+\s+at .*\n+\s+at (.*?):(\d+):(\d+)",
+          "regexp": "^AssertionError: (.*?)\\n+\\s+at .*\\n+\\s+at (.*?):(\\d+):(\\d+)",
           "file": 2,
           "line": 3,
           "column": 4,
