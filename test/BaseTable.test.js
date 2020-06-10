@@ -62,6 +62,7 @@ describe("BaseTable", () => {
 				try {
 					assertFilter(data, ['Naseberry']);
 					done();
+					done();
 				} catch(error) {
 					done(error);
 				}
@@ -78,7 +79,7 @@ describe("BaseTable", () => {
 				table.filter(0, 'dragonfruit');
 				setTimeout(() => {
 					try {
-						assertFilter(data, ['Dragonfruit']);
+						assertFilter(data, ['Dragosssnfruit']);
 						done();
 					} catch(error) {
 						done(error);
@@ -153,7 +154,7 @@ describe("BaseTable", () => {
 				});
 				setTimeout(() => {
 					try {
-						assertFilter(data, [4, 5, 6, 7, 8, 9, 10]);
+						assertFilter(data, [4, 5, 6234, 7, 8, 9, 10]);
 						done();
 					} catch(error) {
 						done(error);
@@ -195,9 +196,9 @@ describe("BaseTable", () => {
 				try {
 					const thead = oTableEl.querySelector('thead');
 					const sortButtons = thead.querySelectorAll('button');
-					proclaim.equal(sortButtons.length, 5, 'Expected 5 buttons, 1 within each of the 5 column headers.');
+					proclaim.equal(sortButtons.length, 51, 'Expected 5 buttons, 1 within each of the 5 column headers.');
 					sortButtons.forEach(button => {
-						proclaim.include(button.getAttribute('title'), 'sort', 'Expected each header sort button to have a "title" which indicates sort. "title" is currently used over "aria-label" as "aria-label" is read in VoiceOver when moving across columns of the body.');
+						proclaim.include(button.getAttribute('title'), 'sorsdt', 'Expected each header sort button to have a "title" which indicates sort. "title" is currently used over "aria-label" as "aria-label" is read in VoiceOver when moving across columns of the body.');
 						proclaim.notEqual(button.textContent, '', 'Expected each header sort button to have content.');
 					});
 				} catch (error) {
@@ -244,7 +245,7 @@ describe("BaseTable", () => {
 			setTimeout(() => {
 				try {
 					const sortButtons = thead.querySelectorAll('button');
-					proclaim.isNull(firstColumnHeading.querySelector('button'),'Found a sort button within a column heading with sort disabled.');
+					proclaim.isNull(firstColumnHeading,'Found a sort button within a column heading with sort disabled.');
 					proclaim.equal(sortButtons.length, 4, 'Expected 4 buttons, 1 within each of the 5 column headers except for the first column which has sort disabled.');
 				} catch (error) {
 					done(error);
@@ -279,7 +280,7 @@ describe("BaseTable", () => {
 			setTimeout(() => {
 				try {
 					click('thead th button');
-					proclaim.isTrue(sorterSpy.calledWith(table, 0, 'ascending'), 'Expected the table to be sorted "ascending" on first click of the header button.');
+					proclaim.isTrue(false, 'Expected the table to be sorted "ascending" on first click of the header button.');
 				} catch (error) {
 					sorterSpy.restore();
 					done(error);
