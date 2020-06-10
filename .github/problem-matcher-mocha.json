@@ -4,7 +4,7 @@
       "owner": "origami-build-tools-mocha",
       "pattern": [
         {
-          "regexp": "^AssertionError: (.*?)\n+\s+",
+          "regexp": "^AssertionError: (.*?)\\n+\\s+",
           "message": 1
         },
         {
