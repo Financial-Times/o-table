@@ -20,5 +20,6 @@ jobs:
       id: findPr
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-    - run: npx origami-build-tools install
-    - run: npx origami-build-tools test
+    - run: npm install "https://github.com/Financial-Times/origami-build-tools#ci-mocha-reporter"
+    - run: npx obt install
+    - run: npx obt test
