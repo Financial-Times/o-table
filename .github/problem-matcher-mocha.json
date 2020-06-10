@@ -4,14 +4,14 @@
       "owner": "origami-build-tools-mocha",
       "pattern": [
         {
-          "regexp": "^AssertionError: (.*?)\\n+\\s+",
-          "message": 1
-        },
-        {
-          "regexp": "at (test.*?):(\\d+):(\\d+)",
+          "regexp": "^(.*?):(\\d+):(\\d+) (.*?)$",
           "file": 1,
           "line": 2,
-          "column": 3,
+          "column": 3
+        },
+        {
+          "regexp": "(AssertionError.*)$",
+          "message": 1,
           "loop": true
         }
       ]
