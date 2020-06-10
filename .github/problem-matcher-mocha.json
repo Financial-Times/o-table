@@ -4,7 +4,7 @@
       "owner": "origami-build-tools-mocha",
       "pattern": [
         {
-          "regexp": "^(.*?):(\\d+):(\\d+) (.*?)$",
+          "regexp": "^\\s+(.*?):(\\d+):(\\d+) (.*?)$",
           "file": 1,
           "line": 2,
           "column": 3
