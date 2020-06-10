@@ -15,7 +15,7 @@ const longTableWithContainer = `
 				</thead>
 				<tbody>
 					<tr>
-						<td>Dragonfruit</td>
+						<td>Dragon</td>
 						<td>Stenocereus</td>
 						<td>Juicy</td>
 						<td class="o-table__cell--numeric">3</td>
@@ -50,7 +50,7 @@ const longTableWithContainer = `
 						<td class="o-table__cell--numeric">0.56</td>
 					</tr>
 					<tr>
-						<td>Dragonfruit</td>
+						<td>Dragon</td>
 						<td>Stenocereus</td>
 						<td>Juicy</td>
 						<td class="o-table__cell--numeric">3</td>
@@ -85,7 +85,7 @@ const longTableWithContainer = `
 						<td class="o-table__cell--numeric">0.56</td>
 					</tr>
 					<tr>
-						<td>Dragonfruit</td>
+						<td>Dragon</td>
 						<td>Stenocereus</td>
 						<td>Juicy</td>
 						<td class="o-table__cell--numeric">3</td>
@@ -120,7 +120,7 @@ const longTableWithContainer = `
 						<td class="o-table__cell--numeric">0.56</td>
 					</tr>
 					<tr>
-						<td>Dragonfruit</td>
+						<td>Dragon</td>
 						<td>Stenocereus</td>
 						<td>Juicy</td>
 						<td class="o-table__cell--numeric">3</td>
@@ -212,7 +212,7 @@ const shortTableWithContainer = `
 				</thead>
 				<tbody>
 					<tr>
-						<td>Dragonfruit</td>
+						<td>Dragon</td>
 						<td>Stenocereus</td>
 						<td>Juicy</td>
 						<td class="o-table__cell--numeric">3</td>
@@ -266,7 +266,7 @@ const tableWithContainerAndComplexHeadings = `
 				</thead>
 				<tbody>
 					<tr>
-						<td>Dragonfruit</td>
+						<td>Dragon</td>
 						<td>Stenocereus</td>
 						<td>Juicy</td>
 					</tr>
