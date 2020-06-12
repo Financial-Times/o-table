@@ -1,0 +1,18 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "origami-build-tools-pa11y",
+      "pattern": [
+        {
+          "regexp": "Accessibility errors were found in (.*)",
+          "file": 1,
+        },
+        {
+          "regexp": "(Error:.*)",
+          "message": 1,
+          "loop": true
+        }
+      ]
+    }
+  ]
+}
