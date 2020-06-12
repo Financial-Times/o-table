@@ -10,6 +10,7 @@
         {
           "regexp": "(Error:.*)",
           "message": 1,
+          "kind": "file",
           "loop": true
         }
       ]
