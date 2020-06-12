@@ -13,6 +13,7 @@ jobs:
     - run: npm install --only=dev
     - run: "echo \"::add-matcher::.github/problem-matcher.json\""
     - run: "echo \"::add-matcher::.github/problem-matcher-mocha.json\""
+    - run: "echo \"::add-matcher::.github/problem-matcher-pa11y.json\""
     - name: Repository name
       id: repo_name
       run: echo ::set-output name=REPO_NAME::${GITHUB_REPOSITORY/*\//}
