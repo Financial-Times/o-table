@@ -11,7 +11,7 @@
           "regexp": "(\\s+)",
           "message": 1,
           "kind": "file"
-        }
+        },
         {
           "regexp": "(Error:.*)",
           "message": 1,
