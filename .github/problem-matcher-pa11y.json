@@ -9,7 +9,6 @@
         },
         {
           "regexp": "(\\s+)",
-          "message": 1,
           "kind": "file"
         },
         {
