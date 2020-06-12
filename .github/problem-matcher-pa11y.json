@@ -8,10 +8,14 @@
           "file": 1,
         },
         {
+          "regexp": "(\\s+)",
+          "message": 1,
+          "kind": "file"
+        }
+        {
           "regexp": "(Error:.*)",
           "message": 1,
-          "kind": "file",
-          "loop": true
+          "kind": "file"
         }
       ]
     }
