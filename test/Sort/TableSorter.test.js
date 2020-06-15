@@ -3,9 +3,9 @@
 
 import * as sandbox from './../helpers/sandbox';
 import * as fixtures from './../helpers/fixtures';
-import BaseTable from './../../src/js/Tables/BaseTable';
-import FlatTable from './../../src/js/Tables/FlatTable';
-import TableSorter from './../../src/js/Sort/TableSorter';
+import BaseTable from './../../src/js/Tables/BaseTable'
+import FlatTable from './../../src/js/Tables/FlatTable'
+import TableSorter from './../../src/js/Sort/TableSorter'
 const sorter = new TableSorter();
 
 describe("BaseTable", () => {
