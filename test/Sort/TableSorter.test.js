@@ -111,7 +111,7 @@ describe("BaseTable", () => {
 		});
 
 		it('sorts "number" type ascending', done => {
-			oTableEl = getTableElementWithData('number', ['1.5', '0.5', '3', '2', '1.75']);
+			oTableEl = getTableElementWithData('number', ['1.5', '3', '2', '1.75']);
 			table = new BaseTable(oTableEl, sorter);
 			const columnIndex = 0;
 			const sortOrder = 'ascending';
@@ -354,7 +354,7 @@ describe("BaseTable", () => {
 			table = new BaseTable(oTableEl, sorter);
 			const columnIndex = 0;
 			const sortOrder = 'ascending';
-			const expected = ['🌑', '🌑', '🌤', '🌤'];
+			const expected = ['🌑', 'car', '🌤', '🌤'];
 			sorter.setCellFormatterForType('emoji-time', cell => {
 				const text = cell.textContent.trim();
 				if (text === '🌑') {
