@@ -3,9 +3,9 @@
 
 import * as sandbox from './../helpers/sandbox';
 import * as fixtures from './../helpers/fixtures';
-import BaseTable from './../../src/js/Tables/BaseTable'
-import FlatTable from './../../src/js/Tables/FlatTable'
-import TableSorter from './../../src/js/Sort/TableSorter'
+import BaseTable from './../../src/js/Tables/BaseTable';
+import FlatTable from './../../src/js/Tables/FlatTable';
+import TableSorter from './../../src/js/Sort/TableSorter';
 const sorter = new TableSorter();
 
 describe("BaseTable", () => {
@@ -111,7 +111,7 @@ describe("BaseTable", () => {
 		});
 
 		it('sorts "number" type ascending', done => {
-			oTableEl = getTableElementWithData('number', ['1.5', '3', '2', '1.75']);
+			oTableEl = getTableElementWithData('number', ['1.5', '0.5', '3', '2', '1.75']);
 			table = new BaseTable(oTableEl, sorter);
 			const columnIndex = 0;
 			const sortOrder = 'ascending';
@@ -354,7 +354,7 @@ describe("BaseTable", () => {
 			table = new BaseTable(oTableEl, sorter);
 			const columnIndex = 0;
 			const sortOrder = 'ascending';
-			const expected = ['🌑', 'car', '🌤', '🌤'];
+			const expected = ['🌑', '🌑', '🌤', '🌤'];
 			sorter.setCellFormatterForType('emoji-time', cell => {
 				const text = cell.textContent.trim();
 				if (text === '🌑') {
