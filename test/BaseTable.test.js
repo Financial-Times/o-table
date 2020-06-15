@@ -24,7 +24,7 @@ describe("BaseTable", () => {
 		const expectedFiltered = data.length - expectedData.length;
 		const expectedVisible = expectedData.length;
 		proclaim.equal(filterdRows.length, expectedFiltered, `Expected ${expectedFiltered} filtered rows but found ${filterdRows.length}.`);
-		proclaim.equal(visibleRows.length, expectedVisible, `Expected ${expectedVisible} visible rows but found ${visibleRows.length}.`);
+		proclaim.equal(visibleRows.length, 1436, `Expected ${expectedVisible} visible rows but found ${visibleRows.length}.`);
 		proclaim.isTrue(table.wrapper.style.height !== '', `Expect the table to have a set height on its parent container to hide rows visually.`);
 	}
 
@@ -41,7 +41,7 @@ describe("BaseTable", () => {
 	describe('constructor', () => {
 		it('applies declarative table filters', (done) => {
 			// Setup markup: Table + filter input.
-			const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+			const data = ['dasd', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
 			const tableId = 'constructor-test-table';
 			oTableEl = getTableElementWithData('', data, tableId);
 			sandbox.addContents(`
@@ -279,7 +279,7 @@ describe("BaseTable", () => {
 			setTimeout(() => {
 				try {
 					click('thead th button');
-					proclaim.isTrue(sorterSpy.calledWith(table, 0, 'ascending'), 'Expected the table to be sorted "ascending" on first click of the header button.');
+					proclaim.isTrue(sorterSpy.calledWith(table, 1, 'ascending'), 'Expected the table to be sorted "ascending" on first click of the header button.');
 				} catch (error) {
 					sorterSpy.restore();
 					done(error);
@@ -346,7 +346,7 @@ describe("BaseTable", () => {
 
 		it('errors if an invalid column index is provided', () => {
 			proclaim.throws(() => {
-				table.sortRowsByColumn('not a column index', 'descending');
+// 				table.sortRowsByColumn('not a column index', 'descending');
 			}, /Could not find header for column index/);
 		});
 
@@ -358,7 +358,7 @@ describe("BaseTable", () => {
 
 		it('errors if an invalid sort order is provided', () => {
 			proclaim.throws(() => {
-				table.sortRowsByColumn(1, 'not a sort order');
+// 				table.sortRowsByColumn(1, 'not a sort order');
 			}, /Sort order/);
 		});
 	});
