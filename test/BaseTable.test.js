@@ -346,7 +346,7 @@ describe("BaseTable", () => {
 
 		it('errors if an invalid column index is provided', () => {
 			proclaim.throws(() => {
-// 				table.sortRowsByColumn('not a column index', 'descending');
+ 				table.sortRowsByColumn('not a column index', 'descending');
 			}, /Could not find header for column index/);
 		});
 
@@ -358,7 +358,7 @@ describe("BaseTable", () => {
 
 		it('errors if an invalid sort order is provided', () => {
 			proclaim.throws(() => {
-// 				table.sortRowsByColumn(1, 'not a sort order');
+ 				table.sortRowsByColumn(1, 'not a sort order');
 			}, /Sort order/);
 		});
 	});
