@@ -301,9 +301,15 @@ describe("BaseTable", () => {
 
 		it('buttons toggle column sort by preferred sort order with header button click (descending first)', done => {
 			// Set preferred sort order on first column.
+			sandbox.init();
+			sandbox.setContents(fixtures.shortTableWithContainer);
+			oTableEl = document.querySelector('[data-o-component=o-table]');
 			oTableEl.setAttribute('data-o-table-preferred-sort-order', 'descending');
-			const sorterSpy = sinon.spy(sorter, "sortRowsByColumn");
+			table = new BaseTable(oTableEl, sorter);
+			// Add sort buttons
 			table.addSortButtons();
+			// Test sort order on click
+			const sorterSpy = sinon.spy(sorter, "sortRowsByColumn");
 			setTimeout(() => {
 				try {
 					click('thead th button');
