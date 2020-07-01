@@ -90,7 +90,7 @@ The table's footer `tfoot` element may use the helper class `o-table-footnote` t
 
 ### Sort Order
 
-When a sortable table column is clicked an ascending sort is applied by default. If clicked again the sort order is toggled to a descending sort. Inverse this, so a descending sort is applied on the first click, set the preferred sort order attribute `data-o-table-preferred-sort-order="descending"`.
+When a sortable table column is clicked an ascending sort is applied by default. If clicked again the sort order is toggled to a descending sort. Set the preferred sort order attribute `data-o-table-preferred-sort-order="descending"` to inverse this, so a descending sort is applied on the first click.
 
 ```html
 <table class="o-table" data-o-component="o-table" data-o-table-preferred-sort-order="descending">
