@@ -88,6 +88,15 @@ The table's footer `tfoot` element may use the helper class `o-table-footnote` t
 </table>
 ```
 
+### Sort Order
+
+When a sortable table column is clicked an ascending sort is applied by default. If clicked again the sort order is toggled to a descending sort. Inverse this, so a descending sort is applied on the first click, set the preferred sort order attribute `data-o-table-preferred-sort-order="descending"`.
+
+```html
+<table class="o-table" data-o-component="o-table" data-o-table-preferred-sort-order="descending">
+</table>
+```
+
 ### Disable sort
 
 Table columns are sortable by default but may be disabled by adding `data-o-table-sortable="false"` to the table.
@@ -237,6 +246,7 @@ const OTable = require('o-table');
 OTable.init(document.body, {
 	sortable: true,
 	expanded: true,
+	preferredSortOrder: 'ascending',
 	minimumRowCount: 10,
 });
 ```
