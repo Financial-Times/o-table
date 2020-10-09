@@ -1,5 +1,6 @@
 $o-table-is-silent: false;
-@import "./../../main";
+$system-code: origami-demos;
+@import "o-table/main";
 
 html {
 	background: oColorsByUsecase('page', 'background');

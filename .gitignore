@@ -7,4 +7,6 @@ demos/local/
 node_modules/
 .editorconfig
 .DS_Store
-package-lock.json
+.cache/
+.parcel-cache/
+dist/

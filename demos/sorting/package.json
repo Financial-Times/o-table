@@ -1,0 +1,24 @@
+{
+	"name": "sorting",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "parcel index.html"
+	},
+	"dependencies": {
+		"@financial-times/o-buttons": "^6.0.0",
+		"@financial-times/o-fonts": "^4.0.0",
+		"@financial-times/o-forms": "^8.0.0",
+		"@financial-times/o-normalise": "^2.0.0",
+		"@financial-times/o-table": "file:../..",
+		"@financial-times/o-typography": "^6.0.0",
+		"@financial-times/o-visual-effects": "^3.0.0"
+	},
+	"keywords": [],
+	"author": "chee <chee@snoot.club>",
+	"license": "ISC",
+	"devDependencies": {
+		"sass": "^1.27.0"
+	}
+}
