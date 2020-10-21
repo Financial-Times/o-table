@@ -3,7 +3,7 @@
         "keywords": ["table", "data", "columns", "rows", "filter", "sort" ],
 	"origamiType": "module",
 	"origamiCategory": "components",
-	"origamiVersion": 1,
+	"origamiVersion": 2,
 	"brands" : [
 		"master",
 		"internal",
