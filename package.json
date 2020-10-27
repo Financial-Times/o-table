@@ -1,5 +1,8 @@
 {
     "name": "@financial-times/o-table",
+    "version": "100.0.0-7",
+    "description": "Provides styling and behvaiour for tables across FT products.",
+    "browser": "main.js",
     "devDependencies": {
         "eslint": "^7.8.1",
         "eslint-config-origami-component": "^2.1.0",
@@ -10,7 +13,6 @@
         "stylelint": "^13.7.0",
         "stylelint-config-origami-component": "^1.0.4"
     },
-    "browser": "main.js",
     "peerDependencies": {
         "@financial-times/o-brand": "^100.0.0-7",
         "@financial-times/o-buttons": "^100.0.0-7",
@@ -22,9 +24,7 @@
         "@financial-times/o-visual-effects": "^100.0.0-7",
         "ftdomdelegate": "^100.0.0-7"
     },
-    "description": "Provides styling and behvaiour for tables across FT products.",
     "publishConfig": {
         "registry": "http://localhost:4873"
-    },
-    "version": "100.0.0-7"
+    }
 }
