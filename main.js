@@ -1,3 +1,4 @@
+// @ts-check
 import oTable from './src/js/oTable.js';
 
 const constructAll = function() {

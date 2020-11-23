@@ -1,3 +1,4 @@
+// @ts-check
 import Delegate from 'ftdomdelegate';
 
 /**
@@ -22,7 +23,7 @@ function append(tbody, rowBatch) {
  * @access private
  * @param {Element} tbody - The table body to prepend the row batch to.
  * @param {Array} rowBatch - An array of rows to prepend to the table body.
- * @returns {undefined}
+ * @returns {void}
  */
 function prepend(tbody, rowBatch) {
 	if (tbody.prepend) {

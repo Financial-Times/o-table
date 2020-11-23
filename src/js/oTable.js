@@ -1,3 +1,4 @@
+// @ts-check
 import FlatTable from './Tables/FlatTable.js';
 import ScrollTable from './Tables/ScrollTable.js';
 import OverflowTable from './Tables/OverflowTable.js';

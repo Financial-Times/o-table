@@ -1,20 +1,20 @@
+// @ts-check
 /**
  * Extracts the contents of img alt text.
  * @example String argument for example purposes only, to represent a HTMLElement.
  * 	extractAltFromImages('<img alt="text">'); // text
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
  * @access private
- * @returns {HTMLElement} the parameter
+ * @returns {String[]} An array containing the alternative text for every img tag within the provided `cell`.
  */
 function extractAltFromImages(cell){
 	const images = Array.from(cell.getElementsByTagName('img'));
-	images.forEach(image => {
+	const alts = images.map(image => {
 		const contents = image.getAttribute('alt');
-		image.insertAdjacentHTML('beforebegin', contents);
-		image.remove();
+		return contents;
 	});
 
-	return cell;
+	return alts;
 }
 
 /**
@@ -28,14 +28,14 @@ function extractAltFromImages(cell){
  * 	extractText('<time class="o-date" data-o-component="o-date" datetime="2020-06-19T07:56:18Z">2 hours ago</time>'); //Correct
  * @param {HTMLElement} cell The DOM node to operate on, possibly a <td>
  * @access private
- * @returns {HTMLElement} text representation of the HTML node
+ * @returns {String} text representation of the HTML node
  */
 function extractText(cell){
 	const time = cell.querySelector('time');
 	if (time && time.dateTime) {
 		const date = new Date(time.dateTime);
 		if (!isNaN(date.getTime())){
-			return date.getTime() + '';
+			return String(date.getTime());
 		}
 	}
 	let text = cell.textContent.trim();
@@ -122,7 +122,7 @@ function extractDigitsIfFound(text) {
  *  removeRange('No numbers') //No numbers
  * @param {String} text The string to operate on
  * @access private
- * @returns {Number}
+ * @returns {Number|String} The number parsed from the given text or the original text if it does not contain a number at the start of it.
  */
 function extractNumberFromRange(text) {
 	const number = parseFloat(text);
@@ -146,7 +146,7 @@ function extractNumberFromRange(text) {
  *  ftDateTimeToNumber('Not a known date') //Note a known date
  * @param {String} text The string to operate on
  * @access private
- * @returns {Number} Number representation of date and/or time for sorting.
+ * @returns {Number|String} Number representation of date and/or time for sorting or the original text.
  */
 function ftDateTimeToNumber(text) {
 	const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -194,15 +194,15 @@ function ftDateTimeToNumber(text) {
 }
 
 /**
- * Removes and number of asterisk's which are at the end of the line.
+ * Removes any number of asterisk's which are at the end of the line.
  * @example
- *  removeRefereneAsterisk('Durian*') //Durian
- *  removeRefereneAsterisk('1,439,165.43**') //1,439,165.43
+ *  removeReferenceAsterisk('Durian*') //Durian
+ *  removeReferenceAsterisk('1,439,165.43**') //1,439,165.43
  * @param {String} text The string to operate on
  * @access private
  * @returns {String} Text without source/reference asterisk.
  */
-function removeRefereneAsterisk(text) {
+function removeReferenceAsterisk(text) {
 	return text.replace(/\*+$/, '');
 }
 
@@ -230,9 +230,15 @@ function removeEmptyCellIndicators(text) {
  * @returns {String} The node content to sort on.
  */
 function extractNodeContent(cell) {
-	const steps = [extractAltFromImages, extractText, removeRefereneAsterisk, removeEmptyCellIndicators];
-	let text = cell;
+	const steps = [extractAltFromImages, extractText, removeReferenceAsterisk, removeEmptyCellIndicators];
+	let text;
 	steps.forEach(step => { text = step(text); });
+	if (cell.querySelector('img')) {
+		text = extractAltFromImages(cell);
+	} else {
+		text = removeEmptyCellIndicators(removeReferenceAsterisk(extractText(cell)));
+	}
+
 	return typeof text === 'string' ? text : '';
 }
 
@@ -290,24 +296,27 @@ class CellFormatter {
 	 *  	return 0;
 	 *  });
 	 * @access public
+	 * @returns {void}
 	 */
 	setFormatter(type, formatFunction) {
 		this.filters[type] = [formatFunction];
 	}
 
 	/**
-	 * @param {HTMLElement} cell
-	 * @param {String} type The data type of the cell, e.g. date, number, currency. Custom types are supported.
+	 * @param {Object} o The parameter object
+	 * @param {HTMLElement} o.cell The table cell to format
+	 * @param {String} o.type The data type of the cell, e.g. date, number, currency. Custom types are supported.
 	 * @see {@link setFormatter} to support add support for a custom type.
 	 * @access public
 	 * @return {String|Number} A representation of cell which can be used for sorting.
 	 */
 	formatCell({ cell, type = 'text' }) {
 		type = type || 'text';
-		let sortValue = cell.getAttribute('data-o-table-sort-value');
-		if (sortValue === null) {
+		let sortValue;
+		sortValue = cell.getAttribute('data-o-table-sort-value');
+		if (sortValue === null || sortValue === '') {
 			if (this.filters[type]) {
-				const cellClone = cell.cloneNode({ deep: true });
+				const cellClone = cell.cloneNode(true);
 				sortValue = cellClone;
 				this.filters[type].forEach(fn => { sortValue = fn(sortValue); });
 			}

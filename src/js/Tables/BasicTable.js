@@ -1,3 +1,4 @@
+// @ts-check
 import BaseTable from './BaseTable.js';
 
 class BasicTable extends BaseTable {

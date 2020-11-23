@@ -1,3 +1,4 @@
+// @ts-check
 import CellFormatter from "./CellFormatter.js";
 
 /**
