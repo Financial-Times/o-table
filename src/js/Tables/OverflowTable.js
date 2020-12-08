@@ -1,4 +1,3 @@
-// @ts-check
 import BaseTable from './BaseTable.js';
 
 class OverflowTable extends BaseTable {
