@@ -1,4 +1,3 @@
-// @ts-check
 import BaseTable from './BaseTable.js';
 
 class FlatTable extends BaseTable {
