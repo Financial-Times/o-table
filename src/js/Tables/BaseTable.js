@@ -469,8 +469,16 @@ class BaseTable {
 			sortButton.classList.add('o-table__sort');
 			// In VoiceOver, button `aria-label` is repeated when moving from one column of tds to the next.
 			// Using `title` avoids this, but risks not being announced by other screen readers.
+			// So, we use aria-describedby.
 			const nextSort = this._getNextSortOrder(th);
-			sortButton.setAttribute('title', `sort table by "${th.textContent}" ${nextSort}`);
+			const sortDescription = `sort table by "${th.textContent}" ${nextSort}`
+			const sortDescriptionElement = document.createElement("div")
+			sortDescriptionElement.style.display = 'none';
+			sortDescriptionElement.id = `sort-${Math.random().toString(36).slice(2)}`
+			sortDescriptionElement.textContent = sortDescription;
+			th.append(sortDescriptionElement);
+
+			sortButton.setAttribute("aria-describedby", sortDescriptionId);
 			return sortButton;
 		});
 
