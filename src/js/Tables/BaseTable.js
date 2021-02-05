@@ -477,8 +477,7 @@ class BaseTable {
 			sortDescriptionElement.id = `sort-${Math.random().toString(36).slice(2)}`
 			sortDescriptionElement.textContent = sortDescription;
 			th.append(sortDescriptionElement);
-
-			sortButton.setAttribute("aria-describedby", sortDescriptionId);
+			sortButton.setAttribute("aria-describedby", sortDescriptionElement.id);
 			return sortButton;
 		});
 
