@@ -195,9 +195,12 @@ describe("BaseTable", () => {
 				try {
 					const thead = oTableEl.querySelector('thead');
 					const sortButtons = thead.querySelectorAll('button');
+					const descriptions = thead.querySelectorAll('.o-table__sort-description');
 					proclaim.equal(sortButtons.length, 5, 'Expected 5 buttons, 1 within each of the 5 column headers.');
-					sortButtons.forEach(button => {
-						proclaim.include(button.getAttribute('title'), 'sort', 'Expected each header sort button to have a "title" which indicates sort. "title" is currently used over "aria-label" as "aria-label" is read in VoiceOver when moving across columns of the body.');
+					proclaim.equal(descriptions.length, 5, 'Expected 5 descriptions, 1 within each of the 5 column headers.');
+					sortButtons.forEach((button, index) => {
+						proclaim.equal(button.getAttribute('aria-describedby'), descriptions[index].id, 'Expected each header sort button to have an aria-describedby, pointing at the id of the correct description. See here: https://github.com/Financial-Times/o-table/issues/188');
+						proclaim.notEqual(descriptions[index].textContent, '', 'Expected each description to have content');
 						proclaim.notEqual(button.textContent, '', 'Expected each header sort button to have content.');
 					});
 				} catch (error) {
@@ -279,7 +282,8 @@ describe("BaseTable", () => {
 			const buttonQuery = 'thead th button';
 			setTimeout(() => {
 				const button = oTableEl.querySelector(buttonQuery);
-				proclaim.include(button.getAttribute('title'), 'ascending', 'Expected the sort button to describe the next sort "ascending".');
+				const descriptionElement = document.getElementById(button.getAttribute('aria-describedby'));
+				proclaim.include(descriptionElement.textContent, 'ascending', 'Expected the sort button to describe the next sort "ascending".');
 				try {
 					click(buttonQuery);
 					proclaim.isTrue(sorterSpy.calledWith(table, 0, 'ascending'), 'Expected the table to be sorted "ascending" on first click of the header button.');
@@ -288,7 +292,7 @@ describe("BaseTable", () => {
 					done(error);
 				}
 				setTimeout(() => {
-					proclaim.include(button.getAttribute('title'), 'descending', 'Expected the sort button to describe the next sort "descending".');
+					proclaim.include(descriptionElement.textContent, 'descending', 'Expected the sort button to describe the next sort "descending".');
 					try {
 						click(buttonQuery);
 						proclaim.isTrue(sorterSpy.calledWith(table, 0, 'descending'), 'Expected the table to be sorted "descending" on second click of the header button.');
