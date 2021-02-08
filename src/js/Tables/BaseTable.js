@@ -471,10 +471,10 @@ class BaseTable {
 			// Using `title` avoids this, but risks not being announced by other screen readers.
 			// So, we use aria-describedby.
 			const nextSort = this._getNextSortOrder(th);
-			const sortDescription = `sort table by "${th.textContent}" ${nextSort}`
-			const sortDescriptionElement = document.createElement("div")
+			const sortDescription = `sort table by "${th.textContent}" ${nextSort}`;
+			const sortDescriptionElement = document.createElement("div");
 			sortDescriptionElement.style.display = 'none';
-			sortDescriptionElement.id = `sort-${Math.random().toString(36).slice(2)}`
+			sortDescriptionElement.id = `sort-${Math.random().toString(36).slice(2)}`;
 			sortDescriptionElement.textContent = sortDescription;
 			th.append(sortDescriptionElement);
 			sortButton.setAttribute("aria-describedby", sortDescriptionElement.id);
