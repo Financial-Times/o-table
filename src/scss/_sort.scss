@@ -35,6 +35,10 @@
 		}
 	}
 
+	.o-table__sort-text {
+		@include oNormaliseVisuallyHidden();
+	}
+
 	// Show descending icon in sort button with DSC sort applied,
 	// or on hover if no sort has been applied and a descending sort
 	// is the preferred sort.
