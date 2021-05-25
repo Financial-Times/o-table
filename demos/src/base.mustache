@@ -5,18 +5,37 @@
 		<label class="o-forms-field o-forms-field--inline o--if-js o-forms-field--demo">
 			<span class="o-forms-title o-forms-title--vertical-center o-forms-title--shrink">
 				<span class="o-forms-title__main">
-					Showing data for:
+					Filter based on characteristic:
 				</span>
 			</span>
 
 			<span class="o-forms-input o-forms-input--select o-forms-input--invalid">
-				<select data-o-table-filter-id="{{tableId}}" data-o-table-filter-column="2" id="demo-filter-select" class="o-forms__select">
+				<select data-o-table-filter-id="{{tableId}}" data-o-table-filter-column="2" id="demo-filter-characteristic" class="o-forms__select">
 					<option value="">All</option>
 					<option value="Juicy">Juicy</option>
 					<option value="Smelly">Smelly</option>
 					<option value="Chewy">Chewy</option>
 					<option value="Sweet">Sweet</option>
 					<option value="Crunchy">Crunchy</option>
+				</select>
+			</span>
+		</label>
+
+		<label class="o-forms-field o-forms-field--inline o--if-js o-forms-field--demo">
+			<span class="o-forms-title o-forms-title--vertical-center o-forms-title--shrink">
+				<span class="o-forms-title__main">
+					Filter based on genus:
+				</span>
+			</span>
+
+			<span class="o-forms-input o-forms-input--select o-forms-input--invalid">
+				<select data-o-table-filter-id="{{tableId}}" data-o-table-filter-column="1" id="demo-filter-genus" class="o-forms__select">
+					<option value="">All</option>
+					<option value="Fragaria">Fragaria</option>
+					<option value="Stenocereus">Stenocereus</option>
+					<option value="Malus">Malus</option>
+					<option value="Manilkara">Manilkara</option>
+					<option value="Durio">Durio</option>
 				</select>
 			</span>
 		</label>

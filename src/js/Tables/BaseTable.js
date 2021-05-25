@@ -95,8 +95,8 @@ class BaseTable {
 			return;
 		}
 		// Do nothing if no filter is found for this table.
-		const filter = window.document.querySelector(`[data-o-table-filter-id="${tableId}"]`);
-		if (!filter) {
+		const filters = window.document.querySelectorAll(`[data-o-table-filter-id="${tableId}"]`);
+		if (!filters) {
 			return;
 		}
 		// Do not setup filter if markup is missing.
@@ -104,31 +104,41 @@ class BaseTable {
 			console.warn(`Could not setup the filter for the table "${tableId}" as markup is missing. A filterable table must be within a div with class "o-table-container".`);
 			return;
 		}
-		// Warn if a misconfigured filter was found.
-		const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
-		if (isNaN(filterColumn)) {
-			console.warn(`Could not setup the filter for the table "${tableId}" as no column index was given to filter on. Add a \`data-o-table-filter-column="{columnIndex}"\` attribute to the filter.`, filter);
-			return;
+
+		for (const filter of Array.from(filters)) {
+
+			// Warn if a misconfigured filter was found.
+			const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+			if (isNaN(filterColumn)) {
+				console.warn(`Could not setup the filter for the table "${tableId}" as no column index was given to filter on. Add a \`data-o-table-filter-column="{columnIndex}"\` attribute to the filter.`, filter);
+				return;
+			}
+			// Add a listener to filter the table.
+			let pendingFilterTimeout;
+			const debouncedFilterHandler = (event) => {
+				if (pendingFilterTimeout) {
+					clearTimeout(pendingFilterTimeout);
+				}
+				pendingFilterTimeout = setTimeout(() => {
+					const f = Array.from(filters, filter => {
+						const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+						return [filterColumn, event.target.value || ''];
+					});
+					this.filter(f);
+					pendingFilterTimeout = null;
+				}, 33);
+			};
+			filter.addEventListener('input', debouncedFilterHandler);
+			filter.addEventListener('change', debouncedFilterHandler);
+			this._listeners.push({ element: filter, debouncedFilterHandler, type: 'input' });
+			this._listeners.push({ element: filter, debouncedFilterHandler, type: 'change' });
 		}
 		// Apply the filter .
-		if (filter.value) {
-			this.filter(filterColumn, filter.value);
-		}
-		// Add a listener to filter the table.
-		let pendingFilterTimeout;
-		const debouncedFilterHandler = function(event) {
-			if (pendingFilterTimeout) {
-				clearTimeout(pendingFilterTimeout);
-			}
-			pendingFilterTimeout = setTimeout(function () {
-				this.filter(filterColumn, event.target.value || '');
-				pendingFilterTimeout = null;
-			}.bind(this), 33);
-		}.bind(this);
-		filter.addEventListener('input', debouncedFilterHandler);
-		filter.addEventListener('change', debouncedFilterHandler);
-		this._listeners.push({ element: filter, debouncedFilterHandler, type: 'input' });
-		this._listeners.push({ element: filter, debouncedFilterHandler, type: 'change' });
+		const f = Array.from(filters, filter => {
+			const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+			return [filterColumn, filter.value];
+		});
+		this.filter(f);
 	}
 
 	/**
@@ -288,8 +298,8 @@ class BaseTable {
 		if (this._updateRowOrderScheduled) {
 			window.cancelAnimationFrame(this._updateRowOrderScheduled);
 		}
-		if (this._updateRowOrderFilrtedBatchScheduled) {
-			window.cancelAnimationFrame(this._updateRowOrderFilrtedBatchScheduled);
+		if (this._updateRowOrderFilteredBatchScheduled) {
+			window.cancelAnimationFrame(this._updateRowOrderFilteredBatchScheduled);
 		}
 
 		if (!this._currentSort && !this._currentFilter) {
@@ -300,7 +310,7 @@ class BaseTable {
 		this._updateRowOrderScheduled = window.requestAnimationFrame(function () {
 			// Move all non-filtered rows to the top, with current sort order.
 			prepend(this.tbody, nonFilteredRows);
-			this._updateRowOrderFilrtedBatchScheduled = window.requestAnimationFrame(function () {
+			this._updateRowOrderFilteredBatchScheduled = window.requestAnimationFrame(function () {
 				// Move all filtered rows to the bottom, with current sort order.
 				append(this.tbody, this._filteredTableRows);
 			}.bind(this));
@@ -315,9 +325,11 @@ class BaseTable {
 	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
 	 * @returns {undefined}
 	 */
-	filter(headerIndex, filter) {
-		this._filterRowsByColumn(headerIndex, filter);
-		this.renderRowUpdates();
+	filter(filters) {
+		for (const [headerIndex, filter] of filters) {
+			this._filterRowsByColumn(headerIndex, filter);
+			this.renderRowUpdates();
+		}
 	}
 
 	/**
