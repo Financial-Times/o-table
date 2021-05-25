@@ -39,33 +39,64 @@ describe("BaseTable", () => {
 	});
 
 	describe('constructor', () => {
-		it('applies declarative table filters', (done) => {
-			// Setup markup: Table + filter input.
-			const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
-			const tableId = 'constructor-test-table';
-			oTableEl = getTableElementWithData('', data, tableId);
-			sandbox.addContents(`
-				<select
-					id="filter-input"
-					data-o-table-filter-id="${tableId}"
-					data-o-table-filter-column="0"
-				>
-					<option value="">All</option>
-					<!-- "selected" indicates the default filter -->
-					<option value="Naseberry" selected>Naseberry</option>
-				</select>
-			`);
-			// Init table.
-			table = new BaseTable(oTableEl, sorter);
-			// Confirm default filter (set declaratively).
-			setTimeout(() => {
-				try {
-					assertFilter(data, ['Naseberry']);
-					done();
-				} catch(error) {
-					done(error);
-				}
-			}, 1000); // wait for window.requestAnimationFrame
+		context('single declarative table filter', () => {
+			it('applies filter option via already existing `selected` attribute', (done) => {
+				// Setup markup: Table + filter input.
+				const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+				const tableId = 'constructor-test-table';
+				oTableEl = getTableElementWithData('', data, tableId);
+				sandbox.addContents(`
+					<select
+						id="filter-input"
+						data-o-table-filter-id="${tableId}"
+						data-o-table-filter-column="0"
+					>
+						<option value="">All</option>
+						<!-- "selected" indicates the default filter -->
+						<option value="Naseberry" selected>Naseberry</option>
+					</select>
+				`);
+				// Init table.
+				table = new BaseTable(oTableEl, sorter);
+				// Confirm default filter (set declaratively).
+				setTimeout(() => {
+					try {
+						assertFilter(data, ['Naseberry']);
+						done();
+					} catch(error) {
+						done(error);
+					}
+				}, 1000); // wait for window.requestAnimationFrame
+			});
+
+			it('applies filter based on user interaction', (done) => {
+				// Setup markup: Table + filter input.
+				const data = ['Dragonfruit', 'Durian', 'Naseberry', 'Strawberry', 'Apple'];
+				const tableId = 'constructor-test-table';
+				oTableEl = getTableElementWithData('', data, tableId);
+				sandbox.addContents(`
+					<select
+						id="filter-input"
+						data-o-table-filter-id="${tableId}"
+						data-o-table-filter-column="0"
+					>
+						<option value="">All</option>
+						<option value="Naseberry">Naseberry</option>
+					</select>
+				`);
+				// Init table.
+				table = new BaseTable(oTableEl, sorter);
+				const select = document.getElementById('filter-input');
+				select.options[1].setAttribute('selected', 'selected');
+				setTimeout(() => {
+					try {
+						assertFilter(data, ['Naseberry']);
+						done();
+					} catch(error) {
+						done(error);
+					}
+				}, 1000); // wait for window.requestAnimationFrame
+			});
 		});
 	});
 
