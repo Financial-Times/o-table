@@ -119,15 +119,15 @@ class BaseTable {
 			}
 			// Add a listener to filter the table.
 			let pendingFilterTimeout;
-			const debouncedFilterHandler = function(event) {
+			const debouncedFilterHandler = (event) => {
 				if (pendingFilterTimeout) {
 					clearTimeout(pendingFilterTimeout);
 				}
-				pendingFilterTimeout = setTimeout(function () {
+				pendingFilterTimeout = setTimeout(() => {
 					this.filter(filterColumn, event.target.value || '');
 					pendingFilterTimeout = null;
-				}.bind(this), 33);
-			}.bind(this);
+				}, 33);
+			};
 			filter.addEventListener('input', debouncedFilterHandler);
 			filter.addEventListener('change', debouncedFilterHandler);
 			this._listeners.push({ element: filter, debouncedFilterHandler, type: 'input' });
