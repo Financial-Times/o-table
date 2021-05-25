@@ -113,10 +113,6 @@ class BaseTable {
 				console.warn(`Could not setup the filter for the table "${tableId}" as no column index was given to filter on. Add a \`data-o-table-filter-column="{columnIndex}"\` attribute to the filter.`, filter);
 				return;
 			}
-			// Apply the filter .
-			if (filter.value) {
-				this.filter(filterColumn, filter.value);
-			}
 			// Add a listener to filter the table.
 			let pendingFilterTimeout;
 			const debouncedFilterHandler = (event) => {
@@ -124,7 +120,11 @@ class BaseTable {
 					clearTimeout(pendingFilterTimeout);
 				}
 				pendingFilterTimeout = setTimeout(() => {
-					this.filter(filterColumn, event.target.value || '');
+					const f = Array.from(filters, filter => {
+						const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+						return [filterColumn, event.target.value || ''];
+					});
+					this.filter(f);
 					pendingFilterTimeout = null;
 				}, 33);
 			};
@@ -133,6 +133,12 @@ class BaseTable {
 			this._listeners.push({ element: filter, debouncedFilterHandler, type: 'input' });
 			this._listeners.push({ element: filter, debouncedFilterHandler, type: 'change' });
 		}
+		// Apply the filter .
+		const f = Array.from(filters, filter => {
+			const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
+			return [filterColumn, filter.value];
+		});
+		this.filter(f);
 	}
 
 	/**
@@ -323,9 +329,11 @@ class BaseTable {
 	 * @param {String|Function} filter - How to filter the column (either a string to match or a callback function).
 	 * @returns {undefined}
 	 */
-	filter(headerIndex, filter) {
-		this._filterRowsByColumn(headerIndex, filter);
-		this.renderRowUpdates();
+	filter(filters) {
+		for (const [headerIndex, filter] of filters) {
+			this._filterRowsByColumn(headerIndex, filter);
+			this.renderRowUpdates();
+		}
 	}
 
 	/**
