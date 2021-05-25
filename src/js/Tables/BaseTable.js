@@ -296,8 +296,8 @@ class BaseTable {
 		if (this._updateRowOrderScheduled) {
 			window.cancelAnimationFrame(this._updateRowOrderScheduled);
 		}
-		if (this._updateRowOrderFilrtedBatchScheduled) {
-			window.cancelAnimationFrame(this._updateRowOrderFilrtedBatchScheduled);
+		if (this._updateRowOrderFilteredBatchScheduled) {
+			window.cancelAnimationFrame(this._updateRowOrderFilteredBatchScheduled);
 		}
 
 		if (!this._currentSort && !this._currentFilter) {
@@ -308,7 +308,7 @@ class BaseTable {
 		this._updateRowOrderScheduled = window.requestAnimationFrame(function () {
 			// Move all non-filtered rows to the top, with current sort order.
 			prepend(this.tbody, nonFilteredRows);
-			this._updateRowOrderFilrtedBatchScheduled = window.requestAnimationFrame(function () {
+			this._updateRowOrderFilteredBatchScheduled = window.requestAnimationFrame(function () {
 				// Move all filtered rows to the bottom, with current sort order.
 				append(this.tbody, this._filteredTableRows);
 			}.bind(this));
