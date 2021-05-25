@@ -186,6 +186,50 @@ describe("BaseTable", () => {
 					}
 				}, 1000); // wait for window.requestAnimationFrame
 			});
+
+			it('shows no rows if filter combination matches no rows', (done) => {
+				sandbox.init();
+				sandbox.setContents(fixtures.tableWithContainerAndComplexHeadings);
+				const genus = ['Stenocereus', 'Durio'];
+				const characteristic = ['Juicy', 'Smelly'];
+				oTableEl = document.querySelector('[data-o-component=o-table]');
+				sandbox.addContents(`
+					<select
+						id="genus-filter-input"
+						data-o-table-filter-id="table-id"
+						data-o-table-filter-column="1"
+					>
+						<option value="">All</option>
+						<option value="Stenocereus">Stenocereus</option>
+						<option value="Durio">Durio</option>
+					</select>
+
+					<select
+						id="characteristic-filter-input"
+						data-o-table-filter-id="table-id"
+						data-o-table-filter-column="2"
+					>
+						<option value="">All</option>
+						<option value="Juicy">Juicy</option>
+						<option value="Smelly">Smelly</option>
+					</select>
+				`);
+				// Init table.
+				table = new BaseTable(oTableEl, sorter);
+				const genusSelect = document.getElementById('genus-filter-input');
+				genusSelect.options[1].setAttribute('selected', 'selected');
+				const characteristicSelect = document.getElementById('characteristic-filter-input');
+				characteristicSelect.options[2].setAttribute('selected', 'selected');
+				setTimeout(() => {
+					try {
+						assertFilter(genus, []);
+						assertFilter(characteristic, []);
+						done();
+					} catch(error) {
+						done(error);
+					}
+				}, 1000); // wait for window.requestAnimationFrame
+			});
 		});
 	});
 
