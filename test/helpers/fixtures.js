@@ -256,7 +256,7 @@ const tableWithContainerAndComplexHeadings = `
 <div class="o-table-container">
 	<div class="o-table-overlay-wrapper">
 		<div class="o-table-scroll-wrapper">
-			<table class="o-table" data-o-component="o-table">
+			<table class="o-table" data-o-component="o-table" id="table-id">
 				<thead>
 					<tr>
 						<th scope="col" role="columnheader"><abbr title="Fruit">F</abbr></th>
