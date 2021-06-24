@@ -465,9 +465,20 @@ class BaseTable {
 			sortButton.classList.add('o-table__sort');
 			// In VoiceOver, button `aria-label` is repeated when moving from one column of tds to the next.
 			// Using `title` avoids this, but risks not being announced by other screen readers.
+			// So, we use aria-describedby.
 			const nextSort = this._getNextSortOrder(th);
-			sortButton.setAttribute('title', `sort table by "${th.textContent}" ${nextSort}`);
-			return sortButton;
+			const sortDescription = `sort table by "${th.textContent}" ${nextSort}`;
+			const sortDescriptionElement = document.createElement("div");
+			sortDescriptionElement.style.display = 'none';
+			sortDescriptionElement.id = `sort-${Math.random().toString(36).slice(2)}`;
+			sortDescriptionElement.textContent = sortDescription;
+			sortDescriptionElement.className = 'o-table__sort-description';
+
+			sortButton.setAttribute('aria-describedby', sortDescriptionElement.id);
+			const container = document.createElement('div');
+			container.append(sortDescriptionElement);
+			container.append(sortButton);
+			return container;
 		});
 
 		// Add sort buttons to table headers.
@@ -496,6 +507,7 @@ class BaseTable {
 	 * @param {String|Null} sortDetails.sortOrder - The type of sort, "ascending" or "descending"
 	 */
 	sorted({ columnIndex, sortOrder }) {
+
 		if (isNaN(columnIndex)) {
 			throw new Error(`Expected a numerical column index but received "${columnIndex}".`);
 		}
@@ -507,15 +519,16 @@ class BaseTable {
 			columnIndex
 		};
 
-		// Update the button title to reflect the new sort.
+		// Update the button's description to indicate the next sort
 		const th = this.getTableHeader(columnIndex);
-		const sortButton = th.querySelector('button');
-		if (sortButton) {
-			let buttonTitle = sortButton.getAttribute('title');
-			buttonTitle = sortOrder === 'ascending' ?
-				buttonTitle.replace('ascending', 'descending') :
-				buttonTitle.replace('descending', 'ascending');
-			sortButton.setAttribute('title', buttonTitle);
+
+		const descriptionElement = th.querySelector('.o-table__sort-description');
+
+		if (descriptionElement) {
+			descriptionElement.textContent = sortOrder === 'ascending'
+
+				? descriptionElement.textContent.replace('ascending', 'descending')
+				: descriptionElement.textContent.replace('descending', 'ascending');
 		}
 
 		this._dispatchEvent('sorted', this._currentSort);

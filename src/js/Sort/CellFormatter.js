@@ -35,7 +35,7 @@ function extractText(cell){
 	if (time && time.dateTime) {
 		const date = new Date(time.dateTime);
 		if (!isNaN(date.getTime())){
-			return date.getTime() + '';
+			return String(date.getTime());
 		}
 	}
 	let text = cell.textContent.trim();
