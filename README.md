@@ -4,15 +4,17 @@ Styling for tables.
 
 - [Usage](#usage)
 - [Markup](#markup)
-	- [Basic Table](#basic-table)
+	- [Basic table](#basic-table)
+	- [Sort Order](#sort-order)
 	- [Disable sort](#disable-sort)
 	- [Responsive options](#responsive-options)
 	- [Expander](#expander)
-	- [Additional Markup](#additional-markup)
+	- [Additional markup](#additional-markup)
 - [Sass](#sass)
 - [JavaScript](#javascript)
-	- [Sorting](#sorting)
 	- [Filtering](#filtering)
+	- [Sorting](#sorting)
+	- [Dynamic Rows](#dynamic-rows)
 	- [Events](#events)
 - [Troubleshooting](#troubleshooting)
 - [Migration](#migration)
@@ -233,12 +235,12 @@ Alternatively include base styles with only selected optional features. E.g. to 
 To manually instantiate `o-table`:
 
 ``` js
-import OTable from 'o-table';
+import OTable from '@financial-times/o-table';
 OTable.init();
 ```
 or
 ``` js
-import OTable from 'o-table';
+import OTable from '@financial-times/o-table';
 oTable = new OTable(document.body);
 ```
 
@@ -247,7 +249,7 @@ This will return an instance of `BasicTable` (default), `OverflowTable`, `FlatTa
 Instantiation will add column sorting to all tables. It will also add scroll controls and, if configured, an [expander](#expander) to any `OverflowTable`. These can be configured with [data attributes](#disable-sort) or imperatively with an options object:
 
 ``` js
-import OTable from 'o-table';
+import OTable from '@financial-times/o-table';
 OTable.init(document.body, {
 	sortable: true,
 	expanded: true,
@@ -258,9 +260,13 @@ OTable.init(document.body, {
 
 ### Filtering
 
-All `o-table` instances support filtering. Filters may be applied declaratively in HTML or the `filter` method may be called against a table instance.
+All `o-table` instances support filtering on a single column. Filters may be applied declaratively in HTML or by calling the `o-table` JavaScript method `filter`.
+
+The style of form elements used to filter a table are not determined by `o-table`. However we recommend using [o-forms](https://registry.origami.ft.com/components/o-forms) to style form elements used to filter an `o-table`, such as `input` or `select` elements. See the [o-table filter demos](https://registry.origami.ft.com/components/o-table#demo-filter) in the component registry for a demo using `o-forms` styles.
 
 #### Filter (declarative)
+
+Declarative filters are case insensitive and perform partial matches, e.g. a filter of "Kingdom" would reveal "United Kingdom".
 
 To enable declarative table filtering add the `data-o-table-filter-id` and `data-o-table-filter-column` to a form input. Where `data-o-table-filter-id` matches the `id` of the table to filter and `data-o-table-filter-column` is the numerical index of the column to filter (starting at 0).
 
@@ -275,7 +281,7 @@ For example, to filter a table based on a users selected option:
 		<!-- more options  -->
 	</select>
 
-	<!-- the table markup, this may be a resposnive table -->
+	<!-- the table markup, this may be a responsive table -->
 	<div class="o-table-container">
 		<!-- the table element with an id -->
 		<table id="example-table">
@@ -284,7 +290,20 @@ For example, to filter a table based on a users selected option:
 	</div>
 ```
 
-Declarative filters are case insensitive and perform partial matches, e.g. a filter of "Kingdom" would reveal "United Kingdom".
+Or to filter a table based on a users selected option:
+```html
+	<label>Filter the table by country:</label>
+	<!-- the filter input specifies the table id in "data-o-table-filter-id" -->
+	<input type="text" data-o-table-filter-id="example-table" data-o-table-filter-column="0"/>
+
+	<!-- the table markup, this may be a responsive table -->
+	<div class="o-table-container">
+		<!-- the table element with an id -->
+		<table id="example-table">
+			<!-- ... -->
+		</table>
+	</div>
+```
 
 #### Filter (imperative)
 
@@ -407,7 +426,7 @@ The formatter accepts the table cell (HTMLElement) and returns a sort value (Num
 In this case we add support for our custom type `emoji-time` by assigning the emoji a numerical sort value. This will effect all tables instantiated by `OTable`.
 
 ``` js
-import OTable from 'o-table';
+import OTable from '@financial-times/o-table';
 // Set a filter for custom data type "emoji-time".
 // The return value may be a string or number.
 OTable.setSortFormatterForType('emoji-time', (cell) => {
@@ -527,7 +546,8 @@ Known issues:
 
 State | Major Version | Last Minor Release | Migration guide |
 :---: | :---: | :---: | :---:
-✨ active | 8 | N/A | [migrate to v8](MIGRATION.md#migrating-from-v7-to-v8) |
+✨ active | 9 | N/A | [migrate to v9](MIGRATION.md#migrating-from-v8-to-v9) |
+✨ active | 8 | 8.1 | [migrate to v8](MIGRATION.md#migrating-from-v7-to-v8) |
 ⚠ maintained | 7 | 7.4 | [migrate to v7](MIGRATION.md#migrating-from-v6-to-v7) |
 ╳ deprecated | 6 | 6.9 | [migrate to v6](MIGRATION.md#migrating-from-v5-to-v6) |
 ╳ deprecated | 5 | 5.2 | [migrate to v5](MIGRATION.md#migrating-from-v4-to-v5) |
