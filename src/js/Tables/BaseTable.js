@@ -106,7 +106,6 @@ class BaseTable {
 		}
 
 		for (const filter of Array.from(filters)) {
-
 			// Warn if a misconfigured filter was found.
 			const filterColumn = parseInt(filter.getAttribute('data-o-table-filter-column'), 10);
 			if (isNaN(filterColumn)) {
