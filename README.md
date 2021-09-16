@@ -1,5 +1,11 @@
 # o-table
 
+***
+
+**This component has moved to the [Origami Component System](https://github.com/Financial-Times/origami).**
+
+***
+
 Styling for tables.
 
 - [Usage](#usage)
